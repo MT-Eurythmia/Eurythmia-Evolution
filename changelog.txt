@@ -1,5 +1,7 @@
 Changelog:
 
+2012-07-13:  Fixed some missing commas.
+
 2012-07-13: Added a script to aid in the generation of new textures for mods 
 that depend on unifieddyes.  Moved this changelog from the forum into the 
 distribution directory.  Rewrote the README to contain everything from the 

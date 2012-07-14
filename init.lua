@@ -388,13 +388,13 @@ for i = 1, 12 do
 
 	minetest.register_craftitem("unifieddyes:dark_" .. hue .. "_s50", {
 		description = "Dark " .. hue .. " (low saturation)",
-		inventory_image = "unifieddyes_dark_" .. hue .. "_s50.png"
+		inventory_image = "unifieddyes_dark_" .. hue .. "_s50.png",
 		groups = {dye=1},
 	})
 
 	minetest.register_craftitem("unifieddyes:dark_" .. hue, {
 		description = "Dark " .. hue,
-		inventory_image = "unifieddyes_dark_" .. hue .. ".png"
+		inventory_image = "unifieddyes_dark_" .. hue .. ".png",
 		groups = {dye=1},
 	})
 
@@ -406,19 +406,19 @@ for i = 1, 12 do
 
 	minetest.register_craftitem("unifieddyes:medium_" .. hue, {
 		description = "Medium " .. hue,
-		inventory_image = "unifieddyes_medium_" .. hue .. ".png"
+		inventory_image = "unifieddyes_medium_" .. hue .. ".png",
 		groups = {dye=1},
 	})
 
 	minetest.register_craftitem("unifieddyes:" .. hue .. "_s50", {
 		description = "Bright " .. hue .. " (low saturation)",
-		inventory_image = "unifieddyes_" .. hue .. "_s50.png"
+		inventory_image = "unifieddyes_" .. hue .. "_s50.png",
 		groups = {dye=1},
 	})
 
 	minetest.register_craftitem("unifieddyes:" .. hue, {
 		description = "Bright " .. hue,
-		inventory_image = "unifieddyes_" .. hue .. ".png"
+		inventory_image = "unifieddyes_" .. hue .. ".png",
 		groups = {dye=1},
 	})
 
