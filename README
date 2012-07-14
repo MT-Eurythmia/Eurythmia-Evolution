@@ -166,3 +166,27 @@ mod).  All of the output files will be placed in that folder.
 
 Use your favorite image browser or file manager to review the results, and if 
 they're right, copy them over to the textures/ folder in your mod.
+
+
+Example Code
+============
+
+Along with this mod, you should also download my template mod, which is quite 
+easy to transform into whatever mod you want to create that needs this mod.
+
+It's just a skeleton, but all you should need to do to get started is to rename 
+the folder to whatever your mod will be named, tweak a few variables near the 
+start of the template's init.lua, and follow the above instructions regarding 
+the creation of your textures.
+
+If you do it right, you should end up with a very basic mod giving you craft 
+and /give access to your various items.  After that part is confirmed working, 
+just add whatever code you need to the end of the init.lua to define additional 
+functions, items, crafts, and smelting recipes, etc., as needed by your mod, 
+and start coding and testing like usual.
+
+This template is not supplied as part of the unifieddyes mod, rather you need
+fetch it separately from here:
+
+Download Template:  https://github.com/VanessaE/modtemplate/zipball/master
+...or browse the code:  https://github.com/VanessaE/modtemplate

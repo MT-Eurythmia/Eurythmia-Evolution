@@ -20,7 +20,7 @@
 
 -- First, the standard machine-readable name of your mod
 
-colored_block_modname = "template_mod"
+colored_block_modname = "template"
 
 -- Human-readable description of the category of nodes you want to generate
 
@@ -31,7 +31,7 @@ colored_block_description = "My Colored Block"
 -- applied.  Typically, this should refer to the white version of your
 -- mod's main block, but it can be anything as long as it makes sense.
 
-neutral_block = colored_block_modname .. ":white"
+neutral_block = colored_block_modname..":white"
 
 -- This variable defines just how many of a given block a crafting operation
 -- should give.  In most cases, the default (1) is correct.
@@ -48,13 +48,14 @@ colored_block_sunlight = "false"
 
 colored_block_walkable = "true"
 
--- What groups should the generated nodes belong to?
+-- What groups should the generated nodes belong to?  Note that this must
+-- be in the form of a table as in the default.
 
-colored_block_groups = "{ snappy = 3, flammable = 2 }"
+colored_block_groups = { snappy=3, flammable=2 }
 
 -- What sound should be played when the node is digged?
 
-colored_block_groups = "default.node_sound_leaves_defaults()"
+colored_block_sound = "default.node_sound_leaves_defaults()"
 
 
 -- ======================================================
@@ -72,8 +73,8 @@ colored_block_groups = "default.node_sound_leaves_defaults()"
 -- and 33% ("dark").
 
 shades = {
-	"dark",
-	"medium",
+	"dark_",
+	"medium_",
 	""		-- represents "no special shade name", e.g. bright.
 }
 
@@ -146,46 +147,53 @@ for shade = 1, 3 do
 
 		huename = hues[hue]
 		huename2 = hues2[hue]
-	
-		minetest.register_node(colored_block_modname .. ":" .. shadename .. "_" .. huename, {
-			description = shadename2 .. huename2 .. colored_block_description,
-			tiles = { colored_block_modname .. "_" .. shadename .. "_" .. huename .. ".png" },
-			inventory_image = colored_block_modname .. "_" .. shadename .. "_" .. huename .. ".png", 
-			wield_image = colored_block_modname .. "_" .. shadename .. "_" .. huename .. ".png",
+
+		colorname    = colored_block_modname..":"..shadename..huename
+		pngname      = colored_block_modname.."_"..shadename..huename..".png"
+		nodedesc     = shadename2..huename2..colored_block_description
+		s50colorname = colored_block_modname..":"..shadename..huename.."_s50"
+		s50pngname   = colored_block_modname.."_"..shadename..huename.."_s50.png"
+		s50nodedesc  = shadename2..huename2..colored_block_description.." (50% Saturation)"
+
+		minetest.register_node(colorname, {
+			description = nodedesc,
+			tiles = { pngname },
+			inventory_image = pngname, 
+			wield_image = pngname,
 			sunlight_propagates = colored_block_sunlight,
 			paramtype = "light",
 			walkable = colored_block_walkable,
 			groups = colored_block_groups,
-			sounds = colored_block_groups
+			sounds = colored_block_sound
 		})
-	
-		minetest.register_node(colored_block_modname .. ":" .. shadename .. "_" .. huename .. "_s50", {
-			description = shadename2 .. huename2 .. colored_block_description .. " (50% Saturation)",
-			tiles = { colored_block_modname .. "_" .. shadename .. "_" .. huename .. "_s50.png" },
-			inventory_image = colored_block_modname .. "_" .. shadename .. "_" .. huename .. "_s50.png", 
-			wield_image = colored_block_modname .. "_" .. shadename .. "_" .. huename .. "_s50.png",
+
+		minetest.register_node(s50colorname, {
+			description = s50nodedesc,
+			tiles = { s50pngname },
+			inventory_image = s50pngname, 
+			wield_image = s50pngname,
 			sunlight_propagates = colored_block_sunlight,
 			paramtype = "light",
 			walkable = colored_block_walkable,
 			groups = colored_block_groups,
-			sounds = colored_block_groups
+			sounds = colored_block_sound
 		})
 
 		minetest.register_craft( {
 			type = "shapeless",
-			output = colored_block_modname .. ":" .. shadename .. "_" .. huename .. " " .. colored_block_yield,
+			output = colorname.." "..colored_block_yield,
 			recipe = {
 				neutral_block,
-				"unifieddyes:" .. shadename .. "_" .. huename
+				"unifieddyes:"..shadename.."_"..huename
 			}
 		})
 
 		minetest.register_craft( {
 			type = "shapeless",
-			output = colored_block_modname .. ":" .. shadename .. "_" .. huename "_s50 " .. colored_block_yield,
+			output = colorname.." "..colored_block_yield,
 			recipe = {
 				neutral_block,
-				"unifieddyes:" .. shadename .. "_" .. huename .. "_s50"
+				"unifieddyes:"..shadename.."_"..huename.."_s50"
 			}
 		})
 
@@ -206,24 +214,28 @@ for grey = 1,5 do
 	greyname2 = greys2[grey]
 	greyname3 = greys3[grey]
 
-	minetest.register_node(colored_block_modname .. ":" .. greyname, {
-		description = greyname2 .. colored_block_description,
-		tiles = { colored_block_modname .. "_" .. greyname .. ".png" },
-		inventory_image = colored_block_modname .. "_" .. greyname .. ".png", 
-		wield_image = colored_block_modname .. "_" .. greyname .. ".png",
+	greyshadename = colored_block_modname..":"..greyname
+	pngname = colored_block_modname.."_"..greyname..".png"
+	nodedesc = greyname2..colored_block_description
+
+	minetest.register_node(greyshadename, {
+		description = nodedesc,
+		tiles = { pngname },
+		inventory_image = pngname, 
+		wield_image = pngname,
 		sunlight_propagates = colored_block_sunlight,
 		paramtype = "light",
 		walkable = colored_block_walkable,
 		groups = colored_block_groups,
-		sounds = colored_block_groups
+		sounds = colored_block_sound
 	})
 
 	minetest.register_craft( {
 		type = "shapeless",
-		output = colored_block_modname .. ":" .. greyname .. " " .. colored_block_yield,
+		output = greyshadename.." "..colored_block_yield,
 		recipe = {
 			neutral_block,
-			"unifieddyes:" .. greyname3
+			"unifieddyes:"..greyname3
 		}
 	})
 
