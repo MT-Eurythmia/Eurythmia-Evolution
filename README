@@ -171,8 +171,9 @@ they're right, copy them over to the textures/ folder in your mod.
 Example Code
 ============
 
-Along with this mod, you should also download my template mod, which is quite 
-easy to transform into whatever mod you want to create that needs this mod.
+Along with this mod, you should also download my modding template, which is 
+quite easy to transform into whatever mod you want to create that needs 
+unifieddyes.
 
 It's just a skeleton, but all you should need to do to get started is to rename 
 the folder to whatever your mod will be named, tweak a few variables near the 
