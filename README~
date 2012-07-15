@@ -171,7 +171,8 @@ the hex value #FF0000 (0 degrees, 100% saturation, pure red) without losing any
 appreciable #detail.
 
 Save this source texture out with a filename of red_base_whatever.png, where
-"whatever" is the one-word name of your mod.
+"whatever" is the same name you used in the TEXTURE variable above.  The
+default cotton setting, thus, would need a filename of red_base_cotton.png.
 
 If you want to add an image on top of the colored blocks, such as a frame, 
 which you want to be the same color throughout all of the textures, create it 
