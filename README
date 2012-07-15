@@ -123,6 +123,9 @@ the item names follow the same format as the filenames, save for having a colon
 Semi-automatic generation of nodes, crafting recipes, and textures
 ==================================================================
 
+The modding template
+--------------------
+
 Along with this mod, you should also download my modding template, which is 
 quite easy to transform into whatever mod you want to create that needs 
 unifieddyes.
@@ -144,8 +147,9 @@ fetch it separately from here:
 Download Template:  https://github.com/VanessaE/modtemplate/zipball/master
 ...or browse the code:  https://github.com/VanessaE/modtemplate
 
-Semi-automatic generation of new textures
-=========================================
+
+The texture generator script
+----------------------------
 
 Obviously, in order for this mod or the above template to be useful, you'll 
 need textures.  If you plan to support the entire range of colors offered by 
