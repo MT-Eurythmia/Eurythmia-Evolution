@@ -66,23 +66,30 @@ Titanium Dioxide.  Finally, craft one portion of that with a bucket of water
 and one piece of jungle grass.  Yields one bucket of white paint.
 
 
-Darker colors
--------------
+Darker/lighter shades
+---------------------
+
+To obtain a dark (33% relative to the 'full' version) version of a given color,
+use two portions of black dye along with the base color, which yields three
+portions of the final color.
 
 To obtain a medium-brightness (66%) version of a given color, mix the desired 
 base color from the list above with one portion of black dye (for example, 
 medium lime = lime + black).  All such mixtures yield two portions of the final 
 color.
 
-To obtain a dark (33%) version of a given color, use two portions of black dye 
-along with the base color, which yields three portions of the final color.
+To obtain the light (150%) version of a color, mix one portion of the
+desired base color with one portion of white paint, which yields two portions of
+the final color.
 
 
 Low-saturation colors
 ---------------------
 
-To get the low saturation (50%) version of one of the base colors, mix one or 
-more of white, black, or a shade of grey with the desired base color:
+Except for the "light" colors and the greys, all colors are available in a
+reduced-saturation version  To get the low saturation (50%) version of one of
+the base colors, mix one or more of white, black, or a shade of grey with the
+desired base color:
 
 Dark, low saturation: dark grey paint + color (yields 2), or two blacks + 1 
 white + color (yields 4).  For example, dark, low-saturation red = red + dark 
@@ -205,3 +212,4 @@ All of the output files will be placed in a new folder, generated-textures/
 
 Use your favorite image browser or file manager to review the results, and if
 they're right, copy them over to the textures/ folder in your mod.
+
