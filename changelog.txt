@@ -1,5 +1,9 @@
 Changelog:
 
+2012-07-16: Added a new set of colors, "light" (brightness of 150% versus the 
+'full' shade), for a total of 89.  No 50% saturation version of this set.  
+Added a palette image showing the full set of colors.
+
 2012-07-13:  Fixed some missing commas.
 
 2012-07-13: Added a script to aid in the generation of new textures for mods 
