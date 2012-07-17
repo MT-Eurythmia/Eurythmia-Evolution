@@ -111,7 +111,7 @@ convert $base_texture -modulate  15,0,0  $composite_file "generated-textures/"$T
 echo "     dark grey"
 convert $base_texture -modulate  50,0,0  $composite_file "generated-textures/"$TEXTURE"_darkgrey.png"
 echo "     medium grey"
-convert $base_texture -modulate 100,0,0  $composite_file "generated-textures/"$TEXTURE"_mediumgrey.png"
+convert $base_texture -modulate 100,0,0  $composite_file "generated-textures/"$TEXTURE"_grey.png"
 echo "     light grey"
 convert $base_texture -modulate 150,0,0  $composite_file "generated-textures/"$TEXTURE"_lightgrey.png"
 echo "     white"
