@@ -1,36 +1,49 @@
 #!/bin/bash
 
-TEXTURE=$1
-COMPOSITE=$2
+if [ $1 = "-t" ] ; then {
+	TINT_OVERLAY=$1
+	BASE=$2
+	COMPOSITE=$3
+} else {
+	TINT_OVERLAY=""
+	BASE=$1
+	COMPOSITE=$2
+} fi
 
-base_texture="red_base_"$TEXTURE".png"
+if [ -z $1 ] || [ $1 == "--help" ] || [ $1 == "-h" ] || [[ $1 == "-t" && -z $3 ]] ; then {
 
-if [ -z $TEXTURE ] || [ $TEXTURE == "--help" ] || [ $TEXTURE == "-h" ] ; then {
-
-	echo -e "\nUsage:"
-	echo -e "\ngentextures.sh basename [overlay filename]"
-	echo -e "\nThis script requires one or two parameters which supply the"
-	echo -e "base filename of the textures, and an optional overlay.  The"
-	echo -e "<basename> is the first part of the filename that your textures"
-	echo -e "will use when your mod is done.  For example, if you supply the"
-	echo -e "word 'cotton', this script will produce filenames like cotton_red.png"
-	echo -e "or 'cotton_dark_blue_s50.png'.  The texture that this script will"
-	echo -e "read and recolor is derived from this parameter, and will be of"
-	echo -e "the form 'red_base_xxxxx.png', where 'xxxx' is the basename."
-	echo -e "\nYou can also supply an optional overlay image filename."
-	echo -e "This image will be composited onto the output files after they"
-	echo -e "have been colorized, but without being modified.  This is useful"
-	echo -e "when you have some part of your base image that will either get"
-	echo -e "changed unpredictably or undesirably.  Simply draw two images -"
-	echo -e "one containing the whole image to be colored, and one containing"
-	echo -e "the parts that should not be changed, with transparency where the"
-	echo -e "base image should show through.\n"
+	echo -e "\nUsage:
+\ngentextures.sh basename [overlay_filename]
+gentextures.sh -t basename overlay_filename
+\nThis script requires up to three parameters which supply the base filename
+of the textures, an optional overlay, and possibly the '-t' switch.  The
+'basename' is the first part of the filename that your textures will use when
+your mod is done, which should almost always be the same as the one-word name
+of your mod.  For example, if you supply the word 'mymod', this script will
+produce filenames like mymod_red.png or 'mymod_dark_blue_s50.png'.  The
+texture that this script will read and recolor is derived from this parameter,
+and will be of the form 'basename_base.png', i.e. 'mymod_base.png'.
+\nYou can also supply an optional overlay image filename.  This image will be
+composited onto the output files after they have been colorized, but without
+being modified.  This is useful when you have some part of your base image
+that will either get changed undesirably (for example, the mortar among
+several bricks, or the shading detail of a stone pattern).  Simply draw two
+images: one containing the whole image to be colored, and one containing the
+parts that should not be changed, with either full or partial alpha
+transparency where the re-colored base image should show through.  Skilled use
+of color and alpha on this overlay can lead to some interesting effects.
+\nIf you add '-t' as the first parameter, the script will switch to 'tint
+overlay' mode.  For this mode to work, you must also supply the base name as
+usual, and you must include an overlay image filename.  Rather than re-color
+the base texture, the script will alter the hue/saturation/value of the
+overlay texture file instead, and leave the base texture unchanged.  When
+using this mode, the base texture should be drawn in some neutral color, but
+any color is fine if it results in what you wanted.\n"
 	exit 1
 } fi
 
-
-if [[ ! -z $TEXTURE && ! -e $base_texture ]]; then {
-	echo -e "\nThe basename 'red_base_"$TEXTURE".png' was not found."
+if [[ ! -e $BASE"_base.png" ]]; then {
+	echo -e "\nThe basename '"$BASE"_base.png' was not found."
         echo -e "\nAborting.\n"
 	exit 1
 } fi
@@ -41,22 +54,19 @@ if [[ ! -z $COMPOSITE && ! -e $COMPOSITE ]]; then {
 	exit 1
 } fi
 
-
-convert $base_texture -modulate 1,2,3 tempfile.png 1>/dev/null 2>/dev/null
+convert $BASE"_base.png" -modulate 1,2,3 tempfile.png 1>/dev/null 2>/dev/null
 
 if (( $? )) ; then {
 	echo -e "\nImagemagick failed while testing the base texture file."
-	echo -e "\nEither the base file 'red_base_"$TEXTURE".png isn't an image,"
+	echo -e "\nEither the base file '"$BASE"_base.png' isn't an image,"
 	echo "or it is broken, or Imagemagick itself just didn't work."
 	echo -e "\nPlease check and correct your base image and try again."
 	echo -e "\nAborting.\n"
 	exit 1
 } fi
 
-composite_file=""
-
 if [ ! -z $COMPOSITE ] ; then {
-	convert $base_texture -modulate 1,2,3 $COMPOSITE -composite tempfile.png 1>/dev/null 2>/dev/null
+	convert $BASE"_base.png" -modulate 1,2,3 $COMPOSITE -composite tempfile.png 1>/dev/null 2>/dev/null
 
 	if (( $? )) ; then {
 		echo -e "\nImagemagick failed while testing the composite file."
@@ -66,53 +76,72 @@ if [ ! -z $COMPOSITE ] ; then {
 		echo -e "\nAborting.\n"
 		exit 1
 	} fi
-
-	composite_file=$COMPOSITE" -composite"
 } fi
 
 rm tempfile.png
 
 base_colors="red orange yellow lime green aqua cyan skyblue blue violet magenta redviolet"
 
-echo -e -n "\nGenerating filenames based on "$base_texture
+echo -e -n "\nGenerating filenames based on "$BASE"_base.png"
 if [ ! -z $COMPOSITE ] ; then {
 	echo ","
 	echo -n "using "$COMPOSITE" as an overlay"
 } fi
+
+if [ ! -z $TINT_OVERLAY ] ; then {
+	echo ","
+	echo -n "and tinting the overlay instead of the base texture"
+} fi
+
 echo -e "...\n"
 
-rm -rf generated-textures
-mkdir generated-textures
+mkdir -p generated-textures
+
+function generate_texture () {
+	name=$1
+	h=$2
+	s=$3
+	v=$4
+	if [ -z $TINT_OVERLAY ]; then {
+		if [ -z $COMPOSITE ]; then {
+			convert $BASE"_base.png" -modulate $v,$s,$h "generated-textures/"$BASE"_"$name".png"
+		} else {
+			convert $BASE"_base.png" -modulate $v,$s,$h $COMPOSITE -composite "generated-textures/"$BASE"_"$name".png"
+		} fi
+	} else {
+		convert $COMPOSITE -modulate $v,$s,$h MIFF:- | composite MIFF:- $BASE"_base.png" "generated-textures/"$BASE"_"$name".png"
+	} fi
+}
 
 hue=0
-for name in $base_colors ; do
+for color_name in $base_colors ; do
 	hue2=`echo "scale=10; ("$hue"*200/360)+100" |bc`
-	echo $name "("$hue" degrees)"
+	echo $color_name "("$hue" degrees)"
 	echo "     dark"
-	convert $base_texture -modulate  33,100,$hue2 $composite_file "generated-textures/"$TEXTURE"_dark_"$name".png"
+	generate_texture "dark_"$color_name $hue2 100 33
 	echo "     medium"
-	convert $base_texture -modulate  66,100,$hue2 $composite_file "generated-textures/"$TEXTURE"_medium_"$name".png"
+	generate_texture "medium_"$color_name $hue2 100 66
 	echo "     full"
-	convert $base_texture -modulate 100,100,$hue2 $composite_file "generated-textures/"$TEXTURE"_"$name".png"
+	generate_texture $color_name $hue2 100 100
 	echo "     light"
-	convert $base_texture -modulate 150,100,$hue2 $composite_file "generated-textures/"$TEXTURE"_light_"$name".png"
+	generate_texture "light_"$color_name $hue2 100 150
 	echo "     dark, 50% saturation"
-	convert $base_texture -modulate  33,50,$hue2  $composite_file "generated-textures/"$TEXTURE"_dark_"$name"_s50.png"
+	generate_texture "dark_"$color_name"_s50" $hue2 50 33
 	echo "     medium, 50% saturation"
-	convert $base_texture -modulate  66,50,$hue2  $composite_file "generated-textures/"$TEXTURE"_medium_"$name"_s50.png"
+	generate_texture "medium_"$color_name"_s50" $hue2 50 66
 	echo "     full, 50% saturation"
-	convert $base_texture -modulate 100,50,$hue2  $composite_file "generated-textures/"$TEXTURE"_"$name"_s50.png"
+	generate_texture $color_name"_s50" $hue2 50 100 
 	hue=$((hue+30))
 done
 
 echo "greyscales"
 echo "     black"
-convert $base_texture -modulate  15,0,0  $composite_file "generated-textures/"$TEXTURE"_black.png"
+generate_texture black 0 0 15
 echo "     dark grey"
-convert $base_texture -modulate  50,0,0  $composite_file "generated-textures/"$TEXTURE"_darkgrey.png"
+generate_texture darkgrey 0 0 50
 echo "     medium grey"
-convert $base_texture -modulate 100,0,0  $composite_file "generated-textures/"$TEXTURE"_grey.png"
+generate_texture grey 0 0 100
 echo "     light grey"
-convert $base_texture -modulate 150,0,0  $composite_file "generated-textures/"$TEXTURE"_lightgrey.png"
+generate_texture lightgrey 0 0 150
 echo "     white"
-convert $base_texture -modulate 190,0,0  $composite_file "generated-textures/"$TEXTURE"_white.png"
+generate_texture white 0 0 190
