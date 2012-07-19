@@ -177,22 +177,25 @@ taking into account all bright and dark areas, to be as close as possible to
 the hex value #FF0000 (0 degrees, 100% saturation, pure red) without losing any 
 appreciable #detail.
 
-Save this source texture out with a filename of red_base_whatever.png, where
-"whatever" is the one-word name of your mod.
+Save this source texture out with a filename of whatever_base.png, where 
+"whatever" is the one-word name of your mod - for example, mymod_base.png.
 
 If you want to add an image on top of the colored blocks, such as a frame, 
 which you want to be the same color throughout all of the textures, create it 
-now.  It should consist only of those parts of the textures that you want to
+now.  It should consist only of those parts of the textures that you want to 
 leave unchanged, with transparency everywhere else.  Save it out using any 
 filename you want.
 
 Now, run the script (make it executable first, if necessary).
 
-If you didn't need the overlay, you just need to supply one command line 
+If you don't need the overlay, you just need to supply one command line 
 argument: the base name of your mod.  The script will use that parameter as the 
 basis of its texture filenames. For example:
 
 ./gentextures.sh mymod
+
+The script will then look for mymod_base.png and copy and convert it into 
+things like mymod_red.png, mymod_dark_blue.png, and so on.
 
 If you want to use an overlay also, run the script with the base name as the 
 first parameter, and the complete filename of your overlay as the second.  For 
@@ -208,8 +211,21 @@ supported by unifieddyes (though this is done manually, not by reading anything
 from the mod), compositing your overlay image in after the recolor step, if 
 you're using that option.
 
-All of the output files will be placed in a new folder, generated-textures/
+All of the output files will be placed in a new folder, generated-textures/ in 
+the current directory.  Note that the script looks for the above files in the 
+current directory also.
 
-Use your favorite image browser or file manager to review the results, and if
-they're right, copy them over to the textures/ folder in your mod.
+The script has a third mode as well:
 
+./gentextures.sh -t mymod myoverlay.png
+
+In this mode, the script will leave the base texture mymod_base.png unchanged, 
+and instead will rotate the colors of the overlay image and then composite that 
+onto the base texture.  The same color changes will happen with the overlay in 
+this mode, so it's a good idea to make the overlay some fairly saturated shade 
+of red.  Along with that, the base image should be some neutral color; any 
+color is fine as long as the result is what you wanted.
+
+Use your favorite image browser or file manager to review the results in 
+generated-textures/, and if they're right, copy them over to the textures/ 
+folder in your mod.
