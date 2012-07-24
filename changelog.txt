@@ -1,5 +1,10 @@
 Changelog:
 
+2012-07-24: Added some extra steps to the dye-making process, added 
+recommendation that empty bottles be given back to the player on use.  Dyes
+are still easy to make, they just require a more realistic (and this, harder)
+process now.
+
 2012-07-16 (a bit later): fixed a minor error in generation of medium grey.
 
 2012-07-16: Added a new set of colors, "light" (brightness of 150% versus the 
