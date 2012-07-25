@@ -8,51 +8,40 @@
 --===========================================================================
 -- First you need something to put the dyes into - glass bottles
 --
--- Smelt some sand into glass as usual, then smelt one of the resulting glass
--- blocks to get a 9-pack of empty bottles.
+-- Smelt some sand into glass as usual, then craft 5 of those into an upside-
+-- down "U" to get 15 empty bottles.
 
 minetest.register_craftitem("unifieddyes:empty_bottle", {
         description = "Empty Glass Bottle",
         inventory_image = "unifieddyes_empty_bottle.png",
 })
 
-minetest.register_craftitem("unifieddyes:bottle_9_pack", {
-        description = "Empty Glass Bottles (9-pack)",
-        inventory_image = "unifieddyes_bottle_9_pack.png",
+minetest.register_craft( {
+	output = "unifieddyes:empty_bottle 15",
+	recipe = {
+		{ "default:glass",  "",              "default:glass" },
+		{ "default:glass",  "",              "default:glass" },
+		{ "",               "default:glass", ""              }
+	}
 })
 
-minetest.register_craft({
-        type = "cooking",
-        output = "unifieddyes:bottle_9_pack",
-        recipe = "default:glass",
-})
-
--- The use of this mod will, if the mods that depend on it are written
--- correctly, generate lots of empty bottles, so let's recycle them.
-
--- First, pack them into a 9-pack unit by placing one into each of the 9
--- crafting slots.
+-- Make sure we can recycle the bottles.  3 bottles -> 1 glass block.
 
 minetest.register_craft( {
-       output = "unifieddyes:bottle_9_pack",
-       recipe = {
-               { "unifieddyes:empty_bottle", "unifieddyes:empty_bottle", "unifieddyes:empty_bottle" },
-               { "unifieddyes:empty_bottle", "unifieddyes:empty_bottle", "unifieddyes:empty_bottle" },
-               { "unifieddyes:empty_bottle", "unifieddyes:empty_bottle", "unifieddyes:empty_bottle" },
-                },
+	type = "shapeless",
+	output = "default:glass",
+	recipe = {
+		"unifieddyes:empty_bottle",
+		"unifieddyes:empty_bottle",
+		"unifieddyes:empty_bottle",
+	},
 })
 
--- then smelt the 9-pack back into a glass block:
 
-minetest.register_craft({
-        type = "cooking",
-        output = "default:glass",
-        recipe = "unifieddyes:bottle_9_pack",
-})
-
--- Now, once you have a 9-pack of bottles, craft it with one bucket of water
--- and a piece of jungle grass to get 9 individual portions of the liquid dye
--- base and an empty bucket:
+--============================================================================
+-- Now let's use some of those bottles along with some other stuff to make
+-- dye base.  Craft six empty bottles along with a bucket of water and a piece
+-- of jungle grass to get 6 portions of dye base.
 
 minetest.register_craftitem("unifieddyes:dye_base", {
         description = "Uncolored Dye Base Liquid",
@@ -60,14 +49,19 @@ minetest.register_craftitem("unifieddyes:dye_base", {
 })
 
 minetest.register_craft( {
-       type = "shapeless",
-       output = "unifieddyes:dye_base 9",
-       recipe = {
-               "bucket:bucket_water",
-               "default:junglegrass",
-               "unifieddyes:bottle_9_pack",
-                },
-        replacements = { {'bucket:bucket_water', 'bucket:bucket_empty'}, },
+	type = "shapeless",
+	output = "unifieddyes:dye_base 6",
+	recipe = {
+		"unifieddyes:empty_bottle",
+		"unifieddyes:empty_bottle",
+		"unifieddyes:empty_bottle",
+		"unifieddyes:empty_bottle",
+		"unifieddyes:empty_bottle",
+		"unifieddyes:empty_bottle",
+		"bucket:bucket_water",
+		"default:junglegrass",
+	},
+	replacements = { {'bucket:bucket_water', 'bucket:bucket_empty'}, },
 })
 
 --==========================================================================
