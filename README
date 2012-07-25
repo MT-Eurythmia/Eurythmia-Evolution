@@ -45,15 +45,15 @@ Getting Started
 ---------------
 
 First thing's first: you're going to need something in which to contain your 
-dyes - namely, glass bottles.  Making them is very simple: Smelt some sand or 
-desert sand into glass blocks as usual, then put one glass block back into the 
-furnace to smelt it into a 9-pack of glass bottles.
+dyes - namely, glass bottles.  Making them is very simple: Craft 5 blocks of 
+glass in a U shape, and you get 15 glass bottles as the output.
 
-[ https://github.com/VanessaE/unifieddyes/raw/master/bottle-9-pack.png ]
+[ https://github.com/VanessaE/unifieddyes/raw/master/empty-bottles.png ]
 
-Now, let's fill them up with some dye base.  Take one 9-pack of bottles and 
-craft it with one piece of jungle grass and one bucket of water.  The result 
-will be nine individual bottles of uncolored dye base and an empty bucket.
+Now, let's fill them up with some dye base.  Craft six glass bottles with one 
+piece of jungle grass and one bucket of water, in any positions in the grid.  
+The result will be 6 individual bottles of uncolored dye base and an empty 
+bucket.
 
 [ https://github.com/VanessaE/unifieddyes/raw/master/dye-base.png ]
 
