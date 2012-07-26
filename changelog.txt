@@ -1,5 +1,7 @@
 Changelog:
 
+2012-07-25 (almost immediately after): Fixed a copy&paste error for black dye.
+
 2012-07-25: Replaced missing craftitem entries and got rid of some redundant 
 code left over from last update.  Added group settings for all dyes according 
 to recently-published standard.  Fixed a few typos in item descriptions, and 
