@@ -2,46 +2,32 @@
 --
 -- License: GPL
 --
--- This mod depends on ironzorg's flowers mod
---
+-- This mod depends on ironzorg's flowers mod and my Vessels mod.
 
---===========================================================================
--- First you need something to put the dyes into - glass bottles
---
--- Smelt some sand into glass as usual, then craft 5 of those into an upside-
--- down "U" to get 15 empty bottles.
+--============================================================================
+-- First, craft some bottles from the Vessels mod, then make some dye base:
+-- Craft six empty bottles along with a bucket of water and a piece
+-- of jungle grass to get 6 portions of dye base.
+
+-- These craft/craftitem definitions for glass bottles are deprecated and are
+-- only included here for backwards compatibility. Use vessels:glass_bottle
+-- instead.
 
 minetest.register_craftitem("unifieddyes:empty_bottle", {
-        description = "Empty Glass Bottle",
+        description = "Glass Bottle (empty) (Deprecated)",
         inventory_image = "unifieddyes_empty_bottle.png",
 })
 
 minetest.register_craft( {
-	output = "unifieddyes:empty_bottle 15",
-	recipe = {
-		{ "default:glass",  "",              "default:glass" },
-		{ "default:glass",  "",              "default:glass" },
-		{ "",               "default:glass", ""              }
-	}
+        type = "shapeless",
+        output = "default:glass",
+        recipe = {
+                "unifieddyes:empty_bottle",
+                "unifieddyes:empty_bottle",
+        },
 })
 
--- Make sure we can recycle the bottles.  3 bottles -> 1 glass block.
-
-minetest.register_craft( {
-	type = "shapeless",
-	output = "default:glass",
-	recipe = {
-		"unifieddyes:empty_bottle",
-		"unifieddyes:empty_bottle",
-		"unifieddyes:empty_bottle",
-	},
-})
-
-
---============================================================================
--- Now let's use some of those bottles along with some other stuff to make
--- dye base.  Craft six empty bottles along with a bucket of water and a piece
--- of jungle grass to get 6 portions of dye base.
+-- Now the current stuff, using vessels:glass_bottle.
 
 minetest.register_craftitem("unifieddyes:dye_base", {
         description = "Uncolored Dye Base Liquid",
@@ -52,12 +38,12 @@ minetest.register_craft( {
 	type = "shapeless",
 	output = "unifieddyes:dye_base 6",
 	recipe = {
-		"unifieddyes:empty_bottle",
-		"unifieddyes:empty_bottle",
-		"unifieddyes:empty_bottle",
-		"unifieddyes:empty_bottle",
-		"unifieddyes:empty_bottle",
-		"unifieddyes:empty_bottle",
+		"vessels:glass_bottle",
+		"vessels:glass_bottle",
+		"vessels:glass_bottle",
+		"vessels:glass_bottle",
+		"vessels:glass_bottle",
+		"vessels:glass_bottle",
 		"bucket:bucket_water",
 		"default:junglegrass",
 	},
