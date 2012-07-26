@@ -1,5 +1,8 @@
 Changelog:
 
+2012-07-26: Split off glass bottles into a separate mod, "Vessels".  This mod
+now depends on it.
+
 2012-07-25 (almost immediately after): Fixed a copy&paste error for black dye.
 
 2012-07-25: Replaced missing craftitem entries and got rid of some redundant 
