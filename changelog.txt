@@ -1,5 +1,10 @@
 Changelog:
 
+2012-07-25: Replaced missing craftitem entries and got rid of some redundant 
+code left over from last update.  Added group settings for all dyes according 
+to recently-published standard.  Fixed a few typos in item descriptions, and 
+straightened up capitalization.
+
 2012-07-24: Added some extra steps to the dye-making process, added 
 recommendation that empty bottles be given back to the player on use.  Dyes
 are still easy to make, they just require a more realistic (and this, harder)
