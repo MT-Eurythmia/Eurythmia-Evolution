@@ -114,7 +114,7 @@ for color = 1, 5 do
 	-- The recipes to turn pigments into usable dyes
 
 	minetest.register_craftitem("unifieddyes:"..pigments[color], {
-		description = dyesdesc[color].." Dye",
+		description = "Full "..dyesdesc[color].." Dye",
 		inventory_image = "unifieddyes_"..pigments[color]..".png",
 		groups = { dye=1, ["basecolor_"..pigments[color]]=1, ["excolor_"..pigments[color]]=1, ["unicolor_"..pigments[color]]=1 }
 	})
@@ -165,7 +165,7 @@ minetest.register_craft({
 })
 
 minetest.register_craftitem("unifieddyes:black", {
-	description = "Carbon Black",
+	description = "Black Dye",
 	inventory_image = "unifieddyes_black.png",
 })
 
@@ -217,7 +217,7 @@ minetest.register_craft( {
 })
 
 minetest.register_craftitem("unifieddyes:lightgrey_paint", {
-        description = "Light grey paint",
+        description = "Light Grey Paint",
         inventory_image = "unifieddyes_lightgrey_paint.png",
 	groups = { dye=1, excolor_lightgrey=1, unicolor_lightgrey=1 }
 })
@@ -234,7 +234,7 @@ minetest.register_craft( {
 })
 
 minetest.register_craftitem("unifieddyes:grey_paint", {
-        description = "Medium grey paint",
+        description = "Medium Grey Paint",
         inventory_image = "unifieddyes_grey_paint.png",
 	groups = { dye=1, basecolor_grey=1, excolor_grey=1, unicolor_grey=1 }
 })
@@ -252,7 +252,7 @@ minetest.register_craft( {
 })
 
 minetest.register_craftitem("unifieddyes:darkgrey_paint", {
-        description = "Dark grey paint",
+        description = "Dark Grey Paint",
         inventory_image = "unifieddyes_darkgrey_paint.png",
 	groups = { dye=1, excolor_darkgrey=1, unicolor_darkgrey=1 }
 })
@@ -265,7 +265,7 @@ minetest.register_craftitem("unifieddyes:darkgrey_paint", {
 -- Cyan
 
 minetest.register_craftitem("unifieddyes:cyan", {
-        description = "Full Cyan dye",
+        description = "Full Cyan Dye",
         inventory_image = "unifieddyes_cyan.png",
 	groups = { dye=1, basecolor_cyan=1, excolor_cyan=1, unicolor_cyan=1 }
 })
@@ -282,7 +282,7 @@ minetest.register_craft( {
 -- Magenta
 
 minetest.register_craftitem("unifieddyes:magenta", {
-        description = "Full Magenta dye",
+        description = "Full Magenta Dye",
         inventory_image = "unifieddyes_magenta.png",
 	groups = { dye=1, basecolor_magenta=1, excolor_magenta=1, unicolor_magenta=1 }
 })
@@ -299,7 +299,7 @@ minetest.register_craft( {
 -- Lime
 
 minetest.register_craftitem("unifieddyes:lime", {
-        description = "Full Lime dye",
+        description = "Full Lime Dye",
         inventory_image = "unifieddyes_lime.png",
 	groups = { dye=1, excolor_lime=1, unicolor_lime=1 }
 })
@@ -316,7 +316,7 @@ minetest.register_craft( {
 -- Aqua
 
 minetest.register_craftitem("unifieddyes:aqua", {
-        description = "Full Aqua dye",
+        description = "Full Aqua Dye",
         inventory_image = "unifieddyes_aqua.png",
 	groups = { dye=1, excolor_aqua=1, unicolor_aqua=1 }
 })
@@ -333,7 +333,7 @@ minetest.register_craft( {
 -- Sky blue
 
 minetest.register_craftitem("unifieddyes:skyblue", {
-        description = "Full Sky Blue dye",
+        description = "Full Sky-blue Dye",
         inventory_image = "unifieddyes_skyblue.png",
 	groups = { dye=1, excolor_sky_blue=1, unicolor_sky_blue=1 }
 })
@@ -350,7 +350,7 @@ minetest.register_craft( {
 -- Violet
 
 minetest.register_craftitem("unifieddyes:violet", {
-        description = "Full Violet/Purple dye",
+        description = "Full Violet/Purple Dye",
         inventory_image = "unifieddyes_violet.png",
 	groups = { dye=1, basecolor_violet=1, excolor_violet=1, unicolor_violet=1 }
 })
@@ -377,7 +377,7 @@ minetest.register_craft( {
 -- Red-violet
 
 minetest.register_craftitem("unifieddyes:redviolet", {
-        description = "Full Red-violet dye",
+        description = "Full Red-violet Dye",
         inventory_image = "unifieddyes_redviolet.png",
 	groups = { dye=1, excolor_red_violet=1, unicolor_red_violet=1 }
 })
@@ -416,9 +416,26 @@ HUES = {
 	"redviolet"
 }
 
+HUES2 = {
+	"Red",
+	"Orange",
+	"Yellow",
+	"Lime",
+	"Green",
+	"Aqua",
+	"Cyan",
+	"Sky-blue",
+	"Blue",
+	"Violet",
+	"Magenta",
+	"Red-violet"
+}
+
+
 for i = 1, 12 do
 
 	hue = HUES[i]
+	hue2 = HUES2[i]
 
 	minetest.register_craft( {
         type = "shapeless",
@@ -508,44 +525,42 @@ for i = 1, 12 do
 	})
 
 	minetest.register_craftitem("unifieddyes:dark_" .. hue .. "_s50", {
-		description = "Dark " .. hue .. " (low saturation)",
+		description = "Dark " .. hue2 .. " Dye (low saturation)",
 		inventory_image = "unifieddyes_dark_" .. hue .. "_s50.png",
 		groups = { dye=1, ["unicolor_dark_"..hue.."_s50"]=1 }
 	})
 
 	minetest.register_craftitem("unifieddyes:dark_" .. hue, {
-		description = "Dark " .. hue,
+		description = "Dark " .. hue2 .. " Dye",
 		inventory_image = "unifieddyes_dark_" .. hue .. ".png",
 		groups = { dye=1, ["unicolor_dark_"..hue]=1 }
 	})
 
 	minetest.register_craftitem("unifieddyes:medium_" .. hue .. "_s50", {
-		description = "Medium " .. hue .. " (low saturation)",
+		description = "Medium " .. hue2 .. " Dye (low saturation)",
 		inventory_image = "unifieddyes_medium_" .. hue .. "_s50.png",
 		groups = { dye=1, ["unicolor_medium_"..hue.."_s50"]=1 }
 	})
 
 	minetest.register_craftitem("unifieddyes:medium_" .. hue, {
-		description = "Medium " .. hue,
+		description = "Medium " .. hue2 .. " Dye",
 		inventory_image = "unifieddyes_medium_" .. hue .. ".png",
 		groups = { dye=1, ["unicolor_medium_"..hue]=1 }
 	})
 
 	minetest.register_craftitem("unifieddyes:" .. hue .. "_s50", {
-		description = "Full " .. hue .. " (low saturation)",
+		description = "Full " .. hue2 .. " Dye (low saturation)",
 		inventory_image = "unifieddyes_" .. hue .. "_s50.png",
 		groups = { dye=1, ["unicolor_"..hue.."_s50"]=1 }
 	})
 
 	minetest.register_craftitem("unifieddyes:light_" .. hue, {
-		description = "Light " .. hue,
+		description = "Light " .. hue2 .. " Dye",
 		inventory_image = "unifieddyes_light_" .. hue .. ".png",
 		groups = { dye=1, ["unicolor_light_"..hue]=1 }
 	})
 
 end
-
-
 
 print("[UnifiedDyes] Loaded!")
 

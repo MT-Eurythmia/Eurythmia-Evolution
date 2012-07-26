@@ -155,7 +155,6 @@ minetest.register_craft({
 minetest.register_craftitem("unifieddyes:carbon_black", {
 	description = "Carbon Black",
 	inventory_image = "unifieddyes_carbon_black.png",
-	groups = { dye=1, basecolor_black=1, excolor_black=1, unicolor_black=1 }
 })
 
 minetest.register_craft({
@@ -167,6 +166,7 @@ minetest.register_craft({
 minetest.register_craftitem("unifieddyes:black", {
 	description = "Black Dye",
 	inventory_image = "unifieddyes_black.png",
+	groups = { dye=1, basecolor_black=1, excolor_black=1, unicolor_black=1 }
 })
 
 minetest.register_craft( {
