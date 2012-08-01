@@ -61,16 +61,14 @@ pigments = {
 	"red",
 	"orange",
 	"yellow",
-	"green",
-	"blue",
+	"green"
 }
 
 dyesdesc = {
 	"Red",
 	"Orange",
 	"Yellow",
-	"Green",
-	"Blue",
+	"Green"
 }
 	
 colorsources = {
@@ -78,10 +76,9 @@ colorsources = {
 	"flowers:flower_tulip",
 	"flowers:flower_dandelion_yellow",
 	"flowers:flower_waterlily",
-	"flowers:flower_viola",
 }
 
-for color = 1, 5 do
+for color in ipairs(colorsources) do
 
 	groupcolor = 
 	-- the recipes to turn sources into pigments
@@ -333,7 +330,45 @@ minetest.register_craft( {
 		},
 })
 
--- Violet
+-- Red-violet
+
+minetest.register_craftitem("unifieddyes:redviolet", {
+        description = "Full Red-violet Dye",
+        inventory_image = "unifieddyes_redviolet.png",
+	groups = { dye=1, excolor_red_violet=1, unicolor_red_violet=1 }
+})
+
+minetest.register_craft( {
+       type = "shapeless",
+       output = "unifieddyes:redviolet 2",
+       recipe = {
+               "unifieddyes:red",
+               "unifieddyes:magenta",
+		},
+})
+
+-- We need to check if the version of the Flowers mod that is installed
+-- contains geraniums or not.  If it doesn't, use the Viola to make blue dye.
+-- If Geraniums do exist, use them to make blue dye instead, and use Violas
+-- to get violet dye.  Violet can always be made by mixing blue with magenta
+-- or red as usual.
+
+
+minetest.register_craftitem("unifieddyes:pigment_blue", {
+	description = "Blue Pigment",
+	inventory_image = "unifieddyes_pigment_blue.png",
+})
+
+minetest.register_craftitem("unifieddyes:blue", {
+	description = "Full Blue Dye",
+	inventory_image = "unifieddyes_blue.png",
+	groups = { dye=1, basecolor_violet=1, excolor_violet=1, unicolor_violet=1 }
+})
+
+minetest.register_craftitem("unifieddyes:pigment_violet", {
+        description = "Violet Pigment",
+        inventory_image = "unifieddyes_pigment_violet.png",
+})
 
 minetest.register_craftitem("unifieddyes:violet", {
         description = "Full Violet/Purple Dye",
@@ -360,22 +395,26 @@ minetest.register_craft( {
 		},
 })
 
--- Red-violet
+if minetest.registered_nodes["flowers:flower_geranium"] == nil then
 
-minetest.register_craftitem("unifieddyes:redviolet", {
-        description = "Full Red-violet Dye",
-        inventory_image = "unifieddyes_redviolet.png",
-	groups = { dye=1, excolor_red_violet=1, unicolor_red_violet=1 }
-})
+	minetest.register_craft({
+		type = "cooking",
+		output = "unifieddyes:pigment_blue 2",
+		recipe = "flowers:flower_viola",
+	})
+else
+	minetest.register_craft({
+		type = "cooking",
+		output = "unifieddyes:pigment_blue 2",
+		recipe = "flowers:flower_geranium",
+	})
 
-minetest.register_craft( {
-       type = "shapeless",
-       output = "unifieddyes:redviolet 2",
-       recipe = {
-               "unifieddyes:red",
-               "unifieddyes:magenta",
-		},
-})
+	minetest.register_craft({
+		type = "cooking",
+		output = "unifieddyes:pigment_violet 2",
+		recipe = "flowers:flower_viola",
+	})
+end
 
 
 -- =================================================================

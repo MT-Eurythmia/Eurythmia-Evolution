@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+2012-07-26: Added a "version" check for the flowers dependency:  If the
+flowers mod defines "flowers:flower_geranium" (as is the case with my update
+of 2012-08-01), then those will be used to get blue pigment powder, and violas
+will produce violet powder, both of which can be directly used to create their
+respective liquid dye colors.  If it is not defined (e.g. the user has an 
+older version of the flowers mod), then violas produce blue dye powder.  Violet
+dye can still be formed by mixing blue and magenta or blue and red dyes, as
+before.
+
 2012-07-26: Better bottle textures.  Note that these are blended against the 
 50% grey field they normally appear on in the inventory display, so they will 
 show artifacts if you try to wield them.  Don't do that. :-)
