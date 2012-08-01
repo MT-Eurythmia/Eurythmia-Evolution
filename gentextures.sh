@@ -1,5 +1,15 @@
 #!/bin/bash
 
+if [ -z "`which convert`"] ; then {
+	echo "Please install Imagemagick."
+	exit 1
+}
+
+if [ -z "`which bc`"] ; then {
+	echo "Please install GNU bc."
+	exit 1
+}
+
 if [ $1 = "-t" ] ; then {
 	TINT_OVERLAY=$1
 	BASE=$2
