@@ -20,7 +20,7 @@ minetest.register_craftitem("unifieddyes:empty_bottle", {
 
 minetest.register_craft( {
         type = "shapeless",
-        output = "default:glass",
+        output = "vessels:glass_fragments",
         recipe = {
                 "unifieddyes:empty_bottle",
                 "unifieddyes:empty_bottle",
