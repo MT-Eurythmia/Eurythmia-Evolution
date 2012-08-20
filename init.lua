@@ -370,7 +370,7 @@ minetest.register_craft( {
 minetest.register_craftitem("unifieddyes:blue", {
 	description = "Full Blue Dye",
 	inventory_image = "unifieddyes_blue.png",
-	groups = { dye=1, basecolor_violet=1, excolor_violet=1, unicolor_violet=1 }
+	groups = { dye=1, basecolor_blue=1, excolor_blue=1, unicolor_blue=1 }
 })
 
 minetest.register_craftitem("unifieddyes:violet", {
