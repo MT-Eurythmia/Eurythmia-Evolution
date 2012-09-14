@@ -26,28 +26,41 @@ vendor.traversable_node_types = {
 
 vendor.formspec = function(pos, player)
 	local meta = minetest.env:get_meta(pos)
-	local description = minetest.registered_nodes[minetest.env:get_node(pos).name].description;
+	local meta = minetest.env:get_meta(pos)
+	local node = minetest.env:get_node(pos)
+	local description = minetest.registered_nodes[node.name].description;
+	local buysell = "sell"
+	if ( node.name == "vendor:depositor" ) then	
+		buysell = "buy"
+	end
+
 	local number = meta:get_int("number")
 	local cost = meta:get_int("cost")
 	local limit = meta:get_int("limit")
-	local formspec = "size[8,7;]"
-		.."label[0,0;" .. description .. "]"
-		.."field[2,1.5;2,1;number;Number;" .. number .. "]"
-		.."label[4,1.0;quantity per batch]"
-		.."field[2,3.0;2,1;cost;Cost;" .. cost .. "]"
-		.."label[4,2.5;cost per batch]"
-		.."field[2,4.5;2,1;limit;Limit;" .. limit .. "]"
-		.."label[4,4.0;sale limit]"
-		.."button[1,6;3,0.5;save;Save]"
-		.."button_exit[4.5,6;3,0.5;close;Save & Close]"
+	local formspec = "size[9,7;]"
+		.."label[0,0;Configure " .. description .. "]"
+		.."field[2,1.5;2,1;number;Count:;" .. number .. "]"
+		.."label[4,1.25;How many to bundle together]"
+		.."field[2,3.0;2,1;cost;Price:;" .. cost .. "]"
+		.."label[4,2.75;Price of a bundle]"
+		.."field[2,4.5;2,1;limit;Sale Limit:;" .. limit .. "]"
+		.."label[4,4.15;Number of bundles to "..buysell.."]"
+		.."label[4,4.45;   (0 for no limit)]"
+		.."button[1.5,6;3,0.5;save;Save]"
+		.."button_exit[4.5.5,6;3,0.5;close;Save & Close]"
 	return formspec
 end
 
 vendor.after_place_node = function(pos, placer)
 	local meta = minetest.env:get_meta(pos)
-	meta:set_string("formspec", vendor.formspec(pos, placer))
+	meta:set_string("itemtype", "")
+	meta:set_int("number", 0)
+	meta:set_int("cost", 0)
+	meta:set_int("limit", 0)
 	meta:set_string("owner", placer:get_player_name() or "")
-	vendor.disable(pos, "New Machine")
+	meta:set_string("formspec", vendor.formspec(pos, placer))
+	local description = minetest.registered_nodes[minetest.env:get_node(pos).name].description;
+	vendor.disable(pos, "New " .. description)
 end
 
 vendor.can_dig = function(pos,player)
@@ -61,10 +74,12 @@ vendor.can_dig = function(pos,player)
 end
 
 vendor.on_receive_fields = function(pos, formname, fields, sender)
-	local description = minetest.registered_nodes[minetest.env:get_node(pos).name].description;
+	local node = minetest.env:get_node(pos)
+	local description = minetest.registered_nodes[node.name].description;
 	local meta = minetest.env:get_meta(pos)
 	local owner = meta:get_string("owner")
 	if sender:get_player_name() ~= owner then
+		minetest.chat_send_player(sender:get_player_name(), "vendor:  Cannot configure machine.  The " .. description .. " belongs to " .. owner ..".")
 		return
 	end
 
@@ -72,22 +87,26 @@ vendor.on_receive_fields = function(pos, formname, fields, sender)
 	local cost = tonumber(fields.cost)
 	local limit = tonumber(fields.limit)
 	
-	if ( number < 1 or number > 99) then
-		vendor.disable(pos, "Number is invalid")
+	if ( number == nil or number < 1 or number > 99) then
+		minetest.chat_send_player(owner, "vendor: Invalid count.  You must enter a count between 1 and 99.")
+		vendor.disable(pos, "Misconfigured")
 		return
 	end
-	if ( cost < 0 ) then
-		vendor.disable(pos, "Cost is invalid")
+	if ( cost == nil or cost < 0 ) then
+		minetest.chat_send_player(owner, "vendor: Invalid price.  You must enter a positive number for the price.")
+		vendor.disable(pos, "Misconfigured")
 		return
 	end
-	if ( limit < 0 ) then
-		vendor.disable(pos, "Limit is invalid")
+	if ( limit == nil or limit < 0 ) then
+		minetest.chat_send_player(owner, "vendor: Invalid sales limit.  You must enter a positive number (or zero) for the limit.")
+		vendor.disable(pos, "Misconfigured")
 		return
 	end
 
 	local inv = vendor.find_connected_chest_inv(owner, pos, nil, nil, nil)
 
 	if ( inv == nil ) then
+		minetest.chat_send_player(owner, "vendor: Inventory is misconfigured.  It must be connected in a line to a locked chest that has items to sell")
 		vendor.disable(pos, "No Inventory/Improper Attachments")
 		return
 	end
@@ -107,7 +126,12 @@ vendor.on_receive_fields = function(pos, formname, fields, sender)
 	meta:set_int("limit", limit)
 	meta:set_int("enabled", 1)
 	meta:set_string("formspec", vendor.formspec(pos, sender))
-	minetest.chat_send_player(owner, "vendor: " .. description .. " is active!")
+
+	local buysell = "selling"
+	if ( node.name == "vendor:depositor" ) then	
+		buysell = "buying"
+	end
+	minetest.chat_send_player(owner, "vendor: " .. description .. " is now " .. buysell .. " " .. number .. " " .. vendor.get_item_desc(itemname) .. " for " .. cost .. money.currency_name)
 	vendor.sound_activate(pos)
 	vendor.refresh(pos)
 end
@@ -117,10 +141,10 @@ vendor.disable = function(pos, desc)
 	vendor.sound_deactivate(pos)
 	local meta = minetest.env:get_meta(pos)
 	local owner = meta:get_string("owner")
+	local description = minetest.registered_nodes[minetest.env:get_node(pos).name].description;
 	if ( desc == nil ) then
-		desc = "Disabled Machine"
+		desc = "Disabled " .. description
 	end
-	minetest.chat_send_player(owner, "vendor: " .. desc)
 	meta:set_string("infotext", ""..desc..", Owned By: " .. owner .. "")
 	meta:set_int("enabled", 0)
 end
@@ -161,9 +185,9 @@ vendor.refresh = function(pos, err)
 	end
 
 	if ( node.name == "vendor:vendor" ) then	
-		infotext = err .. owner .. " sells " .. number .. " " .. vendor.get_item_desc(itemtype) .. " for " .. cost .. money.currency_name .. limit_text .. per_text
+		infotext = err .. owner .. " Sells " .. number .. " " .. vendor.get_item_desc(itemtype) .. " for " .. cost .. money.currency_name .. limit_text .. per_text
 	else 
-		infotext = err .. owner .. " buys " .. number .. " " .. vendor.get_item_desc(itemtype) .. " for " .. cost .. money.currency_name .. limit_text .. per_text
+		infotext = err .. owner .. " Buys " .. number .. " " .. vendor.get_item_desc(itemtype) .. " for " .. cost .. money.currency_name .. limit_text .. per_text
 	end
 
 	if ( meta:get_string("infotext") ~= infotext ) then

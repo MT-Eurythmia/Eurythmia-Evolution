@@ -1,5 +1,5 @@
 ---
---vendor 1.00
+--vendor 1.01
 --Copyright (C) 2012 Bad_Command
 --
 --This library is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
 ---
 
 vendor = {}
-vendor.version = 1.00
+vendor.version = 1.01
 
 dofile(minetest.get_modpath("vendor") .. "/vendor.lua")
 
