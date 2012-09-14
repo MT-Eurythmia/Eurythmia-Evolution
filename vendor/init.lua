@@ -30,10 +30,10 @@ minetest.register_node("vendor:vendor", {
 	paramtype2 = "facedir",
 	groups = {snappy=2,choppy=2,oddly_breakable_by_hand=2},
 
-	on_construct = vendor.on_construct,
 	after_place_node = vendor.after_place_node,
 	can_dig = vendor.can_dig,
-	on_receive_fields = vendor.on_receive_fields
+	on_receive_fields = vendor.on_receive_fields,
+	on_punch = vendor.on_punch,
 })
 
 minetest.register_node("vendor:depositor", {
@@ -44,13 +44,11 @@ minetest.register_node("vendor:depositor", {
 	paramtype2 = "facedir",
 	groups = {snappy=2,choppy=2,oddly_breakable_by_hand=2},
 
-	on_construct = vendor.on_construct,
 	after_place_node = vendor.after_place_node,
 	can_dig = vendor.can_dig,
-	on_receive_fields = vendor.on_receive_fields
+	on_receive_fields = vendor.on_receive_fields,
+	on_punch = vendor.on_punch,
 })
-
-minetest.register_on_punchnode(vendor.on_punch)
 
 minetest.register_craft({
 	output = 'vendor:vendor',

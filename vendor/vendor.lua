@@ -24,18 +24,30 @@ vendor.traversable_node_types = {
 	"vendor:depositor"
 }
 
-vendor.after_place_node = function(pos, placer)
+vendor.formspec = function(pos, player)
 	local meta = minetest.env:get_meta(pos)
-	meta:set_string("owner", placer:get_player_name() or "")
-	vendor.disable(pos, "New Machine")
+	local description = minetest.registered_nodes[minetest.env:get_node(pos).name].description;
+	local number = meta:get_int("number")
+	local cost = meta:get_int("cost")
+	local limit = meta:get_int("limit")
+	local formspec = "size[8,7;]"
+		.."label[0,0;" .. description .. "]"
+		.."field[2,1.5;2,1;number;Number;" .. number .. "]"
+		.."label[4,1.0;quantity per batch]"
+		.."field[2,3.0;2,1;cost;Cost;" .. cost .. "]"
+		.."label[4,2.5;cost per batch]"
+		.."field[2,4.5;2,1;limit;Limit;" .. limit .. "]"
+		.."label[4,4.0;sale limit]"
+		.."button[1,6;3,0.5;save;Save]"
+		.."button_exit[4.5,6;3,0.5;close;Save & Close]"
+	return formspec
 end
 
-vendor.on_construct = function(pos)
+vendor.after_place_node = function(pos, placer)
 	local meta = minetest.env:get_meta(pos)
-
-	meta:set_string("formspec", "hack:sign_text_input")
-	meta:set_string("text", "0 0 0")
-	meta:set_string("infotext", "New Vending Machine")
+	meta:set_string("formspec", vendor.formspec(pos, placer))
+	meta:set_string("owner", placer:get_player_name() or "")
+	vendor.disable(pos, "New Machine")
 end
 
 vendor.can_dig = function(pos,player)
@@ -49,28 +61,27 @@ vendor.can_dig = function(pos,player)
 end
 
 vendor.on_receive_fields = function(pos, formname, fields, sender)
+	local description = minetest.registered_nodes[minetest.env:get_node(pos).name].description;
 	local meta = minetest.env:get_meta(pos)
 	local owner = meta:get_string("owner")
 	if sender:get_player_name() ~= owner then
 		return
 	end
 
-	local text = fields.text
-	meta:set_string("text", text)
-
-	if ( fields.text == nil ) then
-		vendor.disable(pos, "Misconfigured Machine")
+	local number = tonumber(fields.number)
+	local cost = tonumber(fields.cost)
+	local limit = tonumber(fields.limit)
+	
+	if ( number < 1 or number > 99) then
+		vendor.disable(pos, "Number is invalid")
 		return
 	end
-
-	local number, cost, limit, label = string.match(text, "^(%d+) (%d+) (%d+)$")
-	number = tonumber(number)
-	cost = tonumber(cost)
-	limit = tonumber(limit)
-
-	if ( number == nil or cost == nil or limit == nil or number < 1 or number > 99 or cost < 0 or limit < 0 ) then
-		minetest.chat_send_player(name, "vendor: You must specify values in the following form:  <# per bundle> <price for bundle> <sale limit(0 for none)>")
-		vendor.disable(pos, "Misconfigured Machine")
+	if ( cost < 0 ) then
+		vendor.disable(pos, "Cost is invalid")
+		return
+	end
+	if ( limit < 0 ) then
+		vendor.disable(pos, "Limit is invalid")
 		return
 	end
 
@@ -95,6 +106,8 @@ vendor.on_receive_fields = function(pos, formname, fields, sender)
 	meta:set_int("cost", cost)
 	meta:set_int("limit", limit)
 	meta:set_int("enabled", 1)
+	meta:set_string("formspec", vendor.formspec(pos, sender))
+	minetest.chat_send_player(owner, "vendor: " .. description .. " is active!")
 	vendor.sound_activate(pos)
 	vendor.refresh(pos)
 end
@@ -107,6 +120,7 @@ vendor.disable = function(pos, desc)
 	if ( desc == nil ) then
 		desc = "Disabled Machine"
 	end
+	minetest.chat_send_player(owner, "vendor: " .. desc)
 	meta:set_string("infotext", ""..desc..", Owned By: " .. owner .. "")
 	meta:set_int("enabled", 0)
 end
