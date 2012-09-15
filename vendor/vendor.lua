@@ -16,7 +16,7 @@
 --License along with this library; if not, write to the Free Software
 --Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ---
-
+ 
 vendor.traversable_node_types = {
 	"default:chest", 
 	"default:chest_locked",
@@ -29,7 +29,7 @@ vendor.formspec = function(pos, player)
 	local meta = minetest.env:get_meta(pos)
 	local node = minetest.env:get_node(pos)
 	local description = minetest.registered_nodes[node.name].description;
-	local buysell = "sell"
+	local buysell =  "sell"
 	if ( node.name == "vendor:depositor" ) then	
 		buysell = "buy"
 	end

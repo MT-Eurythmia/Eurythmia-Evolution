@@ -18,7 +18,7 @@
 ---
 
 vendor = {}
-vendor.version = 1.01
+vendor.version = 1.02
 
 dofile(minetest.get_modpath("vendor") .. "/vendor.lua")
 
