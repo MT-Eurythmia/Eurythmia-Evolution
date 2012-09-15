@@ -241,7 +241,7 @@ vendor.on_punch = function(pos, node, player)
 	local enabled = meta:get_int("enabled")
 
 	if not money.has_credit(player_name) then
-		minetest.chat_send_player(name, "vendor: You don't have credit ('money' privilege).")
+		minetest.chat_send_player(player_name, "vendor: You don't have credit ('money' privilege).")
 		vendor.sound_error(pos)
 		return 
 	end 
@@ -311,11 +311,11 @@ vendor.on_punch = function(pos, node, player)
 	to_inv:add_item("main", itemtype .. " " .. number)
 
 	if ( vending ) then
-		minetest.chat_send_player(name, "vendor: You bought " .. number .." " .. vendor.get_item_desc(itemtype) .. " from " .. owner .. " for " .. cost .. money.currency_name)
-		vendor.sound_vend()
+		minetest.chat_send_player(player_name, "vendor: You bought " .. number .." " .. vendor.get_item_desc(itemtype) .. " from " .. owner .. " for " .. cost .. money.currency_name)
+		vendor.sound_vend(pos)
 	else
-		minetest.chat_send_player(name, "vendor: You sold " .. number .. " " .. vendor.get_item_desc(itemtype) .. " to " .. owner .. " for " .. cost .. money.currency_name)
-		vendor.sound_deposit()
+		minetest.chat_send_player(player_name, "vendor: You sold " .. number .. " " .. vendor.get_item_desc(itemtype) .. " to " .. owner .. " for " .. cost .. money.currency_name)
+		vendor.sound_deposit(pos)
 	end
 
 
