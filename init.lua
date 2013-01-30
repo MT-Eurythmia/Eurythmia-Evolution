@@ -565,6 +565,7 @@ for i = 1, 12 do
                 "unifieddyes:" .. hue,
                 "unifieddyes:white_paint",
 	        },
+		replacements = { {'unifieddyes:white_paint', 'bucket:bucket_empty'}, },
 	})
 
 	minetest.register_craftitem("unifieddyes:dark_" .. hue .. "_s50", {
