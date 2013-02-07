@@ -1,17 +1,38 @@
--- Unified Dyes Mod by Vanessa Ezekowitz  ~~  2012-07-24
---
--- License: GPL
---
--- This mod depends on ironzorg's flowers mod and my Vessels mod.
+--[[
 
---============================================================================
--- First, craft some bottles from the Vessels mod, then make some dye base:
--- Craft six empty bottles along with a bucket of water and a piece
--- of jungle grass to get 6 portions of dye base.
+Unified Dyes
 
--- These craft/craftitem definitions for glass bottles are deprecated and are
--- only included here for backwards compatibility. Use vessels:glass_bottle
--- instead.
+This mod provides a complete dye system and framework for Minetest 0.4.x.
+
+==============================================================================
+
+Copyright (C) 2012-2013, Vanessa Ezekowitz
+Email: vanessaezekowitz@gmail.com
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+==============================================================================
+
+First, craft some bottles from the Vessels mod, then make some dye base:
+Craft six empty bottles along with a bucket of water and a piece
+of jungle grass to get 6 portions of dye base.
+
+These craft/craftitem definitions for glass bottles are deprecated and are
+only included here for backwards compatibility. Use vessels:glass_bottle
+instead.
+]]--
 
 minetest.register_craftitem("unifieddyes:empty_bottle", {
         description = "Glass Bottle (empty) (Deprecated)",
