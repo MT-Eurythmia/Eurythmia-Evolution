@@ -1,119 +1,89 @@
 VanessaE's Unified Dyes
 =======================
 
-This is a pretty extensive dyes mod, which has the sole purpose of supplying a 
-complete set of colors and a few greys, all of which are intended to be used by 
-other mods as needed to make colored objects.  It uses Ironzorg's Flowers mod 
-as the source of the actual pigments, which can be had from one of the links 
-below.
+The purpose of this mod originally was to supply a complete set of colors for 
+Minetest mod authors to use in their recipes.  Since the default dyes mod that 
+is supplied with Minetest "common" is now usable (via flowers, also included in 
+"common"), this mod has become more of an extension pack.
 
-In total, this mod provides 89 colors and greys.
+Unified Dyes expands the standard dye set from 15 to 90 colors.
 
 IMPORTANT: This mod is not intended to suggest that you should use the entire 
 palette.  Rather, I was hoping people would just choose maybe the dozen or so 
-most useful colors to use in their mods.  The modding template at the bottom of 
-this post, while intended to render the entire palette, is still just a 
-template - please trim out the colors and shades you don't actually need.
+most useful colors to use in their mods.
 
-Dependencies: Nature Pack OR flowers
+Dependencies: default and dye from Minetest "common". This mod will NOT work 
+without these.  This mod will NOT work without these.  The default dye mod is 
+normally activated only in the standard "build" and "minetest_game" games, or perhaps if 
+someone has a modpack or game that includes them.
 
-Recommends: buckets, junglegrass
+Recommends: flowers from common.
 
-License: For the buckets of paint, cc-by-sa 3.0.  For everything else, GPL.
+License: GPL 2.0 or higher for the code, CC-by-SA 3.0 for the textures.
 
 Install: Unzip the distribution file, rename the resultant 
 VanessaE-unifieddyes-blahblah folder to just "unifieddyes", and move it into 
 Minetest's mods folder.
 
-Changelog:
-https://github.com/VanessaE/unifieddyes/blob/master/changelog.txt
-
 The Palette:
 
-[ https://github.com/VanessaE/unifieddyes/raw/master/color-swatches.png ]
-[ The complete official palette, showing all 84 colors and 5 greys. ]
+[ http://digitalaudioconcepts.com/vanessa/hobbies/minetest/screenshots/color-swatches.png ] 
+[ The official palette, showing 84 colors and 5 greys. ]
 
 In the image above, the "50%" markings on the left next to each shade mean 50% 
 saturation for all hues in that shade line.  Note that the "light" shades don't 
 have (or need) that variant.  For the greys, the percentages shown are of 
-brightness relative to pure white.
+brightness relative to pure white.  There are three special cases: Light red 
+has been aliased to default pink dye, and dark green has been aliased to 
+default dark greey dye.  Brown dye also exists in the default set, it's just 
+not shown in the palette above.
 
-Usage instructions, technical information
+
+Usage instructions, technical information 
 =========================================
 
 Getting Started
 ---------------
 
-First thing's first: you're going to need something in which to contain your 
-dyes - namely, glass bottles.  Making them is very simple: Craft 5 blocks of 
-glass in a U shape, and you get 15 glass bottles as the output.
+First thing's first: you're going to need to harvest some materials to make the 
+dyes from.  For this, you need one or more of the following: roses (red), 
+tulips (orange), yellow dandelions (yellow), cactus (green), geraniums (blue), 
+violas (purple), coal (black), or white dandelions (white).  Simply wander 
+around your world and collect whichever of the above you need to get your 
+colors.
 
-[ https://github.com/VanessaE/unifieddyes/raw/master/empty-bottles.png ]
+[ http://digitalaudioconcepts.com/vanessa/hobbies/minetest/screenshots/unifieddyes1.png ]
+[ The 8 base colors directly obtainable from a material in the world. ]
 
-Now, let's fill them up with some dye base.  Craft six glass bottles with one 
-piece of jungle grass and one bucket of water, in any positions in the grid.  
-The result will be 6 individual bottles of uncolored dye base and an empty 
-bucket.
+Simply place one of the above materials into the crafting grid to obtain four 
+portions of dye in that color From those initial 8 colors, you can directly 
+fashion another 11, for a total of 19 standard colors (including the various 
+greys):
 
-[ https://github.com/VanessaE/unifieddyes/raw/master/dye-base.png ]
+[ http://digitalaudioconcepts.com/vanessa/hobbies/minetest/screenshots/unifieddyes2.png ]
+[ The complete 19-color standard set. ]
 
-Next, we need to harvest some materials to make the pigments themselves from.  
-For this, you need one or more of the following: roses (red), tulips (orange), 
-dandelions (yellow), cactus or waterlilies (green), violas (blue), coal 
-("carbon black"), or stone+junglegrass+water (white, "titanium dioxide").  
-Simply wander around your world and collect whichever of the above you need to 
-get your colors.
+The standardized colors and their crafting methods are as follows:
 
-Once that's done, simply smelt a flower, coal, or stone to get the associated 
-pigment.  One flower or lump of coal yields 2 portions of pigment powder, 
-cactus yields 6, while stone yields 10 (of titanium dioxide).
+* Red (0°): one rose
+* Orange (30°): one tulip, or put one red dye and one yellow dye into the
+  crafting grid to mix them (yields 2)
+* Yellow (60°): one yellow dandelion
+* Lime (90°): mix yellow + green (yields 2)
+* Green (120°): one cactus, or mix yellow + blue (yields 2)
+* Aqua (150°): mix green + cyan (yields 2)
+* Cyan (180°): mix green + blue (yields 2)
+* Sky blue (210°): mix cyan + blue (yields 2)
+* Blue (240°): one geranium
+* Violet (270°): one viola, or mix blue + magenta (yields 2).
+* Magenta (300°): mix blue + red (yields 2)
+* Red-violet (330°): mix magenta + red (yields 2)
 
-Now that you have your pigments, take one bottle of the dye base you made above 
-and craft it with one portion of a pigment to get a usable bottle of dye of 
-that color.
-
-[ https://github.com/VanessaE/unifieddyes/raw/master/craft-red-dye.png ]
-
-When all is said and done, the above ingredients and process can be repeated 
-for all 7 of these "root" colors, resulting in...
-
-[ https://github.com/VanessaE/unifieddyes/raw/master/unifieddyes1.png ]
-
-The 7 "root" color pigments along with their sources and resultant dyes: Red, 
-Orange, Yellow, Green, Blue, White, and Black.
-
-The 17 Color standard set:
-
-All colors are fashioned using mixtures of the 'root' colors created above.
-
-[ https://github.com/VanessaE/unifieddyes/raw/master/unifieddyes2.png ]
-[ The 12 "full" colors and the five grey shades. ]
-
-These 17 colors and greys can be formed using these recipes:
-
- *   Red (0°): smelt one rose (yields 2 portions of red dye)
- *   Orange (30°): smelt one tulip (yields 2) or mix red+yellow (yields 2)
- *   Yellow (60°): smelt one yellow dandelion (yields 2)
- *   Lime (90°): mix yellow + green (yields 2)
- *   Green (120°): smelt one cactus or one waterlily (yields 2),
-                  or mix yellow + blue (yields 2)
- *   Aqua (150°): mix green + cyan (yields 2)
- *   Cyan (180°): green + blue (yields 2)
- *   Sky blue (210°): mix cyan + blue (yields 2)
- *   Blue (240°): Smelt one viola (yields 2)
- *   Violet (270°): mix blue + magenta (yields 2) 
-                    or mix 2 blues + 1 red (yields 3)
- *   Magenta (300°): Mix blue + red (yields 2)
- *   Red-violet (330°): mix magenta + red (yields 2)
-
- *   Black (7.5%): smelt one piece of coal (yields 2) -- Note that this dye is
-                   only used with other dyes, not with the paints.
- *   Dark grey (25%): mix one portion of white paint with two portions of
-                      carbon black powder (not the above black dye) (yields 3)
- *   Medium grey (50%): mix one white and one carbon black (yields 2)
- *   Light grey (75%): Mix two white and one carbon black (yields 3)
- *   White (95%): Craft one piece of jungle grass with one bucket of
-                  water and one portion of titanium dioxide (yields 1).
+* Black (7.5%): one piece of coal
+* Dark grey (25%): mix one white + two black (yields 3)
+* Medium grey (50%): mix one white and one black (yields 2)
+* Light grey (75%): Mix two white and one black (yields 3)
+* White (95%): one white dandelion.
 
 The degree figures are the colors' hues on a standard HSV color wheel, and are 
 what I used in the textures supplied with this mod.  For the greys, the figures 
@@ -122,20 +92,22 @@ white.  Note that black and white don't go all the way to the bottom/top of the
 scale, as doing so may crush some details in textures made in those shades (see 
 below, regarding semi-automatic texture generation).
 
+
 Darker/Lighter colors
 ---------------------
 
 To obtain a dark (33%) version of a given color, use two portions of black dye 
-along with the base color, which yields three portions of the final color.
+along with the base color from the list above, which yields three portions of 
+the final color.
 
-To obtain a medium-brightness (66%) version of a given color, mix the desired 
-base color from the list above with one portion of black dye (for example, 
-medium lime = lime + black).  All such mixtures yield two portions of the final 
-color.
+To obtain a medium-brightness (66%) version of a given color, mix one portion 
+the base color with one portion of black dye (for example, medium lime = lime + 
+black).  All such mixtures yield two portions of the final color.
 
 To obtain a light (150% over full) version of a given color, mix one portion of 
-the base color with one portion of white paint.  Yields 2 portions of the final 
+the base color with one portion of white dye.  Yields 2 portions of the final 
 color.
+
 
 Low-saturation colors
 ---------------------
@@ -143,84 +115,57 @@ Low-saturation colors
 To get the low saturation (50%) version of one of the base colors, mix one or 
 more of white, black, or a shade of grey with the desired base color:
 
-Dark, low saturation: dark grey paint + color (yields 2), or two blacks + 1 
-white + color (yields 4).  For example, dark, low-saturation red = red + dark 
-grey paint, or red + two black + one white.
+Dark, low saturation: dark grey dye + color (yields 2), or two blacks + 1 white 
++ color (yields 4).  For example, dark, low-saturation red = red + dark grey, 
+or red + two black + one white.
 
-Medium brightness, low saturation: medium grey paint + color (yields 2), or 
-black + white + color (yields 3).  For example, medium, low-saturation green = 
-green + medium grey, or green + black + white.
+Medium brightness, low saturation: medium grey dye + color (yields 2), or black 
++ white + color (yields 3).  For example, medium, low-saturation green = green 
++ medium grey, or green + black + white.
 
-Full, low saturation: light grey + color (yields 2), or 1 black + 2 whites + 
-color (yields 4).  For example, bright, low-saturation blue = blue + light 
+Full, low saturation: light grey dye + color (yields 2), or 1 black + 2 whites 
++ color (yields 4).  For example, bright, low-saturation blue = blue + light 
 grey, or blue + black + 2 white.
 
 There is no low-saturation version of the "light" colors.
+
+Red + white always returns default pink dye, and black + green always returns 
+default dark green dye.
+
 
 RGB values
 ----------
 
 All RGB values and filenames for all colors and shades of grey are represented 
-in the file "colors.txt" (which is generated with the bash script 
-"listcolors.sh"), included in the distribution directory.
+in the file "colors.txt" (which was generated with the bash script 
+"listcolors.sh"), included in the distribution directory.  Note that 
+listcolors.sh is an example only and was written for a different set of 
+textures than what Unified Dyes includes now.
+
 
 Misc. Notes
 -----------
 
-If you need to use /give commands, the item names are of the following format:
+If you need to use /give commands, the item names for the standard set of 12 
+regular "full" colors (plus pink, brown, and dark green) is simply "dye:color", 
+e.g. "dye:red", "dye:pink", or "dye:skyblue".  Greys have a similar naming 
+convention: dye:white, dye:light_grey, dye:grey, dye:dark_grey, or dye:black.
 
-unifieddyes:{"light_" or nothing or "medium_" or "dark_"}{color}{nothing or 
-"_s50"}.
+For everything beyond those initial 19 colors, the item names are of the 
+following format:
+
+unifieddyes:{"light_" or "medium_" or "dark_"}{color}{nothing or "_s50"}.
 
 For example, low saturation dark yellow is "unifieddyes:dark_yellow_s50", while 
-bright, full-saturation red is simply "unifieddyes:red".  For the greys, the 
-names are unifieddyes:white_paint, unifieddyes:lightgrey_paint, 
-unifieddyes:grey_paint, unifieddyes:darkgrey_paint, or unifieddyes:black.
+light normal-saturation red-violet would be "unifieddyes:light_redviolet".
 
 See the texture filenames in the textures/ folder for further hints - all of 
-the item names follow the same format as the filenames, save for having a colon 
-(:) instead of the first underscore (_).
-
-Mods should use the replacements= parameter in their crafting recipes, to 
-return the empty bottles and buckets after they've been used.  Something like 
-this should do in the case of a bottle of dye:
-
-replacements = { { 'unifieddyes:some_color_here', 'unifieddyes:empty_bottle' }, 
-},
-
-Empty bottles can be crafted back into 9-pack sets, which can then be recycled 
-into glass blocks by smelting them.
+the item names follow the same format as the corresponding filenames, save for 
+having a colon (:) instead of the first underscore (_).
 
 
-Semi-automatic generation of nodes, crafting recipes, and textures
+Semi-automatic generation of nodes, crafting recipes, and textures 
 ==================================================================
-
-The modding template
---------------------
-
-Along with this mod, you should also download my modding template, which is 
-quite easy to transform into whatever mod you want to create that needs 
-unifieddyes.
-
-It's just a skeleton, but all you should need to do to get started is to rename 
-the folder to whatever your mod will be named, tweak a few variables near the 
-start of the template's init.lua, and follow the above instructions regarding 
-the creation of your textures.
-
-If you do it right, you should end up with a very basic mod giving you craft 
-and /give access to your various items.  After that part is confirmed working, 
-just add whatever code you need to the end of the init.lua to define additional 
-functions, items, crafts, and smelting recipes, etc., as needed by your mod, 
-and start coding and testing like usual.
-
-The template is configured by default to return the empty glass bottles 
-whenever a dye is used.
-
-This template is not supplied as part of the unifieddyes mod, rather you need 
-fetch it separately from here:
-
-Download Template: https://github.com/VanessaE/modtemplate/zipball/master
-  ...or browse the code: https://github.com/VanessaE/modtemplate
 
 The texture generator script
 ----------------------------
@@ -298,3 +243,6 @@ actually work, and will exit immediately if the any are invalid, missing, etc.
 Use your favorite image browser or file manager to review the results in 
 generated-textures/, and if they're right, copy them over to the textures/ 
 folder in your mod.
+
+Note that this script does not generate brown and pink variations of your base 
+texture - you'll have to do those two manually.
