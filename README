@@ -164,8 +164,8 @@ the item names follow the same format as the corresponding filenames, save for
 having a colon (:) instead of the first underscore (_).
 
 
-Semi-automatic generation of nodes, crafting recipes, and textures 
-==================================================================
+Semi-automatic generation of textures 
+=====================================
 
 The texture generator script
 ----------------------------
