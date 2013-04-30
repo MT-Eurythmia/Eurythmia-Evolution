@@ -1,4 +1,2 @@
 default
-flowers
-vessels
-bucket
+dye
