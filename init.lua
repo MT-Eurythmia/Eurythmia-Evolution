@@ -168,7 +168,7 @@ minetest.register_craft( {
 
 -- "s50" in a file/item name means "saturation: 50%".
 -- Brightness levels in the textures are 33% ("dark"), 66% ("medium"),
--- 100% ("full" but not so-named), and 150% ("light").
+-- 100% ("full", but not so-named), and 150% ("light").
 
 HUES = {
 	"red",
@@ -336,7 +336,7 @@ for i = 1, 12 do
 	})
 
 	minetest.register_craftitem("unifieddyes:" .. hue .. "_s50", {
-		description = "Full " .. hue2 .. " Dye (low saturation)",
+		description = hue2 .. " Dye (low saturation)",
 		inventory_image = "unifieddyes_" .. hue .. "_s50.png",
 		groups = { dye=1, ["unicolor_"..hue.."_s50"]=1 }
 	})
