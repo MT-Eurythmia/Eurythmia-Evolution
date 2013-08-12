@@ -105,7 +105,7 @@ minetest.register_craft( {
 minetest.register_craftitem(":dye:light_grey", {
         description = "Light Grey Dye",
         inventory_image = "unifieddyes_lightgrey.png",
-	groups = { dye=1, excolor_red_violet=1, unicolor_red_violet=1, not_in_creative_inventory=1 }
+	groups = { dye=1, excolor_lightgrey=1, unicolor_light_grey=1, not_in_creative_inventory=1 }
 })
 
 minetest.register_craft( {
