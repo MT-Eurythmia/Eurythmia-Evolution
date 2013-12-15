@@ -170,7 +170,7 @@ minetest.register_craft( {
 -- Brightness levels in the textures are 33% ("dark"), 66% ("medium"),
 -- 100% ("full", but not so-named), and 150% ("light").
 
-HUES = {
+local HUES = {
 	"red",
 	"orange",
 	"yellow",
@@ -185,7 +185,7 @@ HUES = {
 	"redviolet"
 }
 
-HUES2 = {
+local HUES2 = {
 	"Red",
 	"Orange",
 	"Yellow",
@@ -203,8 +203,8 @@ HUES2 = {
 
 for i = 1, 12 do
 
-	hue = HUES[i]
-	hue2 = HUES2[i]
+	local hue = HUES[i]
+	local hue2 = HUES2[i]
 
 	minetest.register_craft( {
         type = "shapeless",
