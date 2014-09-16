@@ -33,7 +33,9 @@ minetest.register_node("vendor:vendor", {
 	after_place_node = vendor.after_place_node,
 	can_dig = vendor.can_dig,
 	on_receive_fields = vendor.on_receive_fields,
-	on_punch = vendor.on_punch,
+    allow_metadata_inventory_put = vendor.allow_metadata_inventory_put,
+    allow_metadata_inventory_take = vendor.allow_metadata_inventory_take,
+    allow_metadata_inventory_move = vendor.allow_metadata_inventory_move,
 })
 
 minetest.register_node("vendor:depositor", {
@@ -47,7 +49,9 @@ minetest.register_node("vendor:depositor", {
 	after_place_node = vendor.after_place_node,
 	can_dig = vendor.can_dig,
 	on_receive_fields = vendor.on_receive_fields,
-	on_punch = vendor.on_punch,
+    allow_metadata_inventory_put = vendor.allow_metadata_inventory_put,
+    allow_metadata_inventory_take = vendor.allow_metadata_inventory_take,
+    allow_metadata_inventory_move = vendor.allow_metadata_inventory_move,
 })
 
 minetest.register_craft({
@@ -67,5 +71,3 @@ minetest.register_craft({
                 {'default:wood', 'default:wood', 'default:wood'},
         }
 })
-
-
