@@ -1,6 +1,7 @@
 ---
 --vendor
 --Copyright (C) 2012 Bad_Command
+--Rewrited by Andrej
 --
 --This library is free software; you can redistribute it and/or
 --modify it under the terms of the GNU Lesser General Public
@@ -103,7 +104,7 @@ vendor.on_receive_fields_customer = function(pos, formname, fields, sender)
                 if chest_inv:contains_item("main", stack) and player_inv:contains_item("main", price) and
                    chest_inv:room_for_item("main", price) and player_inv:room_for_item("main", stack) then
                    player_inv:remove_item("main", price)
-                   chest_inv:remove_item("main", stack)
+                   stack = chest_inv:remove_item("main", stack)
                    chest_inv:add_item("main", price)
                    player_inv:add_item("main", stack)
                    minetest.chat_send_player(sender:get_player_name(), "You bought item.")
@@ -116,7 +117,7 @@ vendor.on_receive_fields_customer = function(pos, formname, fields, sender)
             else
                 if chest_inv:contains_item("main", price) and player_inv:contains_item("main", stack) and
                    chest_inv:room_for_item("main", stack) and player_inv:room_for_item("main", price) then
-                   player_inv:remove_item("main", stack)
+                   stack = player_inv:remove_item("main", stack)
                    chest_inv:remove_item("main", price)
                    chest_inv:add_item("main", stack)
                    player_inv:add_item("main", price)
@@ -147,12 +148,14 @@ vendor.after_place_node = function(pos, placer)
 	local meta = minetest.get_meta(pos)
     local inv = meta:get_inventory()
     local description = minetest.registered_nodes[node.name].description;
+    local player_name = placer:get_player_name()
     inv:set_size("item", 1)
     inv:set_size("gold", 1)
     
     inv:set_stack( "gold", 1, "default:gold_ingot" )
 
-	meta:set_int("number", 1)
+	meta:set_string("infotext", player_name.." - "..description)
+    meta:set_int("number", 1)
     meta:set_int("cost", 1)
 	meta:set_string("itemname", "")
 
@@ -162,13 +165,20 @@ vendor.after_place_node = function(pos, placer)
 end
 
 vendor.can_dig = function(pos, player)
-	local meta = minetest.get_meta(pos);
-	local owner = meta:get_string("owner")
-	local name = player:get_player_name()
-	if name == owner then
-		return true
-	end
-	return false
+    local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
+    local meta_chest = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z});
+    if chest.name=="default:chest_locked" then
+         if player and player:is_player() then
+            local owner_chest = meta_chest:get_string("owner")
+            local name = player:get_player_name()
+            if name == owner_chest then
+                return true --chest owner can dig shop
+            end
+         end
+         return false
+    else
+        return true --if no chest, enyone can dig this shop
+    end
 end
 
 vendor.on_receive_fields = function(pos, formname, fields, sender)
