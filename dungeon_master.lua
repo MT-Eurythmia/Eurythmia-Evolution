@@ -56,7 +56,8 @@ mobs:register_spawn("mobs_monster:dungeon_master", {"default:stone"}, 7, 0, 7000
 
 mobs:register_egg("mobs_monster:dungeon_master", "Dungeon Master", "fire_basic_flame.png", 1, true)
 
-minetest.register_alias("mobs:dungeon_master", "mobs_monster:dungeon_master")
+-- compatibility
+mobs:alias_mob("mobs:dungeon_master", "mobs_monster:dungeon_master")
 
 -- fireball (weapon)
 mobs:register_arrow("mobs_monster:fireball", {

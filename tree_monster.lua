@@ -31,8 +31,8 @@ mobs:register_mob("mobs_monster:tree_monster", {
 		{name = "ethereal:jungle_tree_sapling", chance = 3, min = 1, max = 2},
 		{name = "default:apple", chance = 2, min = 1, max=3},
 	},
-	water_damage = 1,
-	lava_damage = 5,
+	water_damage = 2,
+	lava_damage = 0,
 	light_damage = 2,
 	fall_damage = 0,
 	animation = {
@@ -54,7 +54,8 @@ mobs:register_spawn("mobs_monster:tree_monster",
 
 mobs:register_egg("mobs_monster:tree_monster", "Tree Monster", "default_tree_top.png", 1)
 
-minetest.register_alias("mobs:tree_monster", "mobs_monster:tree_monster")
+-- compatibility
+mobs:alias_mob("mobs:tree_monster", "mobs_monster:tree_monster")
 
 -- ethereal sapling compatibility
 if not minetest.get_modpath("ethereal") then

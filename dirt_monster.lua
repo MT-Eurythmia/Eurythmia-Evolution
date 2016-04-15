@@ -52,4 +52,5 @@ mobs:register_spawn("mobs_monster:dirt_monster",
 
 mobs:register_egg("mobs_monster:dirt_monster", "Dirt Monster", "default_dirt.png", 1)
 
-minetest.register_alias("mobs:dirt_monster", "mobs_monster:dirt_monster")
+-- compatibility
+mobs:alias_mob("mobs:dirt_monster", "mobs_monster:dirt_monster")

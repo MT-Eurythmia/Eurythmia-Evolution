@@ -53,4 +53,5 @@ mobs:register_spawn("mobs_monster:stone_monster", {"default:stone", "default:des
 
 mobs:register_egg("mobs_monster:stone_monster", "Stone Monster", "default_stone.png", 1)
 
-minetest.register_alias("mobs:stone_monster", "mobs_monster:stone_monster")
+-- compatibility
+mobs:alias_mob("mobs:stone_monster", "mobs_monster:stone_monster")

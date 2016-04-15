@@ -56,7 +56,8 @@ mobs:register_spawn("mobs_monster:lava_flan", {"default:lava_source"}, 15, 0, 10
 
 mobs:register_egg("mobs_monster:lava_flan", "Lava Flan", "default_lava.png", 1)
 
-minetest.register_alias("mobs:lava_flan", "mobs_monster:lava_flan")
+-- compatibility
+mobs:alias_mob("mobs:lava_flan", "mobs_monster:lava_flan")
 
 -- lava orb
 minetest.register_craftitem(":mobs:lava_orb", {

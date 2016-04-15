@@ -56,7 +56,8 @@ mobs:register_spawn("mobs_monster:mese_monster", {"default:stone"}, 7, 0, 5000, 
 
 mobs:register_egg("mobs_monster:mese_monster", "Mese Monster", "default_mese_block.png", 1)
 
-minetest.register_alias("mobs:mese_monster", "mobs_monster:mese_monster")
+-- compatibility
+mobs:alias_mob("mobs:mese_monster", "mobs_monster:mese_monster")
 
 -- mese arrow (weapon)
 mobs:register_arrow("mobs_monster:mese_arrow", {

@@ -54,7 +54,8 @@ mobs:register_spawn("mobs_monster:spider",
 
 mobs:register_egg("mobs_monster:spider", "Spider", "mobs_cobweb.png", 1)
 
-minetest.register_alias("mobs:spider", "mobs_monster:spider")
+-- compatibility
+mobs:alias_mob("mobs:spider", "mobs_monster:spider")
 
 -- ethereal crystal spike compatibility
 if not minetest.get_modpath("ethereal") then

@@ -51,4 +51,5 @@ mobs:register_spawn("mobs_monster:sand_monster", {"default:desert_sand"}, 20, 0,
 
 mobs:register_egg("mobs_monster:sand_monster", "Sand Monster", "default_desert_sand.png", 1)
 
-minetest.register_alias("mobs:sand_monster", "mobs_monster:sand_monster")
+-- compatibility
+mobs:alias_mob("mobs:sand_monster", "mobs_monster:sand_monster")

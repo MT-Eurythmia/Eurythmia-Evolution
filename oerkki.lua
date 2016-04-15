@@ -59,4 +59,5 @@ mobs:register_spawn("mobs_monster:oerkki", {"default:stone"}, 7, 0, 7000, 1, -10
 
 mobs:register_egg("mobs_monster:oerkki", "Oerkki", "default_obsidian.png", 1)
 
-minetest.register_alias("mobs:oerkki", "mobs_monster:oerkki")
+-- compatibility
+mobs:alias_mob("mobs:oerkki", "mobs_monster:oerkki")
