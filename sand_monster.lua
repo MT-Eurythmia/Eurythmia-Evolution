@@ -45,6 +45,12 @@ mobs:register_mob("mobs_monster:sand_monster", {
 		punch_start = 74,
 		punch_end = 105,
 	},
+--[[
+	custom_attack = function(self, p)
+		local pos = self.object:getpos()
+		minetest.add_item(pos, "default:sand")
+	end,
+]]
 })
 
 mobs:register_spawn("mobs_monster:sand_monster", {"default:desert_sand"}, 20, 0, 7000, 1, 31000)
