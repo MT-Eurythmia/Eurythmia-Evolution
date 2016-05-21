@@ -106,10 +106,9 @@ function minetest.handle_node_drops(pos, drops, digger)
 			table.insert(hot_drops,
 				ItemStack({
 					name = output.item:get_name(),
-					count = stack:get_count()
+					count = output.item:to_table().count,
 				})
 			)
-
 		else -- if not then return normal drops
 			table.insert(hot_drops, stack)
 		end
