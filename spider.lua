@@ -1,8 +1,11 @@
 
+local S = mobs.intllib
+
 -- Spider by AspireMint (fishyWET (CC-BY-SA 3.0 license for texture)
 
 mobs:register_mob("mobs_monster:spider", {
 	docile_by_day = true,
+	group_attack = true,
 	type = "monster",
 	passive = false,
 	attack_type = "dogfight",
@@ -52,7 +55,7 @@ mobs:register_mob("mobs_monster:spider", {
 mobs:register_spawn("mobs_monster:spider",
 	{"default:desert_stone", "ethereal:crystal_dirt"}, 13, 0, 7000, 1, 71)
 
-mobs:register_egg("mobs_monster:spider", "Spider", "mobs_cobweb.png", 1)
+mobs:register_egg("mobs_monster:spider", S("Spider"), "mobs_cobweb.png", 1)
 
 -- compatibility
 mobs:alias_mob("mobs:spider", "mobs_monster:spider")
@@ -64,7 +67,7 @@ end
 
 -- cobweb
 minetest.register_node(":mobs:cobweb", {
-	description = "Cobweb",
+	description = S("Cobweb"),
 	drawtype = "plantlike",
 	visual_scale = 1.1,
 	tiles = {"mobs_cobweb.png"},

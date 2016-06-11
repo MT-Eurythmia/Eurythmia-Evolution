@@ -1,4 +1,6 @@
 
+local S = mobs.intllib
+
 -- Dungeon Master by PilzAdam
 
 mobs:register_mob("mobs_monster:dungeon_master", {
@@ -58,7 +60,7 @@ mobs:register_mob("mobs_monster:dungeon_master", {
 
 mobs:register_spawn("mobs_monster:dungeon_master", {"default:stone"}, 7, 0, 7000, 1, -70)
 
-mobs:register_egg("mobs_monster:dungeon_master", "Dungeon Master", "fire_basic_flame.png", 1, true)
+mobs:register_egg("mobs_monster:dungeon_master", S("Dungeon Master"), "fire_basic_flame.png", 1, true)
 
 -- compatibility
 mobs:alias_mob("mobs:dungeon_master", "mobs_monster:dungeon_master")

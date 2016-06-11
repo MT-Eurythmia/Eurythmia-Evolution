@@ -1,4 +1,6 @@
 
+local S = mobs.intllib
+
 -- Tree Monster (or Tree Gollum) by PilzAdam
 
 mobs:register_mob("mobs_monster:tree_monster", {
@@ -52,7 +54,7 @@ mobs:register_mob("mobs_monster:tree_monster", {
 mobs:register_spawn("mobs_monster:tree_monster",
 	{"default:leaves", "default:jungleleaves"}, 7, 0, 7000, 1, 31000, false)
 
-mobs:register_egg("mobs_monster:tree_monster", "Tree Monster", "default_tree_top.png", 1)
+mobs:register_egg("mobs_monster:tree_monster", S("Tree Monster"), "default_tree_top.png", 1)
 
 -- compatibility
 mobs:alias_mob("mobs:tree_monster", "mobs_monster:tree_monster")

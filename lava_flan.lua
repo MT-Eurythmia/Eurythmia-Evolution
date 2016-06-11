@@ -1,4 +1,6 @@
 
+local S = mobs.intllib
+
 -- Lava Flan by Zeg9 (additional textures by JurajVajda)
 
 mobs:register_mob("mobs_monster:lava_flan", {
@@ -54,14 +56,14 @@ mobs:register_mob("mobs_monster:lava_flan", {
 
 mobs:register_spawn("mobs_monster:lava_flan", {"default:lava_source"}, 15, 0, 1000, 2, 0)
 
-mobs:register_egg("mobs_monster:lava_flan", "Lava Flan", "default_lava.png", 1)
+mobs:register_egg("mobs_monster:lava_flan", S("Lava Flan"), "default_lava.png", 1)
 
 -- compatibility
 mobs:alias_mob("mobs:lava_flan", "mobs_monster:lava_flan")
 
 -- lava orb
 minetest.register_craftitem(":mobs:lava_orb", {
-	description = "Lava orb",
+	description = S("Lava orb"),
 	inventory_image = "zmobs_lava_orb.png",
 })
 
@@ -118,7 +120,7 @@ function minetest.handle_node_drops(pos, drops, digger)
 end
 
 minetest.register_tool(":mobs:pick_lava", {
-	description = "Lava Pickaxe",
+	description = S("Lava Pickaxe"),
 	inventory_image = "mobs_pick_lava.png",
 	tool_capabilities = {
 		full_punch_interval = 0.4,
