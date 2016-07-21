@@ -33,7 +33,7 @@ mobs:register_mob("mobs_monster:tree_monster", {
 		{name = "ethereal:jungle_tree_sapling", chance = 3, min = 1, max = 2},
 		{name = "default:apple", chance = 2, min = 1, max=3},
 	},
-	water_damage = 2,
+	water_damage = 0,
 	lava_damage = 0,
 	light_damage = 2,
 	fall_damage = 0,
