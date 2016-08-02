@@ -1,7 +1,7 @@
 -- Falling Light
 -- A simple mod for explorers
 -- (C) Tai "DuCake" Kedzierski 2016
--- Provided to you under LGPLv2
+-- Provided to you under 3-Clause BSD
 
 minetest.register_node("falling_light:light", {
 	description = "Falling Light",
