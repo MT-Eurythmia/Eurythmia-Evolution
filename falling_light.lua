@@ -3,7 +3,7 @@
 -- (C) Tai "DuCake" Kedzierski 2016
 -- Provided to you under 3-Clause BSD
 
-minetest.register_alias(":falling_light:light","vivarium:falling_light")
+minetest.register_alias("falling_light:light","vivarium:falling_light")
 
 minetest.register_node("vivarium:falling_light", {
 	description = "Falling Light",
