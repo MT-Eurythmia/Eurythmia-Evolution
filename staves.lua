@@ -28,12 +28,13 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
 		local relpos = (userpos.y - pos.y)/math.sqrt((userpos.y - pos.y)^2)
 		local lower = 0 ; local higher = 0
 		if relpos < 0 then
+			minetest.chat_send_player(pname, "Stack down")
 			lower = -1*height
 		elseif relpos > 0 then
+			minetest.chat_send_player(pname, "Stack up")
 			higher = height
 		end
 
-		minetest.chat_send_all(pos.y .. "//" .. pos.y+relpos*height)
                 local airnodes = minetest.find_nodes_in_area(
                         {x = pos.x, y = pos.y+lower, z = pos.z},
                         {x = pos.x, y = pos.y+higher, z = pos.z},
