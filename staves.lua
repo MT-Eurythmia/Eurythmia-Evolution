@@ -28,10 +28,10 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
 		local relpos = (userpos.y - pos.y)/math.sqrt((userpos.y - pos.y)^2)
 		local lower = 0 ; local higher = 0
 		if relpos < 0 then
-			minetest.chat_send_player(pname, "Stack down")
+			-- minetest.chat_send_player(pname, "Stack down")
 			lower = -1*height
 		elseif relpos > 0 then
-			minetest.chat_send_player(pname, "Stack up")
+			-- minetest.chat_send_player(pname, "Stack up")
 			higher = height
 		end
 
@@ -40,6 +40,10 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
                         {x = pos.x, y = pos.y+higher, z = pos.z},
                         {"air"}
 		)
+		minetest.sound_play("vivarium_pom", {
+			pos = pos,
+			max_hear_distance = 10
+		})
 
                 for _,fpos in pairs(airnodes) do
 			minetest.swap_node(fpos, {name = targetnode })
@@ -66,7 +70,6 @@ minetest.register_tool("vivarium:staff_clone", { -- this will be the floor staff
 
 		if minetest.is_protected(pos, pname) then
 			minetest.record_protection_violation(pos, pname)
-			print ("Protection violation")
 			return
 		end
 
@@ -83,6 +86,10 @@ minetest.register_tool("vivarium:staff_clone", { -- this will be the floor staff
                         {x = pos.x + breadth, y = pos.y+relpos, z = pos.z + breadth},
                         {"air"}
 		)
+		minetest.sound_play("vivarium_pom", {
+			pos = pos,
+			max_hear_distance = 10
+		})
 
                 for _,fpos in pairs(airnodes) do
 			minetest.swap_node(fpos, {name = targetnode })
