@@ -1,6 +1,6 @@
 -- Staff of X (based on Staff of Light by Xanthin)
 
-minetest.register_tool("vivarium:staff_stack", { -- this will be the floor staff
+minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
 	description = "Stacking Staff (build big columns)",
 	inventory_image = "water_staff.png^[colorize:yellow:90",
 	wield_image = "water_staff.png^[colorize:yellow:90",
@@ -24,10 +24,19 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the floor staff
 		local height = 10
 		local targetnode = minetest.get_node(pos).name
 		local userpos = user:getpos()
+
 		local relpos = (userpos.y - pos.y)/math.sqrt((userpos.y - pos.y)^2)
+		local lower = 0 ; local higher = 0
+		if relpos < 0 then
+			lower = -1*height
+		elseif relpos > 0 then
+			higher = height
+		end
+
+		minetest.chat_send_all(pos.y .. "//" .. pos.y+relpos*height)
                 local airnodes = minetest.find_nodes_in_area(
-                        {x = pos.x, y = pos.y, z = pos.z},
-                        {x = pos.x, y = pos.y+relpos*height, z = pos.z},
+                        {x = pos.x, y = pos.y+lower, z = pos.z},
+                        {x = pos.x, y = pos.y+higher, z = pos.z},
                         {"air"}
 		)
 
