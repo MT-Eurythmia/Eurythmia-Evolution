@@ -1,14 +1,62 @@
+
+function bomf(pos,radius)
+	minetest.add_particlespawner(
+		200, --amount
+		0.1, --time
+		{x=pos.x-radius/2, y=pos.y-radius/2, z=pos.z-radius/2}, --minpos
+		{x=pos.x+radius/2, y=pos.y+radius/2, z=pos.z+radius/2}, --maxpos
+		{x=-0, y=-0, z=-0}, --minvel
+		{x=1, y=1, z=1}, --maxvel
+		{x=-0.5,y=5,z=-0.5}, --minacc
+		{x=0.5,y=5,z=0.5}, --maxacc
+		0.1, --minexptime
+		1, --maxexptime
+		3, --minsize
+		4, --maxsize
+		false, --collisiondetection
+		"tnt_smoke.png" --texture
+	)
+
+	minetest.sound_play("vivarium_pom", {
+		pos = pos,
+		max_hear_distance = 10
+	})
+end
+
+function canstaff(player)
+	return minetest.check_player_privs(player:get_player_name(), {creative=true})
+end
+
+
 -- Staff of X (based on Staff of Light by Xanthin)
 
 minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
-	description = "Stacking Staff (build big columns)",
+	description = "Column Staff",
 	inventory_image = "water_staff.png^[colorize:yellow:90",
 	wield_image = "water_staff.png^[colorize:yellow:90",
-	range = 5,
+	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
+		if not canstaff(user) then return; end
 
 		if pointed_thing.type ~= "node" then
+			--[[
+			if pointed_thing.type == "object" then
+				local newpos = pointed_thing.ref:getpos()
+				bomf(newpos,2 )
+				local luae = pointed_thing.ref:get_luaentity()
+
+				local hpmax = 20
+				if luae.hp_max then
+					print("Healing mobs_redo mod")
+					hpmax = luae.hp_max
+				else
+					return
+				end
+
+				luae:set_hp( hpmax )
+			end
+			--]]
 			return
 		end
 
@@ -21,7 +69,7 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
 		end
 
 
-		local height = 10
+		local height = 5
 		local targetnode = minetest.get_node(pos).name
 		local userpos = user:getpos()
 
@@ -40,11 +88,8 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
                         {x = pos.x, y = pos.y+higher, z = pos.z},
                         {"air"}
 		)
-		minetest.sound_play("vivarium_pom", {
-			pos = pos,
-			max_hear_distance = 10
-		})
 
+		bomf(pos,2)
                 for _,fpos in pairs(airnodes) do
 			minetest.swap_node(fpos, {name = targetnode })
 		end
@@ -54,14 +99,21 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
 })
 
 minetest.register_tool("vivarium:staff_clone", { -- this will be the floor staff
-	description = "Floor Master Staff (extend nodes horzontally from above, side or below)",
+	description = "Staff of Cloning",
 	inventory_image = "water_staff.png^[colorize:green:90",
 	wield_image = "water_staff.png^[colorize:green:90",
-	range = 5,
+	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
+		if not canstaff(user) then return; end
 
 		if pointed_thing.type ~= "node" then
+			if pointed_thing.type == "object" then
+				local newpos = pointed_thing.ref:getpos()
+				newpos = {x=newpos.x+math.random(-1,1), y=newpos.y+0.5, z=newpos.z+math.random(-1,1)}
+				bomf(newpos,2 )
+				minetest.add_entity(newpos, pointed_thing.ref:get_luaentity().name)
+			end
 			return
 		end
 
@@ -77,19 +129,19 @@ minetest.register_tool("vivarium:staff_clone", { -- this will be the floor staff
 		local breadth = 2 -- full square is 2*breadth+1 on side
 		local targetnode = minetest.get_node(pos).name
 		local userpos = user:getpos()
+		--[[
 		local relpos = 0
 		if (userpos.y - pos.y)^2 > 2 then -- if clearly above/below
 			relpos = (userpos.y - pos.y)/math.sqrt((userpos.y - pos.y)^2)
 		end
+		--]]
                 local airnodes = minetest.find_nodes_in_area(
-                        {x = pos.x - breadth, y = pos.y+relpos, z = pos.z - breadth},
-                        {x = pos.x + breadth, y = pos.y+relpos, z = pos.z + breadth},
+                        {x = pos.x - breadth, y = pos.y, z = pos.z - breadth},
+                        {x = pos.x + breadth, y = pos.y, z = pos.z + breadth},
                         {"air"}
 		)
-		minetest.sound_play("vivarium_pom", {
-			pos = pos,
-			max_hear_distance = 10
-		})
+		
+		bomf(pos,breadth*2)
 
                 for _,fpos in pairs(airnodes) do
 			minetest.swap_node(fpos, {name = targetnode })
@@ -101,13 +153,18 @@ minetest.register_tool("vivarium:staff_clone", { -- this will be the floor staff
 
 minetest.register_tool("vivarium:staff_boom", { -- this will be the floor staff
 	description = "Bomf Staff (remove nodes of pointed type)",
-	inventory_image = "water_staff.png^[colorize:black:90",
-	wield_image = "water_staff.png^[colorize:black:90",
-	range = 10,
+	inventory_image = "water_staff.png^[colorize:black:140",
+	wield_image = "water_staff.png^[colorize:black:140",
+	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
+		if not canstaff(user) then return; end
 
 		if pointed_thing.type ~= "node" then
+			if pointed_thing.type == "object" then
+				bomf(pointed_thing.ref:getpos(),1 )
+				pointed_thing.ref:remove()
+			end
 			return
 		end
 
@@ -129,27 +186,7 @@ minetest.register_tool("vivarium:staff_boom", { -- this will be the floor staff
                         {targetnode}
 		)
 
-		minetest.add_particlespawner(
-			200, --amount
-			0.1, --time
-			{x=pos.x-radius/2, y=pos.y-radius/2, z=pos.z-radius/2}, --minpos
-			{x=pos.x+radius/2, y=pos.y+radius/2, z=pos.z+radius/2}, --maxpos
-			{x=-0, y=-0, z=-0}, --minvel
-			{x=1, y=1, z=1}, --maxvel
-			{x=-0.5,y=5,z=-0.5}, --minacc
-			{x=0.5,y=5,z=0.5}, --maxacc
-			0.1, --minexptime
-			1, --maxexptime
-			3, --minsize
-			4, --maxsize
-			false, --collisiondetection
-			"tnt_smoke.png" --texture
-		)
-		minetest.sound_play("vivarium_pom", {
-			pos = pos,
-			max_hear_distance = 10
-		})
-
+		bomf(pos,radius)
 
                 for _,fpos in pairs(targetnodes) do
 			minetest.swap_node(fpos, {name = "air" })
@@ -167,6 +204,7 @@ minetest.register_tool("vivarium:staff_melt", {
 	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
+		if not canstaff(user) then return; end
 
 		if pointed_thing.type ~= "node" then
 			return
@@ -187,6 +225,8 @@ minetest.register_tool("vivarium:staff_melt", {
                         {x = pos.x + breadth, y = pos.y, z = pos.z + breadth},
                         {"default:ice","default:snowblock"}
 		)
+
+		bomf(pos,breadth*2)
 
                 for _,fpos in pairs(frostarea) do
 				local replname = minetest.get_node({x=fpos.x,y=fpos.y-1,z=fpos.z}).name
