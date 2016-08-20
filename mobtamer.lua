@@ -29,6 +29,7 @@ minetest.register_tool("vivarium:mobtamer", {
 			luae.type="npc"
 			luae.attacks_monsters=true
 			luae.state="walk"
+			luae.owner = user:get_player_name()
 			bomf(pos,2 )
 		else
 			luaobj:remove()
