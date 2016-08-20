@@ -24,7 +24,7 @@ vivarium.bestiary = {
 	{name = "mobs_monster",beasts = {"mese_monster",},follow="default:mese_crystal_fragment"},
 	{name = "mobs_monster",beasts = {"stone_monster",},follow="default:stone"},
 	{name = "mobs_monster",beasts = {"spider",},follow="farming:cotton"},
-	{name = "mobs_monster",beasts = {"dungeon_master",},follow=""},
+	{name = "mobs_monster",beasts = {"dungeon_master",},follow="default:mese_crystal_fragment"},
 	{name = "mobs_monster",beasts = {"tree_monster",},follow="group:wood"},
 	{
 		name = "dmobs",
@@ -40,6 +40,8 @@ vivarium.bestiary = {
 		monsters = {"night_master","night_master_2","night_master_1","moonheron","lava_titan","crocodile","echidna","ant_soldier","giant_sandworm","ant_worker","mantis_beast","mese_dragon","snow_biter","swimming_duck","uloboros","sandworm","icelamander","manticore","larva","mese_dragon_tame","duckking","ant_queen","dolidrosaurus","octopus","xgaloctopus","daddy_long_legs","pumpking","tarantula","tarantula_propower","sand_bloco","flying_duck","bloco","duck","crab","enderduck","pumpboom_small","pumpboom_medium","pumpboom_large","werewolf","mantis","phoenix","scrausics","stone_eater","spiderduck","white_werewolf","masticone","firesnake","kraken","signosigno","icesnake","black_widow"},
 		follow="homedecor:coin" -- interim solution until I get fodder
 	},
+	{name = "mobs_slimes",beasts = {"green_small","green_medium","green_big",},follow="mobs_slimes:green_slimeball"},
+	{name = "mobs_slimes",beasts = {"lava_small","lava_medium","lava_big",},follow="mobs_slimes:green_slimeball"},
 	-- {name = "",beasts = {"",},follow=""},
 }
 
