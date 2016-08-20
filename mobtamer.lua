@@ -31,6 +31,7 @@ minetest.register_tool("vivarium:mobtamer", {
 			luae.state="walk"
 			luae.owner = user:get_player_name()
 			luae.tamed = true
+			luae.health = luae.hp_max
 			bomf(pos,2 )
 		else
 			luaobj:remove()
