@@ -45,10 +45,16 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
 				local newpos = pointed_thing.ref:getpos()
 				bomf(newpos,2 )
 				local luae = pointed_thing.ref:get_luaentity()
-
-				luae.type="npc"
-				luae.attacks_monsters=true
-				luae.state="walk"
+				
+				if luae.type == "monster" then
+					luae.type="npc"
+					luae.attacks_monsters=true
+					luae.state="walk"
+				elseif luae.type == "npc" then
+					luae.type = "animal"
+				elseif luae.type == "animal" then
+					luae.type = "monster"
+				end
 			end
 			return
 		end
