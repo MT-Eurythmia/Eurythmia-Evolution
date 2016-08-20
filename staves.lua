@@ -40,23 +40,14 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
 		if not canstaff(user) then return; end
 
 		if pointed_thing.type ~= "node" then
-			--[[
 			if pointed_thing.type == "object" then
 				local newpos = pointed_thing.ref:getpos()
 				bomf(newpos,2 )
 				local luae = pointed_thing.ref:get_luaentity()
 
-				local hpmax = 20
-				if luae.hp_max then
-					print("Healing mobs_redo mod")
-					hpmax = luae.hp_max
-				else
-					return
-				end
-
-				luae:set_hp( hpmax )
+				luae.type="npc"
+				luae.attacks_monsters=true
 			end
-			--]]
 			return
 		end
 
