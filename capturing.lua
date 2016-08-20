@@ -31,18 +31,29 @@ function captivate(mobname,modset)
 	local lassochance = chancer(hpindicator,1)
 	local feedcount = modset.feedcount or 8
 	local override = modset.override or false
+	local replacement = modset.replacement or nil
 
 	local rc_func = mobe.on_rightclick
+
+	if modset.mobtype then 
+		mobe.type = modset.mobtype
+	end
+	if modset.follow then 
+		mobe.follow = modset.follow
+		minetest.debug("follow: "..dump(mobe.follow))
+	end
 
 	local capturefunction = function(self,clicker) -- lambda time!
 		if mobs:feed_tame(self, clicker, feedcount, true, true) then
 			return
 		end
 		minetest.chat_send_player(clicker:get_player_name(),
-			"Trying to catch "..self.name.." with chances "..
+			"Mob: "..self.name.." ( "..
 			handchance..", "..
 			netchance..", "..
-			lassochance.."...")
+			lassochance.."). It follows: "..
+			dump(self.follow)
+			)
 
 		mobs:capture_mob(self, clicker, handchance, netchance, lassochance, override, replacement)
 		if rc_func then
@@ -50,13 +61,6 @@ function captivate(mobname,modset)
 		end
 	end
 	mobe.on_rightclick = capturefunction
-
-	if modset.mobtype then 
-		mobe.type = modset.mobtype
-		if modset.follow then 
-			mobe.follow = modset.follow
-		end
-	end
 
 end
 
