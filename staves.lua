@@ -30,6 +30,7 @@ end
 
 -- Staff of X (based on Staff of Light by Xanthin)
 
+
 minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
 	description = "Column Staff",
 	inventory_image = "water_staff.png^[colorize:yellow:90",
@@ -47,6 +48,7 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
 
 				luae.type="npc"
 				luae.attacks_monsters=true
+				luae.state="walk"
 			end
 			return
 		end
