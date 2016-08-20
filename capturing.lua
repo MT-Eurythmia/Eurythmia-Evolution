@@ -5,8 +5,6 @@
 
 -- TODO adda vivarium:fodder to feed animals in general
 
-dofile(minetest.get_modpath("vivarium") .. "/bestiary.lua")
-
 function chancer(hp,difficulty)
 	return math.floor(1000/hp * hp/(hp*0.4) * difficulty)
 end
@@ -47,13 +45,15 @@ function captivate(mobname,modset)
 			lassochance.."...")
 
 		mobs:capture_mob(self, clicker, handchance, netchance, lassochance, override, replacement)
-		rc_func(self,clicker)
+		if rc_func then
+			rc_func(self,clicker)
+		end
 	end
 	mobe.on_rightclick = capturefunction
 
 	if modset.mobtype then 
 		mobe.type = modset.mobtype
-		if modset.follow and modset.mobtype ~= "monster" then 
+		if modset.follow then 
 			mobe.follow = modset.follow
 		end
 	end
@@ -69,8 +69,10 @@ end
 
 minetest.debug("--- Start Mob Captivator ---")
 
-if bestiary then
-for _,modset in pairs(bestiary) do
+dofile(minetest.get_modpath("vivarium") .. "/bestiary.lua")
+
+if vivarium.bestiary then
+for _,modset in pairs(vivarium.bestiary) do
 
 	if minetest.get_modpath(modset.name) then
 		if modset.beasts then
