@@ -3,7 +3,7 @@
 vivarium.bestiary = {
 	{
 		name = "mobs_animal",
-		beasts = {"cow","sheep_","kitten","pumba","bunny","bee","rat","chicken"}
+		beasts = {"cow","kitten","pumba","bunny","bee","rat","chicken"}
 	},
 	{name = "mobs_giraffe", beasts = {"jeraf",}},
 	{name = "mobs_wolf",beasts = {"dog",}},
@@ -28,7 +28,13 @@ vivarium.bestiary = {
 	{name = "mobs_monster",beasts = {"tree_monster",},follow="group:wood"},
 	{
 		name = "dmobs",
-		beasts = {"panda","elephant","fox","badger","owl","hedgehog"},
+		beasts = {"panda","elephant","hedgehog"},
+		follow = "farming:bread",
+	},
+	{
+		name = "dmobs",
+		beasts = {"fox","badger","owl"},
+		follow = "mobs:meat_raw",
 	},
 	-- {name = "dmobs",beasts = {"dragon",},follow="mobs:meat"},
 	{name = "dmobs",beasts = {"orc","ogre"},follow="mobs_zombie:rotten_flesh"},
