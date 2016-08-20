@@ -69,6 +69,7 @@ end
 
 minetest.debug("--- Start Mob Captivator ---")
 
+if bestiary then
 for _,modset in pairs(bestiary) do
 
 	if minetest.get_modpath(modset.name) then
@@ -90,6 +91,7 @@ for _,modset in pairs(bestiary) do
 		end
 	end
 
+end
 end
 
 minetest.debug("-------- Mobs Captivated ------")
