@@ -295,7 +295,6 @@ minetest.register_tool("vivarium:staff_melt", {
 	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
-		local maxuses = 50
 
 		if pointed_thing.type ~= "node" then
 			if pointed_thing.type == "object" then
@@ -340,7 +339,7 @@ minetest.register_tool("vivarium:staff_melt", {
 				if fpos.y > 0 and replname == "default:water_source" then -- don't bother with water above sea level
 					replname = "air"
 				end
-				if isforbidden(replname) and stafflevel < 2 then
+				if isforbidden(replname) and staffcheck(user) < 2 then
 					targetnode = "default:dirt"
 				end
 				minetest.swap_node(fpos, {name = replname })
