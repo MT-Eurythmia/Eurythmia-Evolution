@@ -14,7 +14,7 @@ vivarium.forbidden_nodes = {
 	".+mithril_block",
 	"default:mese",
 	"protector:",
-	"basic_machines:"
+	"basic_machines:",
 	"ethereal:crystal_spike",
 	".+crystal_block",
 	"mobs:beehive",
