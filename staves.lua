@@ -289,7 +289,7 @@ minetest.register_tool("vivarium:staff_boom", {
 
 -- quick and dirty tool to repair carnage caused by NSSM ice mobs
 minetest.register_tool("vivarium:staff_melt", {
-	description = "Staff of Melting (replace snow/ice with node under it, or above it)",
+	description = "Staff of Melting (Fix Ice Mobs damage)",
 	inventory_image = "water_staff.png^[colorize:blue:90",
 	wield_image = "water_staff.png^[colorize:blue:90",
 	range = 12,
