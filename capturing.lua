@@ -9,6 +9,10 @@ function chancer(hp,difficulty)
 	return math.floor(1000/hp * hp/(hp*0.4) * difficulty)
 end
 
+function damagerate(hp)
+	return math.ceil(hp/10)
+end
+
 function captivate(mobname,modset)
 	local mobe = minetest.registered_entities[mobname]
 	if not mobe then
@@ -37,6 +41,10 @@ function captivate(mobname,modset)
 
 	if modset.mobtype then 
 		mobe.type = modset.mobtype
+		mobe.passive = false
+		mobe.attacks_monsters = true -- if animal respawned as NPC this will be in effect
+		mobe.damage = damagerate(mobe.hp_max)
+
 	end
 	if modset.follow then 
 		mobe.follow = modset.follow
