@@ -22,6 +22,15 @@ vivarium.forbidden_nodes = {
 	"more_chests:"
 }
 
+function vivarium:tellem(player,message)
+	minetest.chat_send_player(player:get_player_name() , message)
+end
+
+function vivarium:wearitem(itemstack,maxuses)
+	itemstack:add_wear(math.ceil(65536/maxuses))
+	return itemstack
+end
+
 function staffcheck(player)
 	local stafflevel = 0
 	if minetest.check_player_privs(player:get_player_name(), {staffer=true}) then stafflevel = 1; end
@@ -65,8 +74,39 @@ function bomf(pos,radius)
 end
 
 
--- Staff of X (based on Staff of Light by Xanthin)
+function vivarium:mobheal(user,luae)
+	if not luae.owner or user:get_player_name() ~= luae.owner then
+		vivarium:tellem(user,"This " ..luae.name .. " is not yours.")
+		return
+	end
+	if luae.health < luae.hp_min then
+		luae.health = luae.hp_min
+		vivarium:tellem(user,"Your " ..luae.name .. " has been healed.")
+	else
+		vivarium:tellem(user,"This " ..luae.name .. " does not need healing.")
+	end
+end
 
+function vivarium:mobtransform(user,luae, forced)
+	if not forced and math.random(1,20) > 1 then return ; end -- 1:20 chance of transforming
+
+	luae.state="walk"
+
+	if luae.type == "monster" then
+		luae.type="npc"
+		luae.attacks_monsters=true
+		vivarium:tellem(user,luae.name .. " became a friendly NPC")
+	elseif luae.type == "npc" then
+		luae.type = "animal"
+		vivarium:tellem(user,luae.name .. " became a docile animal")
+	elseif luae.type == "animal" then
+		luae.type = "monster"
+		luae.passive = false
+		vivarium:tellem(user,luae.name .. " became a vicious monster")
+	end
+end
+
+-- Staff of X (based on Staff of Light by Xanthin)
 
 minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
 	description = "Column Staff (make walls)",
@@ -86,15 +126,7 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
 				bomf(newpos,2 )
 				local luae = pointed_thing.ref:get_luaentity()
 				
-				if luae.type == "monster" then
-					luae.type="npc"
-					luae.attacks_monsters=true
-					luae.state="walk"
-				elseif luae.type == "npc" then
-					luae.type = "animal"
-				elseif luae.type == "animal" then
-					luae.type = "monster"
-				end
+				vivarium:mobtransform(user,luae,true)
 			end
 			return
 		end
@@ -138,6 +170,7 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
                 for _,fpos in pairs(airnodes) do
 			minetest.swap_node(fpos, {name = targetnode })
 		end
+		if staffcheck(user) < 90 then itemstack = vivarium:wearitem(itemstack,50); end
 		return itemstack
 
 	end,
@@ -201,6 +234,8 @@ minetest.register_tool("vivarium:staff_clone", { -- this will be the floor staff
                 for _,fpos in pairs(airnodes) do
 			minetest.swap_node(fpos, {name = targetnode })
 		end
+
+		if staffcheck(user) < 90 then itemstack = vivarium:wearitem(itemstack,50); end
 		return itemstack
 
 	end,
@@ -260,8 +295,17 @@ minetest.register_tool("vivarium:staff_melt", {
 	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
+		local maxuses = 50
 
 		if pointed_thing.type ~= "node" then
+			if pointed_thing.type == "object" then
+				local newpos = pointed_thing.ref:getpos()
+				bomf(newpos,2 )
+				local luae = pointed_thing.ref:get_luaentity()
+				
+				vivarium:mobheal(user,luae)
+				vivarium:mobtransform(user,luae)
+			end
 			return
 		end
 
@@ -298,9 +342,20 @@ minetest.register_tool("vivarium:staff_melt", {
 				end
 				minetest.swap_node(fpos, {name = replname })
 		end
+
+		if staffcheck(user) < 90 then itemstack = vivarium:wearitem(itemstack,50); end
 		return itemstack
 
 	end,
 })
 
-minetest.register_alias("vivarium:water_staff","vivarium:staff_melt")
+minetest.register_craft(
+{
+	output = "vivarium:staff_melt",
+	recipe = {
+		{"default:mese_crystal_fragment","bucket:bucket_lava","default:mese_crystal_fragment"},
+		{"","default:obsidian_shard",""},
+		{"","default:obsidian_shard",""},
+	}
+}
+)
