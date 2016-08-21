@@ -13,6 +13,16 @@ function damagerate(hp)
 	return math.ceil(hp/10)
 end
 
+function getfollows(followt)
+	if type(followt) == "string" then return followt; end
+
+	local followstring = ""
+	for _,s in pairs(followt) do
+		followstring = followstring .. " " .. s
+	end
+	return followstring
+end
+
 function captivate(mobname,modset)
 	local mobe = minetest.registered_entities[mobname]
 	if not mobe then
@@ -60,7 +70,7 @@ function captivate(mobname,modset)
 			handchance..", "..
 			netchance..", "..
 			lassochance.."). It follows: "..
-			dump(self.follow)
+			getfollows(self.follow)
 			)
 
 		mobs:capture_mob(self, clicker, handchance, netchance, lassochance, override, replacement)
