@@ -35,14 +35,14 @@ function staffcheck(player)
 	local stafflevel = 0
 	if minetest.check_player_privs(player:get_player_name(), {staffer=true}) then stafflevel = 1; end
 	if minetest.check_player_privs(player:get_player_name(), {creative=true}) then stafflevel = 100; end
-	minetest.chat_send_all("Staff level : "..stafflevel)
+	--minetest.chat_send_all("Staff level : "..stafflevel)
 	return stafflevel
 end
 
 function isforbidden(nodename)
 	for _,pat in pairs(vivarium.forbidden_nodes) do
 		if string.match(nodename,pat) then
-			minetest.chat_send_all("Forbidden : "..nodename)
+			--minetest.chat_send_all("Forbidden : "..nodename)
 			return true
 		end
 	end
@@ -339,7 +339,7 @@ minetest.register_tool("vivarium:staff_melt", {
 				if fpos.y > 0 and replname == "default:water_source" then -- don't bother with water above sea level
 					replname = "air"
 				end
-				minetest.chat_send_all("Replicating "..replname)
+				--minetest.chat_send_all("Replicating "..replname)
 				if isforbidden(replname) then
 					replname = "default:dirt"
 				end
