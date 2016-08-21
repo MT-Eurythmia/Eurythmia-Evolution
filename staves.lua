@@ -340,6 +340,9 @@ minetest.register_tool("vivarium:staff_melt", {
 				if fpos.y > 0 and replname == "default:water_source" then -- don't bother with water above sea level
 					replname = "air"
 				end
+				if isforbidden(replname) and stafflevel < 2 then
+					targetnode = "default:dirt"
+				end
 				minetest.swap_node(fpos, {name = replname })
 		end
 
