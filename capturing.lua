@@ -14,7 +14,9 @@ function damagerate(hp)
 end
 
 function getfollows(followt)
-	if type(followt) == "string" then return followt; end
+	if type(followt) == "string" then return followt
+	elseif type(followt) ~= "table" then return "nothing"
+	end
 
 	local followstring = ""
 	for _,s in pairs(followt) do
@@ -59,6 +61,8 @@ function captivate(mobname,modset)
 	if modset.follow then 
 		mobe.follow = modset.follow
 		minetest.debug("follow: "..dump(mobe.follow))
+	elseif mobe.follow == nil and vivarium.bestiaryoptions.nilfollow then
+		mobe.follow = vivarium.bestiaryoptions.nilfollow
 	end
 
 	local capturefunction = function(self,clicker) -- lambda time!
