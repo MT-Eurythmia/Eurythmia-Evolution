@@ -1,3 +1,44 @@
+minetest.register_privilege("staffer","Trust players to use staves")
+
+vivarium.forbidden_nodes = {
+	"default:stone_with",
+	"moreores:mineral_",
+	"default:nyancat",
+	".+steelblock", -- lua does not include the "|" operator which is a PAIN.
+	".+copperblock",
+	".+bronzeblock",
+	".+goldblock",
+	".+diamondblock",
+	".+tin_block",
+	".+silver_block",
+	".+mithril_block",
+	"default:mese",
+	"protector:",
+	"basic_machines:"
+	"ethereal:crystal_spike",
+	".+crystal_block",
+	"mobs:beehive",
+	"mobs:spawner",
+	"more_chests:"
+}
+
+function staffcheck(player)
+	local stafflevel = 0
+	if minetest.check_player_privs(player:get_player_name(), {staffer=true}) then stafflevel = 1; end
+	if minetest.check_player_privs(player:get_player_name(), {creative=true}) then stafflevel = 100; end
+	--minetest.chat_send_all("Staff level : "..stafflevel)
+	return stafflevel
+end
+
+function isforbidden(nodename)
+	for _,pat in pairs(vivarium.forbidden_nodes) do
+		if string.match(nodename,pat) then
+			--minetest.chat_send_all("Forbidden : "..nodename)
+			return true
+		end
+	end
+	return false
+end
 
 function bomf(pos,radius)
 	minetest.add_particlespawner(
@@ -23,24 +64,23 @@ function bomf(pos,radius)
 	})
 end
 
-function canstaff(player)
-	return minetest.check_player_privs(player:get_player_name(), {creative=true})
-end
-
 
 -- Staff of X (based on Staff of Light by Xanthin)
 
 
 minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
-	description = "Column Staff",
+	description = "Column Staff (make walls)",
 	inventory_image = "water_staff.png^[colorize:yellow:90",
 	wield_image = "water_staff.png^[colorize:yellow:90",
 	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
-		if not canstaff(user) then return; end
+		local stafflevel = staffcheck(user)
+		if stafflevel < 1 then return; end
 
 		if pointed_thing.type ~= "node" then
+			if stafflevel < 2 then return; end
+
 			if pointed_thing.type == "object" then
 				local newpos = pointed_thing.ref:getpos()
 				bomf(newpos,2 )
@@ -74,10 +114,16 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
 
 		local relpos = (userpos.y - pos.y)/math.sqrt((userpos.y - pos.y)^2)
 		local lower = 0 ; local higher = 0
+
+		if isforbidden(targetnode) and stafflevel < 2 then
+			targetnode = "default:dirt"
+		end
+
+
 		if relpos < 0 then
 			-- minetest.chat_send_player(pname, "Stack down")
 			lower = -1*height
-		elseif relpos > 0 then
+		elseif relpos >= 0 then
 			-- minetest.chat_send_player(pname, "Stack up")
 			higher = height
 		end
@@ -85,7 +131,7 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
                 local airnodes = minetest.find_nodes_in_area(
                         {x = pos.x, y = pos.y+lower, z = pos.z},
                         {x = pos.x, y = pos.y+higher, z = pos.z},
-                        {"air"}
+                        {"air","default:water_source","default:lava_source","default:river_water_source"}
 		)
 
 		bomf(pos,2)
@@ -98,15 +144,20 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
 })
 
 minetest.register_tool("vivarium:staff_clone", { -- this will be the floor staff
-	description = "Staff of Cloning",
+	description = "Staff of Cloning (make floors)",
 	inventory_image = "water_staff.png^[colorize:green:90",
 	wield_image = "water_staff.png^[colorize:green:90",
 	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
-		if not canstaff(user) then return; end
+		local stafflevel = staffcheck(user)
+		if stafflevel < 1 then return; end
 
 		if pointed_thing.type ~= "node" then
+
+			if stafflevel < 2 then -- can only clone mobs if super staffer else abuse
+				return
+			end
 			if pointed_thing.type == "object" then
 				local newpos = pointed_thing.ref:getpos()
 				newpos = {x=newpos.x+math.random(-1,1), y=newpos.y+0.5, z=newpos.z+math.random(-1,1)}
@@ -134,10 +185,15 @@ minetest.register_tool("vivarium:staff_clone", { -- this will be the floor staff
 			relpos = (userpos.y - pos.y)/math.sqrt((userpos.y - pos.y)^2)
 		end
 		--]]
+
+		if isforbidden(targetnode) and stafflevel < 2 then
+			targetnode = "default:dirt"
+		end
+
                 local airnodes = minetest.find_nodes_in_area(
                         {x = pos.x - breadth, y = pos.y, z = pos.z - breadth},
                         {x = pos.x + breadth, y = pos.y, z = pos.z + breadth},
-                        {"air"}
+                        {"air","default:water_source","default:lava_source","default:river_water_source"}
 		)
 		
 		bomf(pos,breadth*2)
@@ -150,14 +206,15 @@ minetest.register_tool("vivarium:staff_clone", { -- this will be the floor staff
 	end,
 })
 
-minetest.register_tool("vivarium:staff_boom", { -- this will be the floor staff
-	description = "Bomf Staff (remove nodes of pointed type)",
+minetest.register_tool("vivarium:staff_boom", {
+	description = "Bomf Staff (delete nodes)",
 	inventory_image = "water_staff.png^[colorize:black:140",
 	wield_image = "water_staff.png^[colorize:black:140",
 	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
-		if not canstaff(user) then return; end
+		local stafflevel = staffcheck(user)
+		if stafflevel < 2 then return; end
 
 		if pointed_thing.type ~= "node" then
 			if pointed_thing.type == "object" then
@@ -203,7 +260,6 @@ minetest.register_tool("vivarium:staff_melt", {
 	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
-		if not canstaff(user) then return; end
 
 		if pointed_thing.type ~= "node" then
 			return
