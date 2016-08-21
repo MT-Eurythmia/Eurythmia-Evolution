@@ -1,12 +1,17 @@
 -- Supported animals
 
+vivarium.bestiaryoptions = {
+	nilfollow = "default:copper_lump",
+}
+
 vivarium.bestiary = {
 	{
 		name = "mobs_animal",
 		beasts = {"cow","kitten","pumba","bunny","bee","rat","chicken"}
 	},
+	{name = "mobs_turtles", beasts = {"turtle",}},
 	{name = "mobs_giraffe", beasts = {"jeraf",}},
-	{name = "mobs_wolf",beasts = {"dog",}},
+	{name = "mobs_wolf",beasts = {"dog","wolf"}},
 	{name = "mobs_deer",beasts = {"deer",}},
 	{name = "mobs_snowman",beasts = {"snowman",},follow= {"farming:carrot","default:snow"}},
 	{name = "mobs_bear",beasts = {"medved",}},
@@ -36,7 +41,7 @@ vivarium.bestiary = {
 		beasts = {"fox","badger","owl"},
 		follow = "mobs:meat_raw",
 	},
-	-- {name = "dmobs",beasts = {"dragon",},follow="mobs:meat"},
+	{name = "dmobs",beasts = {"dragon","dragon2","dragon3","dragon4","dragon_armor_steel","dragon_black","dragon_blue","dragon_egg_fire","dragon_egg_ice","dragon_egg_lightning","dragon_egg_poison","dragon_gem","dragon_gem_fire","dragon_gem_ice","dragon_gem_lightning","dragon_gem_poison","dragon_great","dragon_great_tame","dragon_green","dragon_red"},follow={"mobs:lava_orb","bucket:bucket_lava"}},
 	{name = "dmobs",beasts = {"orc","ogre"},follow="mobs_zombie:rotten_flesh"},
 	{name = "banth",beasts = {"banth",},follow="mobs:meat"},
 	{name = "mobs_crocs",beasts = {"crocodile","crocodile_float","crocodile_swim"},follow="mobs_jellyfish:jellyfish"},
