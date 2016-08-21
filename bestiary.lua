@@ -49,7 +49,7 @@ vivarium.bestiary = {
 	{
 		name = "nssm",
 		monsters = {"night_master","night_master_2","night_master_1","moonheron","lava_titan","crocodile","echidna","ant_soldier","giant_sandworm","ant_worker","mantis_beast","mese_dragon","snow_biter","swimming_duck","uloboros","sandworm","icelamander","manticore","larva","mese_dragon_tame","duckking","ant_queen","dolidrosaurus","octopus","xgaloctopus","daddy_long_legs","pumpking","tarantula","tarantula_propower","sand_bloco","flying_duck","bloco","duck","crab","enderduck","pumpboom_small","pumpboom_medium","pumpboom_large","werewolf","mantis","phoenix","scrausics","stone_eater","spiderduck","white_werewolf","masticone","firesnake","kraken","signosigno","icesnake","black_widow"},
-		follow="homedecor:coin" -- interim solution until I get fodder
+		follow={"nssm:worm_flesh","nssm:tentacle","nssm:duck_legs"} -- interim solution until I get fodder
 	},
 	-- {name = "",beasts = {"",},follow=""},
 }
