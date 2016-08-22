@@ -31,6 +31,7 @@ vivarium.bestiary = {
 	{name = "mobs_monster",beasts = {"spider",},follow="farming:cotton"},
 	{name = "mobs_monster",beasts = {"dungeon_master",},follow="default:mese_crystal_fragment"},
 	{name = "mobs_monster",beasts = {"tree_monster",},follow="group:wood"},
+	{name = "dmobs",beasts = {"whale",},follow="mobs_bugslive:bug"},
 	{
 		name = "dmobs",
 		beasts = {"panda","elephant","hedgehog"},
