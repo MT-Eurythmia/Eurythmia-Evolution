@@ -79,7 +79,19 @@ function captivate(mobname,modset)
 
 		mobs:capture_mob(self, clicker, handchance, netchance, lassochance, override, replacement)
 		if rc_func then
-			rc_func(self,clicker)
+			--rc_func(self,clicker)
+		end
+		if clicker:get_wielded_item():get_name() == "vivarium:mobtamer" then
+			if self.order == "follow" then
+				self.order = "stand"
+				minetest.chat_send_player(clicker:get_player_name(),self.name .." will now stand.")
+			elseif self.order == "stand" then
+				self.order = ""
+				minetest.chat_send_player(clicker:get_player_name(),self.name .." is free to roam around.")
+			else
+				self.order = "follow"
+				minetest.chat_send_player(clicker:get_player_name(),self.name .." will now follow you.")
+			end
 		end
 	end
 	mobe.on_rightclick = capturefunction
