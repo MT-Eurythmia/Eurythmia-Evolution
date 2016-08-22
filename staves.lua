@@ -237,8 +237,8 @@ minetest.register_tool("vivarium:staff_clone", { -- this will be the floor staff
 		bomf(pos,breadth*2)
 
                 for _,fpos in pairs(airnodes) do
-			--minetest.swap_node(fpos, {name = targetnode })
-			minetest.place_node(fpos, {name = targetnode})
+			minetest.swap_node(fpos, {name = targetnode })
+			--minetest.place_node(fpos, {name = targetnode})
 		end
 
 		if staffcheck(user) < 90 then itemstack = vivarium:wearitem(itemstack,50); end
