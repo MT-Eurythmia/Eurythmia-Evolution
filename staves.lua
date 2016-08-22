@@ -4,8 +4,10 @@ vivarium.forbidden_nodes = {
 	"default:stone_with",
 	"moreores:mineral_",
 	"default:nyancat",
+	"steel_bottle",
 	".+steelblock", -- lua does not include the "|" operator which is a PAIN.
 	".+copperblock",
+	"copperpatina",
 	".+bronzeblock",
 	".+goldblock",
 	".+diamondblock",
@@ -19,7 +21,9 @@ vivarium.forbidden_nodes = {
 	".+crystal_block",
 	"mobs:beehive",
 	"mobs:spawner",
-	"more_chests:"
+	"more_chests:",
+	"fire:basic_flame",
+	"fire:permanent_fire",
 }
 
 function vivarium:tellem(player,message)
