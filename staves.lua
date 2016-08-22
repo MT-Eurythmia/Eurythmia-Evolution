@@ -172,8 +172,7 @@ minetest.register_tool("vivarium:staff_stack", { -- this will be the wall staff
 
 		bomf(pos,2)
                 for _,fpos in pairs(airnodes) do
-			--minetest.swap_node(fpos, {name = targetnode })
-			minetest.place_node(fpos, {name = targetnode})
+			minetest.swap_node(fpos, {name = targetnode })
 		end
 		if staffcheck(user) < 90 then itemstack = vivarium:wearitem(itemstack,50); end
 		return itemstack
@@ -238,7 +237,6 @@ minetest.register_tool("vivarium:staff_clone", { -- this will be the floor staff
 
                 for _,fpos in pairs(airnodes) do
 			minetest.swap_node(fpos, {name = targetnode })
-			--minetest.place_node(fpos, {name = targetnode})
 		end
 
 		if staffcheck(user) < 90 then itemstack = vivarium:wearitem(itemstack,50); end
@@ -286,8 +284,7 @@ minetest.register_tool("vivarium:staff_boom", {
 		bomf(pos,radius)
 
                 for _,fpos in pairs(targetnodes) do
-			--minetest.swap_node(fpos, {name = "air" })
-			minetest.dig_node(fpos)
+			minetest.swap_node(fpos, {name = "air" })
 		end
 		return itemstack
 
