@@ -32,6 +32,7 @@ vivarium.bestiary = {
 	{name = "mobs_monster",beasts = {"dungeon_master",},follow="default:mese_crystal_fragment"},
 	{name = "mobs_monster",beasts = {"tree_monster",},follow="group:wood"},
 	{name = "dmobs",beasts = {"whale",},follow="mobs_bugslive:bug"},
+	{name = "dmobs",beasts = {"dmobs:gnorm",}},
 	{
 		name = "dmobs",
 		beasts = {"panda","elephant","hedgehog"},
@@ -43,7 +44,7 @@ vivarium.bestiary = {
 		follow = "mobs:meat_raw",
 	},
 	{name = "dmobs",beasts = {"dragon","dragon2","dragon3","dragon4","dragon_armor_steel","dragon_black","dragon_blue","dragon_egg_fire","dragon_egg_ice","dragon_egg_lightning","dragon_egg_poison","dragon_gem","dragon_gem_fire","dragon_gem_ice","dragon_gem_lightning","dragon_gem_poison","dragon_great","dragon_great_tame","dragon_green","dragon_red"},follow={"mobs:lava_orb","bucket:bucket_lava"}},
-	{name = "dmobs",beasts = {"orc","ogre"},follow="mobs_zombie:rotten_flesh"},
+	{name = "dmobs",beasts = {"orc","orc_redesign","ogre"},follow="mobs_zombie:rotten_flesh"},
 	{name = "banth",beasts = {"banth",},follow="mobs:meat"},
 	{name = "mobs_crocs",beasts = {"crocodile","crocodile_float","crocodile_swim"},follow="mobs_jellyfish:jellyfish"},
 	{name = "mobs_sharks",beasts = {"shark_lg","shark_md","shark_sm"},follow="mobs_turtles:turtle"},
