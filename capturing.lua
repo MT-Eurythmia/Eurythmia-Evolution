@@ -81,7 +81,7 @@ function captivate(mobname,modset)
 		if rc_func then
 			--rc_func(self,clicker)
 		end
-		if clicker:get_wielded_item():get_name() == "vivarium:mobtamer" then
+		if clicker:get_wielded_item():get_name() == "vivarium:mobtamer" and self.owner == clicker:get_player_name() then
 			if self.order == "follow" then
 				self.order = "stand"
 				minetest.chat_send_player(clicker:get_player_name(),self.name .." will now stand.")
