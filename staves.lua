@@ -205,6 +205,7 @@ minetest.register_tool("vivarium:staff_clone", { -- this will be the floor staff
 		end
 
 		local pos = pointed_thing.under
+		local playerpos = user:getpos()
 		local pname = user:get_player_name()
 
 		if minetest.is_protected(pos, pname) then
@@ -213,27 +214,23 @@ minetest.register_tool("vivarium:staff_clone", { -- this will be the floor staff
 		end
 
 
-		local breadth = 2 -- full square is 2*breadth+1 on side
 		local targetnode = minetest.get_node(pos).name
 		local userpos = user:getpos()
-		--[[
-		local relpos = 0
-		if (userpos.y - pos.y)^2 > 2 then -- if clearly above/below
-			relpos = (userpos.y - pos.y)/math.sqrt((userpos.y - pos.y)^2)
-		end
-		--]]
+
+		local startpos = {x = vivarium:min(pos.x,playerpos.x),y = pos.y,z = vivarium:min(pos.z,playerpos.z)}
+		local endpos = {x = vivarium:max(pos.x,playerpos.x),y = pos.y,z = vivarium:max(pos.z,playerpos.z)}
 
 		if isforbidden(targetnode) and stafflevel < 2 then
 			targetnode = "default:dirt"
 		end
 
                 local airnodes = minetest.find_nodes_in_area(
-                        {x = pos.x - breadth, y = pos.y, z = pos.z - breadth},
-                        {x = pos.x + breadth, y = pos.y, z = pos.z + breadth},
+                        startpos,
+			endpos,
                         {"air","default:water_source","default:lava_source","default:river_water_source"}
 		)
 		
-		bomf(pos,breadth*2)
+		bomf({x = (playerpos.x+pos.x)/2 , y = (playerpos.y+pos.y)/2 , z = (playerpos.z+pos.z)/2},4)
 
                 for _,fpos in pairs(airnodes) do
 			minetest.swap_node(fpos, {name = targetnode })
@@ -244,6 +241,90 @@ minetest.register_tool("vivarium:staff_clone", { -- this will be the floor staff
 
 	end,
 })
+
+minetest.register_tool("vivarium:staff_creative", { -- this will be the super creative staff
+	description = "Creator Staff (make blocks or blocks)",
+	inventory_image = "water_staff.png^[colorize:purple:90",
+	wield_image = "water_staff.png^[colorize:purple:90",
+	range = 10,
+	stack_max = 1,
+	on_use = function(itemstack, user, pointed_thing)
+		local stafflevel = staffcheck(user)
+		if stafflevel < 50 then return; end -- really do not want to give this to regular staffers
+
+		local playerpos = user:getpos()
+		local pname = user:get_player_name()
+
+		if pointed_thing.type ~= "node" then
+			if pointed_thing.type == "object" then
+				local airnodes = minetest.find_nodes_in_area(
+					{x = playerpos.x -30, y = playerpos.y - 30, z = playerpos.z -30},
+					{x = playerpos.x +30, y = playerpos.y + 30, z = playerpos.z +30},
+					{"air","default:water_source","default:lava_source","default:river_water_source"}
+				)
+				local newpos = airnodes[ math.random(1,#airnodes) ]
+
+				bomf(pointed_thing.ref:getpos(),3)
+				pointed_thing.ref:setpos(newpos)
+				bomf(newpos,3)
+				--[[
+				newpos = {x=newpos.x+math.random(-1,1), y=newpos.y+0.5, z=newpos.z+math.random(-1,1)}
+				bomf(newpos,2 )
+				minetest.add_entity(newpos, pointed_thing.ref:get_luaentity().name)
+				-- ]]
+			end
+			return
+		end
+
+		local pos = pointed_thing.under
+		if minetest.is_protected(pos, pname) then
+			minetest.record_protection_violation(pos, pname)
+			return
+		end
+
+
+		local targetnode = minetest.get_node(pos).name
+		local userpos = user:getpos()
+
+		local startpos = {x = vivarium:min(pos.x,playerpos.x),y = vivarium:min(pos.y,playerpos.y),z = vivarium:min(pos.z,playerpos.z)}
+		local endpos = {x = vivarium:max(pos.x,playerpos.x),y = vivarium:max(pos.y,playerpos.y),z = vivarium:max(pos.z,playerpos.z)}
+
+		if isforbidden(targetnode) and stafflevel < 2 then
+			targetnode = "default:dirt"
+		end
+
+                local airnodes = minetest.find_nodes_in_area(
+                        startpos,
+			endpos,
+                        {"air","default:water_source","default:lava_source","default:river_water_source"}
+		)
+		
+		bomf({x = (playerpos.x+pos.x)/2 , y = (playerpos.y+pos.y)/2 , z = (playerpos.z+pos.z)/2},4)
+
+                for _,fpos in pairs(airnodes) do
+			minetest.swap_node(fpos, {name = targetnode })
+		end
+
+		if staffcheck(user) < 90 then itemstack = vivarium:wearitem(itemstack,50); end
+		return itemstack
+
+	end,
+})
+
+--[[
+
+--]]
+
+function vivarium:max(x,y)
+	if x < y then return y
+	else return x
+	end
+end
+function vivarium:min(x,y)
+	if x < y then return x
+	else return y
+	end
+end
 
 minetest.register_tool("vivarium:staff_boom", {
 	description = "Bomf Staff (delete nodes)",
