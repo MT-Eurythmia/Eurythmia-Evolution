@@ -77,6 +77,17 @@ function bomf(pos,radius)
 	})
 end
 
+function vivarium:max(x,y)
+	if x < y then return y
+	else return x
+	end
+end
+function vivarium:min(x,y)
+	if x < y then return x
+	else return y
+	end
+end
+
 
 function vivarium:mobheal(user,luae)
 	if not luae.owner or user:get_player_name() ~= luae.owner then
@@ -287,7 +298,7 @@ minetest.register_tool("vivarium:staff_creative", { -- this will be the super cr
 		local userpos = user:getpos()
 
 		local startpos = {x = vivarium:min(pos.x,playerpos.x),y = vivarium:min(pos.y,playerpos.y),z = vivarium:min(pos.z,playerpos.z)}
-		local endpos = {x = vivarium:max(pos.x,playerpos.x),y = vivarium:max(pos.y,playerpos.y),z = vivarium:max(pos.z,playerpos.z)}
+		local endpos = {x = vivarium:max(pos.x,playerpos.x),y = vivarium:max(pos.y,playerpos.y-1),z = vivarium:max(pos.z,playerpos.z)}
 
 		if isforbidden(targetnode) and stafflevel < 2 then
 			targetnode = "default:dirt"
@@ -314,17 +325,6 @@ minetest.register_tool("vivarium:staff_creative", { -- this will be the super cr
 --[[
 
 --]]
-
-function vivarium:max(x,y)
-	if x < y then return y
-	else return x
-	end
-end
-function vivarium:min(x,y)
-	if x < y then return x
-	else return y
-	end
-end
 
 minetest.register_tool("vivarium:staff_boom", {
 	description = "Bomf Staff (delete nodes)",
