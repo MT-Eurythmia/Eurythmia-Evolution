@@ -18,6 +18,7 @@ if minetest.get_modpath("moreores") then
 end
 
 function vivarium:register_coin(coinname,coindesc,cmaterial,overimg)
+	local coinimg = "vivarium_coin.png^"..overimg
 	minetest.register_craftitem("vivarium:coin_"..coinname, {
 		description = coindesc,
 	})
@@ -26,8 +27,8 @@ function vivarium:register_coin(coinname,coindesc,cmaterial,overimg)
 		description = coindesc,
 		drawtype = "plantlike",
 		paramtype = "light",
-		tiles = {"vmg_mushroom_steak.png"},
-		inventory_image = "vivarium_coin.png^"..overimg,
+		tiles = {coinimg},
+		inventory_image = coingimg,
 		groups = {dig_immediate = 3},
 	})
 
