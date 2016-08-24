@@ -9,3 +9,6 @@ dofile(minetest.get_modpath("vivarium") .. "/mobtamer.lua")
 if minetest.get_modpath("nssm") then
 	dofile(minetest.get_modpath("vivarium") .. "/nssm_coin.lua")
 end
+if minetest.get_modpath("moreores") then
+	dofile(minetest.get_modpath("vivarium") .. "/tincrafts.lua")
+end
