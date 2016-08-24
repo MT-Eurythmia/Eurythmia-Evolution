@@ -45,12 +45,18 @@ vivarium.bestiary = {
 	},
 	{name = "dmobs",beasts = {"dragon","dragon2","dragon3","dragon4","dragon_armor_steel","dragon_black","dragon_blue","dragon_egg_fire","dragon_egg_ice","dragon_egg_lightning","dragon_egg_poison","dragon_gem","dragon_gem_fire","dragon_gem_ice","dragon_gem_lightning","dragon_gem_poison","dragon_great","dragon_great_tame","dragon_green","dragon_red"},follow={"mobs:lava_orb","bucket:bucket_lava"}},
 	{name = "dmobs",beasts = {"orc","orc_redesign","ogre"},follow="mobs_zombie:rotten_flesh"},
+	{name = "f46_dragon",beasts = {"dragon",},follow={"mobs:lava_orb","bucket:bucket_lava"}},
 	{name = "banth",beasts = {"banth",},follow="mobs:meat"},
 	{name = "mobs_crocs",beasts = {"crocodile","crocodile_float","crocodile_swim"},follow="mobs_jellyfish:jellyfish"},
 	{name = "mobs_sharks",beasts = {"shark_lg","shark_md","shark_sm"},follow="mobs_turtles:turtle"},
 	{
 		name = "nssm",
-		monsters = {"night_master","night_master_2","night_master_1","moonheron","lava_titan","crocodile","echidna","ant_soldier","giant_sandworm","ant_worker","mantis_beast","mese_dragon","snow_biter","swimming_duck","uloboros","sandworm","icelamander","manticore","larva","mese_dragon_tame","duckking","ant_queen","dolidrosaurus","octopus","xgaloctopus","daddy_long_legs","pumpking","tarantula","tarantula_propower","sand_bloco","flying_duck","bloco","duck","crab","enderduck","pumpboom_small","pumpboom_medium","pumpboom_large","werewolf","mantis","phoenix","scrausics","stone_eater","spiderduck","white_werewolf","masticone","firesnake","kraken","signosigno","icesnake","black_widow"},
+		monsters = {"stone_eater"},
+		follow={"default:stone"}
+	},
+	{
+		name = "nssm",
+		monsters = {"night_master","night_master_2","night_master_1","moonheron","lava_titan","crocodile","echidna","ant_soldier","giant_sandworm","ant_worker","mantis_beast","mese_dragon","snow_biter","swimming_duck","uloboros","sandworm","icelamander","manticore","larva","mese_dragon_tame","duckking","ant_queen","dolidrosaurus","octopus","xgaloctopus","daddy_long_legs","pumpking","tarantula","tarantula_propower","sand_bloco","flying_duck","bloco","duck","crab","enderduck","pumpboom_small","pumpboom_medium","pumpboom_large","werewolf","mantis","phoenix","scrausics","spiderduck","white_werewolf","masticone","kraken","signosigno","icesnake","black_widow"},
 		follow={"nssm:worm_flesh","nssm:tentacle","nssm:duck_legs"} -- interim solution until I get fodder
 	},
 	-- {name = "",beasts = {"",},follow=""},
