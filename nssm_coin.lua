@@ -19,9 +19,11 @@ end
 
 function vivarium:register_coin(coinname,coindesc,cmaterial,overimg)
 	local coinimg = "vivarium_coin.png^"..overimg
+	--[[
 	minetest.register_craftitem("vivarium:coin_"..coinname, {
 		description = coindesc,
 	})
+	--]]
 
 	minetest.register_node("vivarium:coin_"..coinname, {
 		description = coindesc,
