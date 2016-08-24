@@ -257,7 +257,7 @@ minetest.register_tool("vivarium:staff_creative", { -- this will be the super cr
 	description = "Creator Staff (make blocks or blocks)",
 	inventory_image = "water_staff.png^[colorize:purple:90",
 	wield_image = "water_staff.png^[colorize:purple:90",
-	range = 10,
+	range = 15,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
 		local stafflevel = staffcheck(user)
@@ -268,21 +268,22 @@ minetest.register_tool("vivarium:staff_creative", { -- this will be the super cr
 
 		if pointed_thing.type ~= "node" then
 			if pointed_thing.type == "object" then
-				local airnodes = minetest.find_nodes_in_area(
-					{x = playerpos.x -30, y = playerpos.y - 30, z = playerpos.z -30},
-					{x = playerpos.x +30, y = playerpos.y + 30, z = playerpos.z +30},
-					{"air","default:water_source","default:lava_source","default:river_water_source"}
-				)
-				local newpos = airnodes[ math.random(1,#airnodes) ]
+				local mobpos = pointed_thing.ref:getpos()
+				local newpos = mobpos
+				local distance = 30
+				
+				while (vector.distance(playerpos,newpos) < distance/2) do
+					local airnodes = minetest.find_nodes_in_area(
+						{x = playerpos.x -distance, y = playerpos.y - 10, z = playerpos.z -distance},
+						{x = playerpos.x +distance, y = playerpos.y + 10, z = playerpos.z +distance},
+						{"air","default:water_source","default:lava_source","default:river_water_source"}
+					)
+					newpos = airnodes[ math.random(1,#airnodes) ]
+				end
 
-				bomf(pointed_thing.ref:getpos(),3)
+				bomf( mobpos , 3)
+				bomf( newpos , 5)
 				pointed_thing.ref:setpos(newpos)
-				bomf(newpos,3)
-				--[[
-				newpos = {x=newpos.x+math.random(-1,1), y=newpos.y+0.5, z=newpos.z+math.random(-1,1)}
-				bomf(newpos,2 )
-				minetest.add_entity(newpos, pointed_thing.ref:get_luaentity().name)
-				-- ]]
 			end
 			return
 		end
