@@ -17,6 +17,7 @@ vivarium.bestiary = {
 	{name = "mobs_bear",beasts = {"medved",}},
 	{name = "mobs_mr_goat",beasts = {"goat",}},
 	{name = "mobs_yeti",beasts = {"yeti",}},
+	{name = "mobs_horse",beasts = {"horse",}},
 	{name = "mobs_slimes",beasts = {"green_small","green_medium","green_big","lava_small","lava_medium","lava_big"}, follow="mobs_slimes:slimeball"},
 	{name = "mobs_sandworm",beasts = {"sandworm",},follow="default:stone_desert"},
 	{name = "mobs_senderman",beasts = {"senderman",},follow="default:nyan"},
