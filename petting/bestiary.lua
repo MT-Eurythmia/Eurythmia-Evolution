@@ -41,7 +41,7 @@ petting.bestiary = {
 	},
 	{
 		name = "dmobs",
-		beasts = {"fox","badger","owl"},
+		animals = {"fox","badger","owl"},
 		follow = "mobs:meat_raw",
 	},
 	{name = "dmobs",beasts = {"dragon","dragon2","dragon3","dragon4","dragon_armor_steel","dragon_black","dragon_blue","dragon_egg_fire","dragon_egg_ice","dragon_egg_lightning","dragon_egg_poison","dragon_gem","dragon_gem_fire","dragon_gem_ice","dragon_gem_lightning","dragon_gem_poison","dragon_great","dragon_great_tame","dragon_green","dragon_red"},follow={"mobs:lava_orb","bucket:bucket_lava"}},
