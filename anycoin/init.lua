@@ -22,7 +22,7 @@ function anycoin:register_coin(coinname,coindesc,cmaterial,overimg,cvalue)
 	
 	core.register_craft({
 		type = "shapeless",
-		output = "anycoin:coin_base "..cvalue,
+		output = "anycoin:anycoin "..cvalue,
 		recipe = {"anycoin:coin_"..coinname}
 	}
 	)
@@ -42,28 +42,35 @@ end
 
 -- A base coin to serve as an exchange base
 
-minetest.register_craftitem("anycoin:coin_base", {
+minetest.register_craftitem("anycoin:anycoin", {
 	description = "AnyCoin (1 ac-)",
 	inventory_image = "anycoin_coin.png",
 	coinvalue = 1,
 })
 
-minetest.register_craftitem("anycoin:coin_base9", {
+minetest.register_craftitem("anycoin:nineycoin", {
 	description = "NineyCoin (9 ac-)",
 	inventory_image = "anycoin_coin.png^[colorize:blue:60",
 	coinvalue = 9
 })
 
-local basecoin = "anycoin:coin_base"
+local basecoin = "anycoin:anycoin"
 
 core.register_craft( {
 
-	output = "anycoin:coin_base9",
+	output = "anycoin:nineycoin",
 	recipe = {
 		{basecoin,basecoin,basecoin},
 		{basecoin,basecoin,basecoin},
 		{basecoin,basecoin,basecoin},
 	}
+
+})
+
+core.register_craft( {
+	type = "shapeless",
+	output = "anycoin:anycoin 9",
+	recipe = {"anycoin:nineycoin"}
 
 })
 
