@@ -48,6 +48,9 @@ function petting:captivate(mobname,modset)
 	local replacement = modset.replacement or nil
 
 	local rc_func = mobe.on_rightclick
+	local callbackmoment = modset.rc_callback
+		
+	end
 
 	if modset.mobtype then 
 		mobe.type = modset.mobtype
@@ -64,32 +67,34 @@ function petting:captivate(mobname,modset)
 	end
 
 	local capturefunction = function(self,clicker) -- lambda time!
+		if rc_func and callbackmoment == "before" then
+			rc_func(self,clicker)
+		end
 		if mobs:feed_tame(self, clicker, feedcount, true, true) then
 			return
 		end
-		minetest.chat_send_player(clicker:get_player_name(),
-			"Mob: "..self.name.." ( "..
-			handchance..", "..
-			netchance..", "..
-			lassochance.."). It follows: "..
-			petting:getfollows(self.follow)
+		if self.owner and self.owner ~= clicker:get_player_name() then
+			minetest.chat_send_player(clicker:get_player_name(),
+				"Mob: "..self.name.." ( "..
+				handchance..", "..
+				netchance..", "..
+				lassochance.."). It follows: "..
+				petting:getfollows(self.follow)
 			)
+		end
 
 		mobs:capture_mob(self, clicker, handchance, netchance, lassochance, override, replacement)
-		if rc_func then
-			--rc_func(self,clicker)
-		end
 		if clicker:get_wielded_item():get_name() == "petting:mobtamer" and self.owner == clicker:get_player_name() then
 			if self.order == "follow" then
 				self.order = "stand"
 				minetest.chat_send_player(clicker:get_player_name(),self.name .." will now stand.")
-			elseif self.order == "stand" then
-				self.order = ""
-				minetest.chat_send_player(clicker:get_player_name(),self.name .." is free to roam around.")
 			else
 				self.order = "follow"
 				minetest.chat_send_player(clicker:get_player_name(),self.name .." will now follow you.")
 			end
+		end
+		if rc_func and callbackmoment == "after" then
+			rc_func(self,clicker)
 		end
 	end
 	mobe.on_rightclick = capturefunction
