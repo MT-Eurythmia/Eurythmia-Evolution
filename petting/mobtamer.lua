@@ -1,4 +1,4 @@
-minetest.register_tool("vivarium:mobtamer", {
+minetest.register_tool("petting:mobtamer", {
 	description = "Mob Tamer",
 	inventory_image = "mobs_nametag.png^[colorize:blue:90",
 	wield_image = "mobs_nametag.png^[colorize:blue:90",
@@ -14,7 +14,7 @@ minetest.register_tool("vivarium:mobtamer", {
 		local inventory = user:get_inventory()
 		local eggname = ''
 		for idx,x in pairs(inventory:get_list("main") ) do
-			if x:get_name() == "vivarium:mobtamer" then
+			if x:get_name() == "petting:mobtamer" then
 				break
 			end
 			eggname = x:get_name()
@@ -45,7 +45,7 @@ minetest.register_tool("vivarium:mobtamer", {
 })
 
 minetest.register_craft({
-	output = "vivarium:mobtamer",
+	output = "petting:mobtamer",
 	recipe = {
 		{"mobs:leather","mobs:magic_lasso","mobs:leather"},
 		{"mobs:nametag","mobs:nametag","mobs:nametag"}

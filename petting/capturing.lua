@@ -3,17 +3,15 @@
 -- TODO add an identification tag to get mob name, stats, and follows
 -- consumes said tag, uses mobs nametag image with yellow coloration
 
--- TODO adda vivarium:fodder to feed animals in general
-
-function chancer(hp,difficulty)
+function petting:chancer(hp,difficulty)
 	return math.floor(1000/hp * hp/(hp*0.4) * difficulty)
 end
 
-function damagerate(hp)
+function petting:damagerate(hp)
 	return math.ceil(hp/10)
 end
 
-function getfollows(followt)
+function petting:getfollows(followt)
 	if type(followt) == "string" then return followt
 	elseif type(followt) ~= "table" then return "nothing"
 	end
@@ -25,7 +23,7 @@ function getfollows(followt)
 	return followstring
 end
 
-function captivate(mobname,modset)
+function petting:captivate(mobname,modset)
 	local mobe = minetest.registered_entities[mobname]
 	if not mobe then
 		minetest.debug("Could not process "..mobname.. " - no such mob!")
@@ -42,9 +40,9 @@ function captivate(mobname,modset)
 		return
 	end
 
-	local handchance = chancer(hpindicator,0.2)
-	local netchance = chancer(hpindicator,0.5)
-	local lassochance = chancer(hpindicator,1)
+	local handchance = petting:chancer(hpindicator,0.2)
+	local netchance = petting:chancer(hpindicator,0.5)
+	local lassochance = petting:chancer(hpindicator,1)
 	local feedcount = modset.feedcount or 8
 	local override = modset.override or false
 	local replacement = modset.replacement or nil
@@ -55,14 +53,14 @@ function captivate(mobname,modset)
 		mobe.type = modset.mobtype
 		mobe.passive = false
 		mobe.attacks_monsters = true -- if animal respawned as NPC this will be in effect
-		mobe.damage = damagerate(mobe.hp_max)
+		mobe.damage = petting:damagerate(mobe.hp_max)
 
 	end
 	if modset.follow then 
 		mobe.follow = modset.follow
-		minetest.debug("follow: "..dump(mobe.follow))
-	elseif mobe.follow == nil and vivarium.bestiaryoptions.nilfollow then
-		mobe.follow = vivarium.bestiaryoptions.nilfollow
+		--minetest.debug("follow: "..dump(mobe.follow))
+	elseif mobe.follow == nil and petting.options.nilfollow then
+		mobe.follow = petting.options.nilfollow
 	end
 
 	local capturefunction = function(self,clicker) -- lambda time!
@@ -74,14 +72,14 @@ function captivate(mobname,modset)
 			handchance..", "..
 			netchance..", "..
 			lassochance.."). It follows: "..
-			getfollows(self.follow)
+			petting:getfollows(self.follow)
 			)
 
 		mobs:capture_mob(self, clicker, handchance, netchance, lassochance, override, replacement)
 		if rc_func then
 			--rc_func(self,clicker)
 		end
-		if clicker:get_wielded_item():get_name() == "vivarium:mobtamer" and self.owner == clicker:get_player_name() then
+		if clicker:get_wielded_item():get_name() == "petting:mobtamer" and self.owner == clicker:get_player_name() then
 			if self.order == "follow" then
 				self.order = "stand"
 				minetest.chat_send_player(clicker:get_player_name(),self.name .." will now stand.")
@@ -98,40 +96,46 @@ function captivate(mobname,modset)
 
 end
 
-function addcapture(modname,moblist,modset)
+function petting:addcapture(modname,moblist,modset)
 	for _,mobname in pairs(moblist) do
-		captivate(modname..":"..mobname, modset)
+		petting:captivate(modname..":"..mobname, modset)
+	end
+end
+
+function petting:loadbeasts(bestiary)
+	for _,modset in pairs(bestiary) do
+
+		if minetest.get_modpath(modset.name) then
+			if modset.beasts then
+				modset.mobtype = nil
+				addcapture(modset.name,modset.beasts,modset)
+			end
+			if modset.animals then
+				modset.mobtype = "animal"
+				addcapture(modset.name,modset.animals,modset)
+			end
+			if modset.monsters then
+				modset.mobtype = "monster"
+				addcapture(modset.name,modset.monsters,modset)
+			end
+			if modset.npcs then
+				modset.mobtype = "npc"
+				addcapture(modset.name,modset.npcs,modset)
+			end
+		end
+
 	end
 end
 
 
 minetest.debug("--- Start Mob Captivator ---")
 
-dofile(minetest.get_modpath("vivarium") .. "/bestiary.lua")
+dofile(minetest.get_modpath("petting") .. "/bestiary.lua")
 
-if vivarium.bestiary then
-for _,modset in pairs(vivarium.bestiary) do
-
-	if minetest.get_modpath(modset.name) then
-		if modset.beasts then
-			modset.mobtype = nil
-			addcapture(modset.name,modset.beasts,modset)
-		end
-		if modset.animals then
-			modset.mobtype = "animal"
-			addcapture(modset.name,modset.animals,modset)
-		end
-		if modset.monsters then
-			modset.mobtype = "monster"
-			addcapture(modset.name,modset.monsters,modset)
-		end
-		if modset.npcs then
-			modset.mobtype = "npc"
-			addcapture(modset.name,modset.npcs,modset)
-		end
-	end
-
+if petting.bestiary then
+	petting:loadbeasts(petting.bestiary)
 end
-end
+
+-- ned to add a way for mobs to define their own bestiary separately
 
 minetest.debug("-------- Mobs Captivated ------")
