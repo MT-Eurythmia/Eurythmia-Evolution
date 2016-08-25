@@ -50,8 +50,6 @@ function petting:captivate(mobname,modset)
 	local rc_func = mobe.on_rightclick
 	local callbackmoment = modset.rc_callback
 		
-	end
-
 	if modset.mobtype then 
 		mobe.type = modset.mobtype
 		mobe.passive = false
