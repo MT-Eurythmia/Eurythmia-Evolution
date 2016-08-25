@@ -45,7 +45,7 @@ function staffmagic:staffcheck(player)
 	return stafflevel
 end
 
-function staffmagic:staffmagic:isforbidden(nodename)
+function staffmagic:isforbidden(nodename)
 	for _,pat in pairs(staffmagic.forbidden_nodes) do
 		if string.match(nodename,pat) then
 			--minetest.chat_send_all("Forbidden : "..nodename)
@@ -127,8 +127,8 @@ end
 
 minetest.register_tool("staffmagic:staff_stack", { -- this will be the wall staff
 	description = "Column Staff (make walls)",
-	inventory_image = "water_staff.png^[colorize:yellow:90",
-	wield_image = "water_staff.png^[colorize:yellow:90",
+	inventory_image = "staffmagic_staff.png^[colorize:yellow:90",
+	wield_image = "staffmagic_staff.png^[colorize:yellow:90",
 	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
@@ -136,6 +136,7 @@ minetest.register_tool("staffmagic:staff_stack", { -- this will be the wall staf
 		if stafflevel < 1 then return; end
 
 		if pointed_thing.type ~= "node" then
+			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
 			if stafflevel < 2 then return; end
 
 			if pointed_thing.type == "object" then
@@ -195,8 +196,8 @@ minetest.register_tool("staffmagic:staff_stack", { -- this will be the wall staf
 
 minetest.register_tool("staffmagic:staff_clone", { -- this will be the floor staff
 	description = "Staff of Cloning (make floors)",
-	inventory_image = "water_staff.png^[colorize:green:90",
-	wield_image = "water_staff.png^[colorize:green:90",
+	inventory_image = "staffmagic_staff.png^[colorize:green:90",
+	wield_image = "staffmagic_staff.png^[colorize:green:90",
 	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
@@ -204,6 +205,7 @@ minetest.register_tool("staffmagic:staff_clone", { -- this will be the floor sta
 		if stafflevel < 1 then return; end
 
 		if pointed_thing.type ~= "node" then
+			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
 
 			if stafflevel < 2 then -- can only clone mobs if super staffer else abuse
 				return
@@ -257,8 +259,8 @@ minetest.register_tool("staffmagic:staff_clone", { -- this will be the floor sta
 
 minetest.register_tool("staffmagic:staff_creative", { -- this will be the super creative staff
 	description = "Creator Staff (make blocks or blocks)",
-	inventory_image = "water_staff.png^[colorize:purple:90",
-	wield_image = "water_staff.png^[colorize:purple:90",
+	inventory_image = "staffmagic_staff.png^[colorize:purple:90",
+	wield_image = "staffmagic_staff.png^[colorize:purple:90",
 	range = 15,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
@@ -269,6 +271,7 @@ minetest.register_tool("staffmagic:staff_creative", { -- this will be the super 
 		local pname = user:get_player_name()
 
 		if pointed_thing.type ~= "node" then
+			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
 			if pointed_thing.type == "object" then
 				local mobpos = pointed_thing.ref:getpos()
 				local newpos = mobpos
@@ -285,6 +288,7 @@ minetest.register_tool("staffmagic:staff_creative", { -- this will be the super 
 
 				staffmagic:bomf( mobpos , 3)
 				staffmagic:bomf( newpos , 5)
+				staffmagic:tellem(user,"You sent the " ..pointed_thing.ref:get_luaentity().name .. " packing.")
 				pointed_thing.ref:setpos(newpos)
 			end
 			return
@@ -331,8 +335,8 @@ minetest.register_tool("staffmagic:staff_creative", { -- this will be the super 
 
 minetest.register_tool("staffmagic:staff_boom", {
 	description = "Bomf Staff (delete nodes)",
-	inventory_image = "water_staff.png^[colorize:black:140",
-	wield_image = "water_staff.png^[colorize:black:140",
+	inventory_image = "staffmagic_staff.png^[colorize:black:140",
+	wield_image = "staffmagic_staff.png^[colorize:black:140",
 	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
@@ -340,6 +344,7 @@ minetest.register_tool("staffmagic:staff_boom", {
 		if stafflevel < 2 then return; end
 
 		if pointed_thing.type ~= "node" then
+			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
 			if pointed_thing.type == "object" then
 				staffmagic:bomf(pointed_thing.ref:getpos(),1 )
 				pointed_thing.ref:remove()
@@ -378,13 +383,14 @@ minetest.register_tool("staffmagic:staff_boom", {
 -- quick and dirty tool to repair carnage caused by NSSM ice mobs
 minetest.register_tool("staffmagic:staff_melt", {
 	description = "Staff of Melting (Fix Ice Mobs damage)",
-	inventory_image = "water_staff.png^[colorize:blue:90",
-	wield_image = "water_staff.png^[colorize:blue:90",
+	inventory_image = "staffmagic_staff.png^[colorize:blue:90",
+	wield_image = "staffmagic_staff.png^[colorize:blue:90",
 	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
 
 		if pointed_thing.type ~= "node" then
+			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
 			if pointed_thing.type == "object" then
 				local newpos = pointed_thing.ref:getpos()
 				staffmagic:bomf(newpos,2 )
