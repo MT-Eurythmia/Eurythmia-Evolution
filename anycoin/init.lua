@@ -6,7 +6,8 @@ if minetest.get_modpath("moreores") then
 	metals = "moreores:tin_ingot"
 end
 
-function anycoin:register_coin(coinname,coindesc,cmaterial,overimg,cvalue)
+function anycoin:register_coin(coinname,coindesc,cmaterial,cvalue)
+	local overimg = cmaterial.inventory_image or "default_dirt_with_grass.png"
 	local coinimg = "anycoin_coin.png^"..overimg
 	local value = cvalue
 	if not cvalue then
@@ -42,7 +43,7 @@ function anycoin:register_coin(coinname,coindesc,cmaterial,overimg,cvalue)
 end
 
 -- A base coin to serve as an exchange base
-anycoin:register_coin("base","AnyCoin",nil,"default_dirt_with_grass.png",1)
+anycoin:register_coin("base","AnyCoin",nil,1)
 
 local basecoin = "anycoin:coin_base"
 
