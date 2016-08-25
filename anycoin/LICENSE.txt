@@ -1,0 +1,19 @@
+Code
+++++
+
+Copyright 2016 Tai "DuCake" Kedzierski (taikedz)
+
+This software is provided to you under LGPLv3 license
+
+You may use, modify, copy and distribute as long as you retain this copyright notice, and provide the source code of this project and any code directly derived from this project's code upon request without restriction. You may not re-license this work or any work derived from it under a license that would contradict the LGPLv3.
+
+
+
+Textures
+++++++++
+
+Copyright 2016 Tai "DuCake" Kedzierski (taikedz)
+
+The textures provided in this file are provided to you under Creative Commons BY-SA 4.0
+
+You may copy, modify and distribute your copies, provided you retain this copyright notice, and grant the same permissions to the users of the work you derived from this present work.
