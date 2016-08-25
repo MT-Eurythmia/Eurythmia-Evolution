@@ -28,7 +28,7 @@ minetest.register_tool("petting:mobtamer", {
 
 			luae.type="npc"
 			luae.attacks_monsters=true
-			luae.state="walk"
+			luae.state="stand"
 			luae.owner = user:get_player_name()
 			luae.tamed = true
 			luae.health = luae.hp_max
