@@ -46,12 +46,14 @@ minetest.register_craftitem("anycoin:anycoin", {
 	description = "AnyCoin (1 ac-)",
 	inventory_image = "anycoin_coin.png",
 	coinvalue = 1,
+	stack_max = 500,
 })
 
 minetest.register_craftitem("anycoin:nineycoin", {
 	description = "NineyCoin (9 ac-)",
 	inventory_image = "anycoin_coin.png^[colorize:blue:60",
-	coinvalue = 9
+	coinvalue = 9,
+	stack_max = 500,
 })
 
 local basecoin = "anycoin:anycoin"
