@@ -32,7 +32,7 @@ minetest.register_tool("petting:mobtamer", {
 			luae.owner = user:get_player_name()
 			luae.tamed = true
 			luae.health = luae.hp_max
-			bomf(pos,2 )
+			vivarium:bomf(pos,2 )
 		else
 			luaobj:remove()
 			minetest.chat_send_player(user:get_player_name(),"Not a mob!")

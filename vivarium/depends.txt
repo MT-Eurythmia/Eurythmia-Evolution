@@ -1,5 +1,1 @@
 default
-anycoin
-staffmagic
-petting
-tincraft?

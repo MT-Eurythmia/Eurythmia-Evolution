@@ -55,30 +55,6 @@ function staffmagic:isforbidden(nodename)
 	return false
 end
 
-function staffmagic:bomf(pos,radius)
-	minetest.add_particlespawner(
-		200, --amount
-		0.1, --time
-		{x=pos.x-radius/2, y=pos.y-radius/2, z=pos.z-radius/2}, --minpos
-		{x=pos.x+radius/2, y=pos.y+radius/2, z=pos.z+radius/2}, --maxpos
-		{x=-0, y=-0, z=-0}, --minvel
-		{x=1, y=1, z=1}, --maxvel
-		{x=-0.5,y=5,z=-0.5}, --minacc
-		{x=0.5,y=5,z=0.5}, --maxacc
-		0.1, --minexptime
-		1, --maxexptime
-		3, --minsize
-		4, --maxsize
-		false, --collisiondetection
-		"tnt_smoke.png" --texture
-	)
-
-	minetest.sound_play("staffmagic_pom", {
-		pos = pos,
-		max_hear_distance = 10
-	})
-end
-
 function staffmagic:max(x,y)
 	if x < y then return y
 	else return x
@@ -141,7 +117,7 @@ minetest.register_tool("staffmagic:staff_stack", { -- this will be the wall staf
 
 			if pointed_thing.type == "object" then
 				local newpos = pointed_thing.ref:getpos()
-				staffmagic:bomf(newpos,2 )
+				vivarium:bomf(newpos,2 )
 				local luae = pointed_thing.ref:get_luaentity()
 				
 				staffmagic:mobtransform(user,luae,true)
@@ -184,7 +160,7 @@ minetest.register_tool("staffmagic:staff_stack", { -- this will be the wall staf
                         {"air","default:water_source","default:lava_source","default:river_water_source"}
 		)
 
-		staffmagic:bomf(pos,2)
+		vivarium:bomf(pos,2)
                 for _,fpos in pairs(airnodes) do
 			minetest.swap_node(fpos, {name = targetnode })
 		end
@@ -213,7 +189,7 @@ minetest.register_tool("staffmagic:staff_clone", { -- this will be the floor sta
 			if pointed_thing.type == "object" then
 				local newpos = pointed_thing.ref:getpos()
 				newpos = {x=newpos.x+math.random(-1,1), y=newpos.y+0.5, z=newpos.z+math.random(-1,1)}
-				staffmagic:bomf(newpos,2 )
+				vivarium:bomf(newpos,2 )
 				minetest.add_entity(newpos, pointed_thing.ref:get_luaentity().name)
 			end
 			return
@@ -245,7 +221,7 @@ minetest.register_tool("staffmagic:staff_clone", { -- this will be the floor sta
                         {"air","default:water_source","default:lava_source","default:river_water_source"}
 		)
 		
-		staffmagic:bomf({x = (playerpos.x+pos.x)/2 , y = (playerpos.y+pos.y)/2 , z = (playerpos.z+pos.z)/2},4)
+		vivarium:bomf({x = (playerpos.x+pos.x)/2 , y = (playerpos.y+pos.y)/2 , z = (playerpos.z+pos.z)/2},4)
 
                 for _,fpos in pairs(airnodes) do
 			minetest.swap_node(fpos, {name = targetnode })
@@ -286,8 +262,8 @@ minetest.register_tool("staffmagic:staff_creative", { -- this will be the super 
 					newpos = airnodes[ math.random(1,#airnodes) ]
 				end
 
-				staffmagic:bomf( mobpos , 3)
-				staffmagic:bomf( newpos , 5)
+				vivarium:bomf( mobpos , 3)
+				vivarium:bomf( newpos , 5)
 				staffmagic:tellem(user,"You sent the " ..pointed_thing.ref:get_luaentity().name .. " packing.")
 				pointed_thing.ref:setpos(newpos)
 			end
@@ -317,7 +293,7 @@ minetest.register_tool("staffmagic:staff_creative", { -- this will be the super 
                         {"air","default:water_source","default:lava_source","default:river_water_source"}
 		)
 		
-		staffmagic:bomf({x = (playerpos.x+pos.x)/2 , y = (playerpos.y+pos.y)/2 , z = (playerpos.z+pos.z)/2},4)
+		vivarium:bomf({x = (playerpos.x+pos.x)/2 , y = (playerpos.y+pos.y)/2 , z = (playerpos.z+pos.z)/2},4)
 
                 for _,fpos in pairs(airnodes) do
 			minetest.swap_node(fpos, {name = targetnode })
@@ -346,7 +322,7 @@ minetest.register_tool("staffmagic:staff_boom", {
 		if pointed_thing.type ~= "node" then
 			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
 			if pointed_thing.type == "object" then
-				staffmagic:bomf(pointed_thing.ref:getpos(),1 )
+				vivarium:bomf(pointed_thing.ref:getpos(),1 )
 				pointed_thing.ref:remove()
 			end
 			return
@@ -370,7 +346,7 @@ minetest.register_tool("staffmagic:staff_boom", {
                         {targetnode}
 		)
 
-		staffmagic:bomf(pos,radius)
+		vivarium:bomf(pos,radius)
 
                 for _,fpos in pairs(targetnodes) do
 			minetest.swap_node(fpos, {name = "air" })
@@ -393,7 +369,7 @@ minetest.register_tool("staffmagic:staff_melt", {
 			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
 			if pointed_thing.type == "object" then
 				local newpos = pointed_thing.ref:getpos()
-				staffmagic:bomf(newpos,2 )
+				vivarium:bomf(newpos,2 )
 				local luae = pointed_thing.ref:get_luaentity()
 				
 				staffmagic:mobheal(user,luae)
@@ -418,7 +394,7 @@ minetest.register_tool("staffmagic:staff_melt", {
                         {"default:ice","default:snowblock"}
 		)
 
-		staffmagic:bomf(pos,breadth*2)
+		vivarium:bomf(pos,breadth*2)
 
                 for _,fpos in pairs(frostarea) do
 				local replname = minetest.get_node({x=fpos.x,y=fpos.y-1,z=fpos.z}).name

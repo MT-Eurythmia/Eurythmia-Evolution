@@ -1,4 +1,5 @@
 default
+vivarium
 nssm?
 dmobs?
 mobs_animal?
