@@ -1,10 +1,10 @@
 -- Supported animals
 
-vivarium.bestiaryoptions = {
+petting.options = {
 	nilfollow = "default:copper_lump",
 }
 
-vivarium.bestiary = {
+petting.bestiary = {
 	{
 		name = "mobs_animal",
 		beasts = {"cow","kitten","pumba","bunny","bee","rat","chicken"}
