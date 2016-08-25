@@ -51,6 +51,9 @@ function monstercoin:register_coin(coinname,coindesc,cmaterial,overimg)
 end
 
 monstercoin:register_coin("nyan","Nyan Coin","default:nyancat","default_nc_front.png")
-monstercoin:register_coin("ice","Ice Monster Coin","nssm:frosted_amphibian_heart","frosted_amphibian_heart.png")
-monstercoin:register_coin("worm","Worms Coin","nssm:worm_flesh","worm_flesh.png")
-monstercoin:register_coin("scrausics","Scrausics Coin","nssm:raw_scrausics_wing","raw_scrausics_wing.png")
+
+if minetest.get_modpath("nssm") then
+	monstercoin:register_coin("ice","Ice Monster Coin","nssm:frosted_amphibian_heart","frosted_amphibian_heart.png")
+	monstercoin:register_coin("worm","Worms Coin","nssm:worm_flesh","worm_flesh.png")
+	monstercoin:register_coin("scrausics","Scrausics Coin","nssm:raw_scrausics_wing","raw_scrausics_wing.png")
+end
