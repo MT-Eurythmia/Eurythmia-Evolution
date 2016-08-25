@@ -108,19 +108,19 @@ function petting:loadbeasts(bestiary)
 		if minetest.get_modpath(modset.name) then
 			if modset.beasts then
 				modset.mobtype = nil
-				addcapture(modset.name,modset.beasts,modset)
+				petting:addcapture(modset.name,modset.beasts,modset)
 			end
 			if modset.animals then
 				modset.mobtype = "animal"
-				addcapture(modset.name,modset.animals,modset)
+				petting:addcapture(modset.name,modset.animals,modset)
 			end
 			if modset.monsters then
 				modset.mobtype = "monster"
-				addcapture(modset.name,modset.monsters,modset)
+				petting:addcapture(modset.name,modset.monsters,modset)
 			end
 			if modset.npcs then
 				modset.mobtype = "npc"
-				addcapture(modset.name,modset.npcs,modset)
+				petting:addcapture(modset.name,modset.npcs,modset)
 			end
 		end
 
