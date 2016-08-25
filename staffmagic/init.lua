@@ -92,15 +92,15 @@ end
 
 
 function staffmagic:mobheal(user,luae)
-	if not luae.owner or user:get_player_name() ~= luae.owner then
+	if (not minetest.check_player_privs(user:get_player_name(), {creative=true}) ) and ( not luae.owner or user:get_player_name() ~= luae.owner) then
 		staffmagic:tellem(user,"This " ..luae.name .. " is not yours.")
 		return
 	end
 	if luae.health < luae.hp_min then
 		luae.health = luae.hp_min
-		staffmagic:tellem(user,"Your " ..luae.name .. " has been healed.")
+		staffmagic:tellem(user,"The " ..luae.name .. " has been healed.")
 	else
-		staffmagic:tellem(user,"This " ..luae.name .. " does not need healing.")
+		staffmagic:tellem(user,"The " ..luae.name .. " does not need healing.")
 	end
 end
 
