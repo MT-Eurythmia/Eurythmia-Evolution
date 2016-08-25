@@ -33,7 +33,8 @@ petting.bestiary = {
 	{name = "mobs_monster",beasts = {"dungeon_master",},follow="default:mese_crystal_fragment"},
 	{name = "mobs_monster",beasts = {"tree_monster",},follow="group:wood"},
 	{name = "dmobs",beasts = {"whale",},follow="mobs_bugslive:bug"},
-	{name = "dmobs",beasts = {"dmobs:gnorm",}},
+	{name = "dmobs",beasts = {"gnorm","pig"}},
+	{name = "dmobs",beasts = {"pig_evil",},follow={"mobs:pork_raw"}}, -- .... it's an EVIL pig, duh!
 	{
 		name = "dmobs",
 		beasts = {"panda","elephant","hedgehog"},
