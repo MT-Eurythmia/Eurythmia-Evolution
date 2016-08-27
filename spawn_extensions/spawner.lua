@@ -4,7 +4,7 @@ dofile(minetest.get_modpath("petting").."/spawntable.lua")
 
 --[[
 
-petting:add_spawns({
+spawnex:add_spawns({
         spawn_on = {}, --nodes, e.g. default:dirt_with_grass
         when_near = {}, --nodes, e.g. default:leaves
         light = {0,20}, -- minimum and maximum light
@@ -22,7 +22,7 @@ petting:add_spawns({
 
 --]]
 
-for i,rs in pairs(petting.spawnrules) do -- process RuleSets
+for i,rs in pairs(spawnex.spawnrules) do -- process RuleSets
 	for j,mobname in pairs(rs.mobs) do
 		mobs:spawn_specific(
 			mobname,

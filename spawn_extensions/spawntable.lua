@@ -2,20 +2,20 @@
 -- Adds extra spawn rules for the specified mobs
 -- Mobs can br grouped this way
 
-petting.spawnrules = {}
+spawnex.spawnrules = {}
 
-function petting:add_spawns(ruleset)
-	petting.spawnrules[#petting.spawnrules+1] = ruleset
+function spawnex:add_spawns(ruleset)
+	spawnex.spawnrules[#spawnex.spawnrules+1] = ruleset
 end
 
-function petting:deepcopy(table)
+function spawnex:deepcopy(table)
 	if type(table) ~= "table" then return table end
 	-- what about dealing with circular references?
 	local newtable = {}
 
 	for i,n in pairs(table) do
 		if type(n) == "table" then
-			newtable[i] = petting:deepcopy(n)
+			newtable[i] = spawnex:deepcopy(n)
 		else
 			newtable[i] = n -- newtable[i] is the new reference we need?
 		end
@@ -23,7 +23,7 @@ function petting:deepcopy(table)
 	return newtable
 end
 
-function petting:havemobs(modname,mobnames)
+function spawnex:havemobs(modname,mobnames)
 	if not minetest.get_modpath(modname) then return {} end
 
 	local moblist = {}
@@ -42,7 +42,7 @@ end
 
 --[[
 
-petting:add_spawns({
+spawnex:add_spawns({
 	spawn_on = {}, --nodes, e.g. default:dirt_with_grass
 	when_near = {}, --nodes, e.g. default:leaves
 	light = {0,20}, -- minimum and maximum light
@@ -65,11 +65,11 @@ petting:add_spawns({
 -- Things that spawn in fields -- ethereal support
 
 local fieldmobs = {}
-fieldmobs = apend(fieldmobs,petting:havemobs("mobs_animal",{"cow","kitten","pumba","bunny","chicken"}) )
-fieldmobs = apend(fieldmobs,petting:havemobs("mobs_wolf",{"wolf"}) )
-fieldmobs = apend(fieldmobs,petting:havemobs("mobs_horse",{"horse"}) )
+fieldmobs = apend(fieldmobs,spawnex:havemobs("mobs_animal",{"cow","kitten","pumba","bunny","chicken"}) )
+fieldmobs = apend(fieldmobs,spawnex:havemobs("mobs_wolf",{"wolf"}) )
+fieldmobs = apend(fieldmobs,spawnex:havemobs("mobs_horse",{"horse"}) )
 
-petting:addspawns( {
+spawnex:addspawns( {
 	spawn_on = {"ethereal:green_grass"},
 	when_near = {"air"},
 	light = {0,20},
@@ -86,7 +86,7 @@ local forestmobs = {}
 fieldmobs = apend(fieldmobs,petdting:havemobs("mobs_deer",{"deer"}) )
 fieldmobs = apend(fieldmobs,petdting:havemobs("mobs_bear",{"medved"}) )
 
-petting:addspawns( {
+spawnex:addspawns( {
 	spawn_on = {"ethereal:green_grass"},
 	when_near = {"group:wood"}, -- group trunks??
 	light = {0,20},
@@ -99,9 +99,9 @@ petting:addspawns( {
 -- ==============
 -- Things that spawn in dark damp places
 
-local sewermobs = petting:havemobs("mobs_animal",{"rat"})
+local sewermobs = spawnex:havemobs("mobs_animal",{"rat"})
 
-petting:addspawns( {
+spawnex:addspawns( {
 	spawn_on = {"default:stone","default:cobblestone","default:desertstone"},
 	when_near = {"default:water_source"},
 	light = {0,5},
@@ -114,9 +114,9 @@ petting:addspawns( {
 -- ===============
 -- Things that spawn in bamboo groves
 
-local bamboomobs = petting:havemobs("dmobs",{"panda"})
+local bamboomobs = spawnex:havemobs("dmobs",{"panda"})
 
-petting:addspawns( {
+spawnex:addspawns( {
 	spawn_on = {"ethereal:dirt_grove"}, -- FIXME check itemstring
 	when_near = {"ethereal:bamboo"}, -- FIXME check itemstring
 	light = {0,20},
@@ -139,35 +139,35 @@ local deepspawn = {
 local deepmobs = {}
 
 -- -100 : 0
-deepmobs = petting:havemobs("mobs_monster",{"stone_monster"})
-deepmobs = apend(deepmobs,petting:havemobs("mobs_monster",{"oerkki"}) )
+deepmobs = spawnex:havemobs("mobs_monster",{"stone_monster"})
+deepmobs = apend(deepmobs,spawnex:havemobs("mobs_monster",{"oerkki"}) )
 deepspawn.altitudes = {-100,0}
 deepspawn.mobs = deepmobs
-petting:addspawns(deepspawn)
+spawnex:addspawns(deepspawn)
 
 -- -500 : -100
-deepmobs = petting:havemobs("mobs_senderman",{"senderman"}) -- resets deepmobs variable
-deepmobs = apend(deepmobs,petting:havemobs("mobs_monster",{"stone_monster"}) )
-deepmobs = apend(deepmobs,petting:havemobs("mobs_monster",{"mese_monster"}) )
+deepmobs = spawnex:havemobs("mobs_senderman",{"senderman"}) -- resets deepmobs variable
+deepmobs = apend(deepmobs,spawnex:havemobs("mobs_monster",{"stone_monster"}) )
+deepmobs = apend(deepmobs,spawnex:havemobs("mobs_monster",{"mese_monster"}) )
 deepspawn.altitudes = {-500,-100}
 deepspawn.mobs = deepmobs
-petting:addspawns(deepspawn)
+spawnex:addspawns(deepspawn)
 
 -- -1500 : -500
-deepmobs = petting:havemobs("mobs_senderman",{"senderman"}) -- resets deepmobs variable
-deepmobs = apend(deepmobs,petting:havemobs("mobs_monster",{"dungeon_master"}) )
-deepmobs = apend(deepmobs,petting:havemobs("mobs_monster",{"mese_monster"}) )
+deepmobs = spawnex:havemobs("mobs_senderman",{"senderman"}) -- resets deepmobs variable
+deepmobs = apend(deepmobs,spawnex:havemobs("mobs_monster",{"dungeon_master"}) )
+deepmobs = apend(deepmobs,spawnex:havemobs("mobs_monster",{"mese_monster"}) )
 deepspawn.altitudes = {-500,-100}
 deepspawn.mobs = deepmobs
-petting:addspawns(deepspawn)
+spawnex:addspawns(deepspawn)
 
 
 -- ==============
 -- Beach mobs
 
-local beachmobs = petting:havemobs("mobs_turtles",{"turtle"})
+local beachmobs = spawnex:havemobs("mobs_turtles",{"turtle"})
 
-petting:addspawns( {
+spawnex:addspawns( {
 	spawn_on = {"default:sand"},
 	when_near = {"default:water_source"},
 	light = {0,5},
