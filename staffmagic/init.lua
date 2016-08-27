@@ -1,4 +1,6 @@
 minetest.register_privilege("staffer","Trust players to use staves")
+minetest.register_privilege("super_staffer","Trust players to use staves responsibly")
+minetest.register_privilege("staff_master","I trust you.")
 
 staffmagic = {}
 
@@ -40,7 +42,8 @@ end
 function staffmagic:staffcheck(player)
 	local stafflevel = 0
 	if minetest.check_player_privs(player:get_player_name(), {staffer=true}) then stafflevel = 1; end
-	if minetest.check_player_privs(player:get_player_name(), {creative=true}) then stafflevel = 100; end
+	if minetest.check_player_privs(player:get_player_name(), {super_staffer=true}) then stafflevel = 51; end
+	if minetest.check_player_privs(player:get_player_name(), {staff_master=true}) then stafflevel = 91; end
 	--minetest.chat_send_all("Staff level : "..stafflevel)
 	return stafflevel
 end
