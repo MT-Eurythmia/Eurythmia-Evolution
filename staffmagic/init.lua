@@ -4,6 +4,10 @@ minetest.register_privilege("staff_master","I trust you.")
 
 staffmagic = {}
 
+staffmagic.staff_power = {
+	boom = "tnt:gunpowder",
+}
+
 staffmagic.forbidden_nodes = {
 	"default:stone_with",
 	"moreores:mineral_",
@@ -116,7 +120,7 @@ minetest.register_tool("staffmagic:staff_stack", { -- this will be the wall staf
 
 		if pointed_thing.type ~= "node" then
 			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
-			if stafflevel < 2 then return; end
+			if stafflevel < 50 then return; end
 
 			if pointed_thing.type == "object" then
 				local newpos = pointed_thing.ref:getpos()
@@ -144,7 +148,7 @@ minetest.register_tool("staffmagic:staff_stack", { -- this will be the wall staf
 		local relpos = (userpos.y - pos.y)/math.sqrt((userpos.y - pos.y)^2)
 		local lower = 0 ; local higher = 0
 
-		if staffmagic:isforbidden(targetnode) and stafflevel < 2 then
+		if staffmagic:isforbidden(targetnode) and stafflevel < 90 then
 			targetnode = "default:dirt"
 		end
 
@@ -186,7 +190,7 @@ minetest.register_tool("staffmagic:staff_clone", { -- this will be the floor sta
 		if pointed_thing.type ~= "node" then
 			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
 
-			if stafflevel < 2 then -- can only clone mobs if super staffer else abuse
+			if stafflevel < 50 then -- can only clone mobs if super staffer else abuse
 				return
 			end
 			if pointed_thing.type == "object" then
@@ -214,7 +218,7 @@ minetest.register_tool("staffmagic:staff_clone", { -- this will be the floor sta
 		local startpos = {x = staffmagic:min(pos.x,playerpos.x),y = pos.y,z = staffmagic:min(pos.z,playerpos.z)}
 		local endpos = {x = staffmagic:max(pos.x,playerpos.x),y = pos.y,z = staffmagic:max(pos.z,playerpos.z)}
 
-		if staffmagic:isforbidden(targetnode) and stafflevel < 2 then
+		if staffmagic:isforbidden(targetnode) and stafflevel < 90 then
 			targetnode = "default:dirt"
 		end
 
@@ -254,7 +258,10 @@ minetest.register_tool("staffmagic:staff_creative", { -- this will be the super 
 			if pointed_thing.type == "object" then
 				local mobpos = pointed_thing.ref:getpos()
 				local newpos = mobpos
-				local distance = 30
+				local distance = math.ceil(pointed_thing.ref:get_luaentity().view_range * 1.5)
+				if stafflevel < 90 and distance > 30 then
+					distance = 30
+				end
 				
 				while (vector.distance(playerpos,newpos) < distance/2) do
 					local airnodes = minetest.find_nodes_in_area(
@@ -267,7 +274,7 @@ minetest.register_tool("staffmagic:staff_creative", { -- this will be the super 
 
 				vivarium:bomf( mobpos , 3)
 				vivarium:bomf( newpos , 5)
-				staffmagic:tellem(user,"You sent the " ..pointed_thing.ref:get_luaentity().name .. " packing.")
+				staffmagic:tellem(user,"You sent the " ..pointed_thing.ref:get_luaentity().name .. " packing "..math.ceil(vector.distance(mobpos,newpos)).."m away")
 				pointed_thing.ref:setpos(newpos)
 			end
 			return
@@ -286,7 +293,7 @@ minetest.register_tool("staffmagic:staff_creative", { -- this will be the super 
 		local startpos = {x = staffmagic:min(pos.x,playerpos.x),y = staffmagic:min(pos.y,playerpos.y),z = staffmagic:min(pos.z,playerpos.z)}
 		local endpos = {x = staffmagic:max(pos.x,playerpos.x),y = staffmagic:max(pos.y,playerpos.y-1),z = staffmagic:max(pos.z,playerpos.z)}
 
-		if staffmagic:isforbidden(targetnode) and stafflevel < 2 then
+		if staffmagic:isforbidden(targetnode) and stafflevel < 90 then
 			targetnode = "default:dirt"
 		end
 
@@ -308,10 +315,6 @@ minetest.register_tool("staffmagic:staff_creative", { -- this will be the super 
 	end,
 })
 
---[[
-
---]]
-
 minetest.register_tool("staffmagic:staff_boom", {
 	description = "Bomf Staff (delete nodes)",
 	inventory_image = "staffmagic_staff.png^[colorize:black:140",
@@ -320,16 +323,38 @@ minetest.register_tool("staffmagic:staff_boom", {
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
 		local stafflevel = staffmagic:staffcheck(user)
-		if stafflevel < 2 then return; end
+
+		local radius = 1
+		local inventory = user:get_inventory()
+		for idx,x in pairs(inventory:get_list("main") ) do
+			if x:get_name() == staffmagic.staff_power.boom then
+				local count = x:get_count()
+				radius = radius + math.floor(count/10)
+				break
+			end
+		end
+
+		if stafflevel < 20 then return; end -- allow regular staffers to bomf animals
 
 		if pointed_thing.type ~= "node" then
-			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
-			if pointed_thing.type == "object" then
-				vivarium:bomf(pointed_thing.ref:getpos(),1 )
-				pointed_thing.ref:remove()
+			if not pointed_thing.ref then return end
+			local mob = pointed_thing.ref
+			local mobe = mob:get_luaentity()
+
+			if mob:is_player() then return end
+
+			for _,obj in pairs(minetest.get_objects_inside_radius(mob:getpos() ,radius)) do
+				if mobe.name == obj:get_luaentity().name then -- crashes, attempted index a nil value (name). remove ".name" and you see the debug below
+					vivarium:bomf(obj:getpos(),1 )
+					obj:remove()
+				else
+					minetest.chat_send_all(tostring(mobe.name).." is not "..dump(obj:get_luaentity() )) -- the debug shows it has no "name" property
+				end
 			end
 			return
 		end
+
+		if stafflevel < 50 then return; end -- allow super staffers to dig
 
 		local pos = pointed_thing.under
 		local pname = user:get_player_name()
@@ -340,7 +365,6 @@ minetest.register_tool("staffmagic:staff_boom", {
 		end
 
 
-		local radius = 3
 		local targetnode = minetest.get_node(pos).name
 		local userpos = user:getpos()
                 local targetnodes = minetest.find_nodes_in_area(
@@ -352,7 +376,11 @@ minetest.register_tool("staffmagic:staff_boom", {
 		vivarium:bomf(pos,radius)
 
                 for _,fpos in pairs(targetnodes) do
-			minetest.swap_node(fpos, {name = "air" })
+			if string.match("fire:",targetnode) then -- stop fire sound at same time.
+				minetest.dig_node(fpos)
+			else
+				minetest.swap_node(fpos, {name = "air" })
+			end
 		end
 		return itemstack
 
