@@ -5,7 +5,7 @@ minetest.register_privilege("staff_master","I trust you.")
 staffmagic = {}
 
 staffmagic.staff_power = {
-	boom = "tnt:gunpowder",
+	boom = "anycoin:coin_bronze",
 }
 
 staffmagic.forbidden_nodes = {
