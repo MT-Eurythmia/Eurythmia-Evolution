@@ -273,18 +273,23 @@ minetest.register_tool("staffmagic:staff_creative", { -- this will be the super 
 			if pointed_thing.type == "object" then
 				local mobpos = pointed_thing.ref:getpos()
 				local newpos = mobpos
-				local distance = math.ceil(pointed_thing.ref:get_luaentity().view_range * 1.5)
+				local distance = 30
+				if pointed_thing.ref:get_luaentity().view_range then
+					distance = math.ceil(pointed_thing.ref:get_luaentity().view_range * 1.5)
+				end
 				if stafflevel < 90 and distance > 30 then
 					distance = 30
 				end
 				
-				while (vector.distance(playerpos,newpos) < distance/2) do
+				local count = 10
+				while (vector.distance(playerpos,newpos) < distance/2) and count > 0 do
 					local airnodes = minetest.find_nodes_in_area(
 						{x = playerpos.x -distance, y = playerpos.y - 10, z = playerpos.z -distance},
 						{x = playerpos.x +distance, y = playerpos.y + 10, z = playerpos.z +distance},
 						{"air","default:water_source","default:lava_source","default:river_water_source"}
 					)
 					newpos = airnodes[ math.random(1,#airnodes) ]
+					count = count -1
 				end
 
 				vivarium:bomf( mobpos , 3)
@@ -352,11 +357,11 @@ minetest.register_tool("staffmagic:staff_boom", {
 			if mob:is_player() then return end
 
 			for _,obj in pairs(minetest.get_objects_inside_radius(mob:getpos() ,radius)) do
-				--if mobe.name == obj:get_luaentity().name then -- crashes, attempted index a nil value (name). remove ".name" and you see the debug below
+				--if mobe.name == obj:get_luaentity() then -- crashes, attempted index a nil value (name). remove ".name" and you see the debug below
 					vivarium:bomf(obj:getpos(),1 )
 					obj:remove()
 				--else
-				--	minetest.chat_send_all(tostring(mobe.name).." is not "..dump(obj:get_luaentity() )) -- the debug shows it has no "name" property
+				--	minetest.debug(tostring(mobe.name).." is not "..dump(obj:get_luaentity() )) -- the debug shows it has no "name" property
 				--end
 			end
 			return
