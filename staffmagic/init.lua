@@ -344,12 +344,12 @@ minetest.register_tool("staffmagic:staff_boom", {
 			if mob:is_player() then return end
 
 			for _,obj in pairs(minetest.get_objects_inside_radius(mob:getpos() ,radius)) do
-				if mobe.name == obj:get_luaentity().name then -- crashes, attempted index a nil value (name). remove ".name" and you see the debug below
+				--if mobe.name == obj:get_luaentity().name then -- crashes, attempted index a nil value (name). remove ".name" and you see the debug below
 					vivarium:bomf(obj:getpos(),1 )
 					obj:remove()
-				else
-					minetest.chat_send_all(tostring(mobe.name).." is not "..dump(obj:get_luaentity() )) -- the debug shows it has no "name" property
-				end
+				--else
+				--	minetest.chat_send_all(tostring(mobe.name).." is not "..dump(obj:get_luaentity() )) -- the debug shows it has no "name" property
+				--end
 			end
 			return
 		end
