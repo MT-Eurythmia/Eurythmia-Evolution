@@ -6,6 +6,7 @@ staffmagic = {}
 
 staffmagic.staff_power = {
 	boom = "anycoin:coin_bronze",
+	stack = "anycoin:anycoin"
 }
 
 staffmagic.forbidden_nodes = {
@@ -73,6 +74,19 @@ function staffmagic:min(x,y)
 	end
 end
 
+function staffmagic:countpower(user,staff)
+	local inventory = user:get_inventory()
+	local powerup = staffmagic.staff_power[staff]
+	for idx,x in pairs(inventory:get_list("main") ) do
+		if x:get_name() == powerup then
+			local count = x:get_count()
+			if count > 10 then count = 100 end
+			return math.floor(count/10)
+		end
+	end
+	minetest.chat_send_player(user:get_player_name(),"No powerups! You need 10 "..staffmagic.staff_power[staff].." per extra 1 node")
+	return 0
+end
 
 function staffmagic:mobheal(user,luae)
 	if (not minetest.check_player_privs(user:get_player_name(), {creative=true}) ) and ( not luae.owner or user:get_player_name() ~= luae.owner) then
@@ -141,7 +155,8 @@ minetest.register_tool("staffmagic:staff_stack", { -- this will be the wall staf
 		end
 
 
-		local height = 5
+		local height = 2
+		height = height + staffmagic:countpower(user,"stack")
 		local targetnode = minetest.get_node(pos).name
 		local userpos = user:getpos()
 
@@ -325,16 +340,9 @@ minetest.register_tool("staffmagic:staff_boom", {
 		local stafflevel = staffmagic:staffcheck(user)
 
 		local radius = 1
-		local inventory = user:get_inventory()
-		for idx,x in pairs(inventory:get_list("main") ) do
-			if x:get_name() == staffmagic.staff_power.boom then
-				local count = x:get_count()
-				radius = radius + math.floor(count/10)
-				break
-			end
-		end
 
 		if stafflevel < 20 then return; end -- allow regular staffers to bomf animals
+		radius = radius + staffmagic:countpower(user,"boom")
 
 		if pointed_thing.type ~= "node" then
 			if not pointed_thing.ref then return end
