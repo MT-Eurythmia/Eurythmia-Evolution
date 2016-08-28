@@ -80,7 +80,7 @@ function staffmagic:countpower(user,staff)
 	for idx,x in pairs(inventory:get_list("main") ) do
 		if x:get_name() == powerup then
 			local count = x:get_count()
-			if count > 10 then count = 100 end
+			if count > 100 then count = 100 end
 			return math.floor(count/10)
 		end
 	end
