@@ -80,7 +80,7 @@ function staffmagic:countpower(user,staff)
 	for idx,x in pairs(inventory:get_list("main") ) do
 		if x:get_name() == powerup then
 			local count = x:get_count()
-			if count > 100 then count = 100 end
+			if count > 10 then count = 100 end
 			return math.floor(count/10)
 		end
 	end
@@ -357,12 +357,12 @@ minetest.register_tool("staffmagic:staff_boom", {
 			if mob:is_player() then return end
 
 			for _,obj in pairs(minetest.get_objects_inside_radius(mob:getpos() ,radius)) do
-				--if mobe.name == obj:get_luaentity() then -- crashes, attempted index a nil value (name). remove ".name" and you see the debug below
+				if not obj:is_player() then
+				if mobe.name == obj:get_luaentity()["name"] then
 					vivarium:bomf(obj:getpos(),1 )
 					obj:remove()
-				--else
-				--	minetest.debug(tostring(mobe.name).." is not "..dump(obj:get_luaentity() )) -- the debug shows it has no "name" property
-				--end
+				end
+				end -- playercheck
 			end
 			return
 		end
