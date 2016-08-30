@@ -64,4 +64,14 @@ petting.bestiary = {
 	-- {name = "",beasts = {"",},follow=""},
 }
 
+-- Custom NSSM overrides
+-- ensure the monsters themselves have an egg when captured
 
+if minetest.get_modpath("nssm") do
+	local nssmbeasts = {"ant_queen","ant_soldier","ant_worker","api","black_widow","bloco","crab","crocodile","daddy_long_legs","darts","dolidrosaurus","duckking","duck","echidna","enderduck","flying_duck","giant_sandworm","icelamander","icesnake","init","kraken","larva","lava_titan","manticore","mantis_beast","mantis","masticone","mese_dragon","moonheron","night_master","nssm_api","nssm_materials","nssm_spears","nssm_weapons","octopus","phoenix","pumpboom","pumpking","rainbow_staff","sand_bloco","sandworm","scrausics","signosigno","snow_biter","spawn","spiderduck","stone_eater","swimming_duck","tarantula","uloboros","werewolf","white_werewolf"}
+
+	for _,x in pairs(nssmbeasts) do
+		local desc = x:gsub("_"," ")
+		nssm:register_egg(":nssm:"..x,desc,x.."_egg.png")
+	end
+end
