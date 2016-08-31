@@ -1,1 +1,1 @@
---dofile(minetest.get_modpath("overrides".."/nssm.lua"))
+--dofile(minetest.get_modpath("overrides").."/nssm.lua")
