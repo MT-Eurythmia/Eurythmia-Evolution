@@ -23,12 +23,21 @@ minetest.register_tool("petting:mobtamer", {
 
 		-- here get the mob to the left
 		local inventory = user:get_inventory()
-		local eggname = ''
+		local eggname = nil
 		for idx,x in pairs(inventory:get_list("main") ) do
 			if x:get_name() == "petting:mobtamer" then
 				break
 			end
 			eggname = x:get_name()
+		end
+
+		if eggname == nil then
+			minetest.chat_send_player(user:get_player_name(), ".... what. Report Mob Tamer failure to DuCake with screenshot of your inventory.")
+			return
+		end
+		if eggname:sub(1,1) == ":" then
+			minetest.chat_send_player(user:get_player_name(), "Your monster is ill-defined. Please let DuCake know")
+			return
 		end
 
 
