@@ -18,7 +18,8 @@
 --Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ---
 
-local maxcost = ItemStack("default:gold_ingot"):get_stack_max()
+local currency = "default:gold_ingot"
+local maxcost = ItemStack(currency):get_stack_max()
 
 easyvend.set_formspec = function(pos, player)
 	local meta = minetest.get_meta(pos)
@@ -127,7 +128,7 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
         if ( chest_meta:get_string("owner") == meta:get_string("owner") and chest_inv ~= nil and player_inv ~= nil ) then
             
             local stack = {name=itemname, count=number, wear=0, metadata=""} 
-            local price = {name="default:gold_ingot", count=cost, wear=0, metadata=""}
+            local price = {name=currency, count=cost, wear=0, metadata=""}
             local chest_has, player_has, chest_free, player_free
             if buysell == "sell" then
                 chest_has = chest_inv:contains_item("main", stack)
@@ -223,7 +224,7 @@ easyvend.after_place_node = function(pos, placer)
     inv:set_size("item", 1)
     inv:set_size("gold", 1)
     
-    inv:set_stack( "gold", 1, "default:gold_ingot" )
+    inv:set_stack( "gold", 1, currency )
 
 	meta:set_string("infotext", player_name.." - "..description)
     meta:set_int("number", 1)
