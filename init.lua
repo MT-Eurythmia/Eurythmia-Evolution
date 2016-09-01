@@ -22,6 +22,11 @@ easyvend.version = 1.02
 
 dofile(minetest.get_modpath("easyvend") .. "/easyvend.lua")
 
+local sounds = default.node_sound_wood_defaults({
+		place = { name = "easyvend_activate", gain = 1 },
+		dug = { name = "easyvend_disable", gain = 1 },
+})
+
 minetest.register_node("easyvend:vendor", {
 	description = "Vending Machine",
 	tile_images ={"easyvend_side.png", "easyvend_side.png", "easyvend_side.png",
@@ -33,6 +38,8 @@ minetest.register_node("easyvend:vendor", {
 	after_place_node = easyvend.after_place_node,
 	can_dig = easyvend.can_dig,
 	on_receive_fields = easyvend.on_receive_fields,
+	sounds = sounds,
+
     allow_metadata_inventory_put = easyvend.allow_metadata_inventory_put,
     allow_metadata_inventory_take = easyvend.allow_metadata_inventory_take,
     allow_metadata_inventory_move = easyvend.allow_metadata_inventory_move,
@@ -49,6 +56,8 @@ minetest.register_node("easyvend:depositor", {
 	after_place_node = easyvend.after_place_node,
 	can_dig = easyvend.can_dig,
 	on_receive_fields = easyvend.on_receive_fields,
+	sounds = sounds,
+
     allow_metadata_inventory_put = easyvend.allow_metadata_inventory_put,
     allow_metadata_inventory_take = easyvend.allow_metadata_inventory_take,
     allow_metadata_inventory_move = easyvend.allow_metadata_inventory_move,
