@@ -40,6 +40,10 @@ easyvend.set_formspec = function(pos, player)
 end
 
 easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
+    if not fields.save then
+        return
+    end
+
     local node = minetest.get_node(pos)
 	local meta = minetest.get_meta(pos)
 
@@ -49,28 +53,42 @@ easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
 
     local itemstack = inv_self:get_stack("item",1)
     local itemname=""
+
+    local oldnumber = meta:get_int("number")
+    local oldcost = meta:get_int("cost")
 	
-	if not( number == nil or number < 1 or number > 99) then
+	if ( number == nil or number < 1 or number > 99) then
+                minetest.chat_send_player(sender:get_player_name(), "Invalid item count; must be between 1 and 99!")
+                easyvend.sound_error(sender:get_player_name())
+                meta:set_int("number", oldnumber)
+                easyvend.set_formspec(pos, sender)
+                return
+	elseif ( cost == nil or cost < 1 or cost > 99) then
+                minetest.chat_send_player(sender:get_player_name(), "Invalid price; must be between 1 and 99!")
+                easyvend.sound_error(sender:get_player_name())
+                meta:set_int("cost", oldcost)
+                easyvend.set_formspec(pos, sender)
+                return
+        elseif ( itemstack == nil or itemstack:is_empty() ) then
+                minetest.chat_send_player(sender:get_player_name(), "You must specify an item!")
+                easyvend.sound_error(sender:get_player_name())
+                return
+        end
+
         meta:set_int("number", number)
-	end
-    
-	if not( cost == nil or cost < 1 or cost > 99) then
-		meta:set_int("cost", cost)
-	end
-    
-    if( itemstack and itemstack:get_name() ) then
+        meta:set_int("cost", cost)
         itemname=itemstack:get_name()
-    end
 	meta:set_string("itemname", itemname)
     
-    easyvend.set_formspec(pos, sender)
+        easyvend.sound_setup(pos)
+        easyvend.set_formspec(pos, sender)
 end
 
 easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
     if not fields.save then
         return
     end
-    
+
 	local node = minetest.get_node(pos)
 	local meta = minetest.get_meta(pos)
     local number = meta:get_int("number")
@@ -236,6 +254,10 @@ end
 
 easyvend.sound_error = function(playername) 
 	minetest.sound_play("easyvend_error", {to_player = playername, gain = 1.0})
+end
+
+easyvend.sound_setup= function(pos)
+	minetest.sound_play("easyvend_activate", {pos = pos, gain = 1.0, max_hear_distance = 10,})
 end
 
 easyvend.sound_vend = function(pos) 
