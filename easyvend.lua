@@ -28,8 +28,13 @@ easyvend.set_formspec = function(pos, player)
 	local description = minetest.registered_nodes[node.name].description;
 	local number = meta:get_int("number")
 	local cost = meta:get_int("cost")
+        local bg = ""
+        if minetest.get_modpath("default") then
+            bg = default.gui_bg .. default.gui_bg_img .. default.gui_slots
+        end
 
 	meta:set_string("formspec", "size[8,7;]"
+                .. bg
 		.."label[0,0;" .. description .. "]"
 
         .."list[current_name;item;0,1;1,1;]"
