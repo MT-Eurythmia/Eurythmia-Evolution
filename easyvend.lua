@@ -98,6 +98,17 @@ easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
     
         easyvend.sound_setup(pos)
         easyvend.set_formspec(pos, sender)
+
+        local iname = minetest.registered_items[itemname].description
+        if iname == nil then iname = itemname end
+        local d = ""
+        local owner = meta:get_string("owner")
+        if node.name == "easyvend:vendor" then
+            d = string.format("Vending machine selling %s %d:%d (owned by %s)", iname, number, cost, owner)
+        elseif node.name == "easyvend:depositor" then
+            d = string.format("Depositing machine buying %s %d:%d (owned by %s)", iname, number, cost, owner)
+        end
+        meta:set_string("infotext", d)
 end
 
 easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
@@ -224,19 +235,24 @@ easyvend.after_place_node = function(pos, placer)
     local node = minetest.get_node(pos)
 	local meta = minetest.get_meta(pos)
     local inv = meta:get_inventory()
-    local description = minetest.registered_nodes[node.name].description;
     local player_name = placer:get_player_name()
     inv:set_size("item", 1)
     inv:set_size("gold", 1)
     
     inv:set_stack( "gold", 1, currency )
 
-	meta:set_string("infotext", player_name.." - "..description)
+    local d = ""
+    if node.name == "easyvend:vendor" then
+        d = string.format("New vending machine (owned by %s)", player_name)
+    elseif node.name == "easyvend:depositor" then
+        d = string.format("New depositing machine (owned by %s)", player_name)
+    end
+    meta:set_string("infotext", d)
     meta:set_int("number", 1)
     meta:set_int("cost", 1)
 	meta:set_string("itemname", "")
 
-	meta:set_string("owner", placer:get_player_name() or "")
+	meta:set_string("owner", player_name or "")
     
     easyvend.set_formspec(pos, placer)
 end
