@@ -122,7 +122,7 @@ vendor.on_receive_fields_customer = function(pos, formname, fields, sender)
                    chest_inv:add_item("main", stack)
                    player_inv:add_item("main", price)
                    minetest.chat_send_player(sender:get_player_name(), "You sold item.")
-                   vendor.sound_vend(pos)
+                   vendor.sound_deposit(pos)
                 elseif chest_inv:contains_item("main", price) and player_inv:contains_item("main", stack) then
                     minetest.chat_send_player(sender:get_player_name(), "No room in inventory!")
                 else
@@ -196,6 +196,9 @@ vendor.sound_vend = function(pos)
 	minetest.sound_play("vendor_vend", {pos = pos, gain = 1.0, max_hear_distance = 5,})
 end
 
+vendor.sound_deposit = function(pos)
+	minetest.sound_play("vendor_deposit", {pos = pos, gain = 1.0, max_hear_distance = 5,})
+end
 
 vendor.allow_metadata_inventory_put = function(pos, listname, index, stack, player)
     if listname=="item" then
