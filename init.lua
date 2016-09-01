@@ -1,6 +1,6 @@
 ---
---vendor 1.01
---Copyright (C) 2012 Bad_Command
+--easyvend
+--Copyright (C) 2012 Bad_Command, 2016 Wuzzy
 --
 --This library is free software; you can redistribute it and/or
 --modify it under the terms of the GNU Lesser General Public
@@ -17,45 +17,45 @@
 --Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ---
 
-vendor = {}
-vendor.version = 1.02
+easyvend = {}
+easyvend.version = 1.02
 
-dofile(minetest.get_modpath("vendor") .. "/vendor.lua")
+dofile(minetest.get_modpath("easyvend") .. "/easyvend.lua")
 
-minetest.register_node("vendor:vendor", {
+minetest.register_node("easyvend:vendor", {
 	description = "Vending Machine",
-	tile_images ={"vendor_side.png", "vendor_side.png", "vendor_side.png",
-		"vendor_side.png", "vendor_side.png", "vendor_vendor_front.png"},
+	tile_images ={"easyvend_side.png", "easyvend_side.png", "easyvend_side.png",
+		"easyvend_side.png", "easyvend_side.png", "easyvend_vendor_front.png"},
 	paramtype = "light",
 	paramtype2 = "facedir",
 	groups = {snappy=2,choppy=2,oddly_breakable_by_hand=2},
 
-	after_place_node = vendor.after_place_node,
-	can_dig = vendor.can_dig,
-	on_receive_fields = vendor.on_receive_fields,
-    allow_metadata_inventory_put = vendor.allow_metadata_inventory_put,
-    allow_metadata_inventory_take = vendor.allow_metadata_inventory_take,
-    allow_metadata_inventory_move = vendor.allow_metadata_inventory_move,
+	after_place_node = easyvend.after_place_node,
+	can_dig = easyvend.can_dig,
+	on_receive_fields = easyvend.on_receive_fields,
+    allow_metadata_inventory_put = easyvend.allow_metadata_inventory_put,
+    allow_metadata_inventory_take = easyvend.allow_metadata_inventory_take,
+    allow_metadata_inventory_move = easyvend.allow_metadata_inventory_move,
 })
 
-minetest.register_node("vendor:depositor", {
+minetest.register_node("easyvend:depositor", {
 	description = "Depositing Machine",
-	tile_images ={"vendor_side.png", "vendor_side.png", "vendor_side.png",
-		"vendor_side.png", "vendor_side.png", "vendor_depositor_front.png"},
+	tile_images ={"easyvend_side.png", "easyvend_side.png", "easyvend_side.png",
+		"easyvend_side.png", "easyvend_side.png", "easyvend_depositor_front.png"},
 	paramtype = "light",
 	paramtype2 = "facedir",
 	groups = {snappy=2,choppy=2,oddly_breakable_by_hand=2},
 
-	after_place_node = vendor.after_place_node,
-	can_dig = vendor.can_dig,
-	on_receive_fields = vendor.on_receive_fields,
-    allow_metadata_inventory_put = vendor.allow_metadata_inventory_put,
-    allow_metadata_inventory_take = vendor.allow_metadata_inventory_take,
-    allow_metadata_inventory_move = vendor.allow_metadata_inventory_move,
+	after_place_node = easyvend.after_place_node,
+	can_dig = easyvend.can_dig,
+	on_receive_fields = easyvend.on_receive_fields,
+    allow_metadata_inventory_put = easyvend.allow_metadata_inventory_put,
+    allow_metadata_inventory_take = easyvend.allow_metadata_inventory_take,
+    allow_metadata_inventory_move = easyvend.allow_metadata_inventory_move,
 })
 
 minetest.register_craft({
-	output = 'vendor:vendor',
+	output = 'easyvend:vendor',
 	recipe = {
                 {'default:wood', 'default:wood', 'default:wood'},
                 {'default:wood', 'default:steel_ingot', 'default:wood'},
@@ -64,7 +64,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = 'vendor:depositor',
+	output = 'easyvend:depositor',
 	recipe = {
                 {'default:wood', 'default:steel_ingot', 'default:wood'},
                 {'default:wood', 'default:steel_ingot', 'default:wood'},

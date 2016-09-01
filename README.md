@@ -1,4 +1,3 @@
-vendor
-======
+# `easyvend`
 
-Minetest mod:  Vending machines
+Minetest mod: Vending and depositing machines

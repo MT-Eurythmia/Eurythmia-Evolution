@@ -18,7 +18,7 @@
 --Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ---
 
-vendor.set_formspec = function(pos, player)
+easyvend.set_formspec = function(pos, player)
 	local meta = minetest.get_meta(pos)
 	local node = minetest.get_node(pos)
 
@@ -39,7 +39,7 @@ vendor.set_formspec = function(pos, player)
         .."list[current_player;main;0,3;8,4;]")
 end
 
-vendor.on_receive_fields_owner = function(pos, formname, fields, sender)
+easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
     local node = minetest.get_node(pos)
 	local meta = minetest.get_meta(pos)
 
@@ -63,10 +63,10 @@ vendor.on_receive_fields_owner = function(pos, formname, fields, sender)
     end
 	meta:set_string("itemname", itemname)
     
-    vendor.set_formspec(pos, sender)
+    easyvend.set_formspec(pos, sender)
 end
 
-vendor.on_receive_fields_customer = function(pos, formname, fields, sender)
+easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
     if not fields.save then
         return
     end
@@ -77,7 +77,7 @@ vendor.on_receive_fields_customer = function(pos, formname, fields, sender)
     local cost = meta:get_int("cost")
     local itemname=meta:get_string("itemname")
     local buysell =  "sell"
-	if ( node.name == "vendor:depositor" ) then	
+	if ( node.name == "easyvend:depositor" ) then	
 		buysell = "buy"
 	end
 	
@@ -108,7 +108,7 @@ vendor.on_receive_fields_customer = function(pos, formname, fields, sender)
                    chest_inv:add_item("main", price)
                    player_inv:add_item("main", stack)
                    minetest.chat_send_player(sender:get_player_name(), "You bought item.")
-                   vendor.sound_vend(pos)
+                   easyvend.sound_vend(pos)
                 elseif chest_inv:contains_item("main", stack) and player_inv:contains_item("main", price) then
                     minetest.chat_send_player(sender:get_player_name(), "No room in inventory!")
                 else
@@ -122,7 +122,7 @@ vendor.on_receive_fields_customer = function(pos, formname, fields, sender)
                    chest_inv:add_item("main", stack)
                    player_inv:add_item("main", price)
                    minetest.chat_send_player(sender:get_player_name(), "You sold item.")
-                   vendor.sound_deposit(pos)
+                   easyvend.sound_deposit(pos)
                 elseif chest_inv:contains_item("main", price) and player_inv:contains_item("main", stack) then
                     minetest.chat_send_player(sender:get_player_name(), "No room in inventory!")
                 else
@@ -143,7 +143,7 @@ vendor.on_receive_fields_customer = function(pos, formname, fields, sender)
     
 end
 
-vendor.after_place_node = function(pos, placer)
+easyvend.after_place_node = function(pos, placer)
     local node = minetest.get_node(pos)
 	local meta = minetest.get_meta(pos)
     local inv = meta:get_inventory()
@@ -161,10 +161,10 @@ vendor.after_place_node = function(pos, placer)
 
 	meta:set_string("owner", placer:get_player_name() or "")
     
-    vendor.set_formspec(pos, placer)
+    easyvend.set_formspec(pos, placer)
 end
 
-vendor.can_dig = function(pos, player)
+easyvend.can_dig = function(pos, player)
     local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
     local meta_chest = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z});
     if chest.name=="default:chest_locked" then
@@ -181,26 +181,26 @@ vendor.can_dig = function(pos, player)
     end
 end
 
-vendor.on_receive_fields = function(pos, formname, fields, sender)
+easyvend.on_receive_fields = function(pos, formname, fields, sender)
 	local meta = minetest.get_meta(pos)
 	local owner = meta:get_string("owner")
     
 	if sender:get_player_name() == owner then
-		vendor.on_receive_fields_owner(pos, formname, fields, sender)
+		easyvend.on_receive_fields_owner(pos, formname, fields, sender)
     else
-        vendor.on_receive_fields_customer(pos, formname, fields, sender)
+        easyvend.on_receive_fields_customer(pos, formname, fields, sender)
 	end
 end
 
-vendor.sound_vend = function(pos) 
-	minetest.sound_play("vendor_vend", {pos = pos, gain = 1.0, max_hear_distance = 5,})
+easyvend.sound_vend = function(pos) 
+	minetest.sound_play("easyvend_vend", {pos = pos, gain = 1.0, max_hear_distance = 5,})
 end
 
-vendor.sound_deposit = function(pos)
-	minetest.sound_play("vendor_deposit", {pos = pos, gain = 1.0, max_hear_distance = 5,})
+easyvend.sound_deposit = function(pos)
+	minetest.sound_play("easyvend_deposit", {pos = pos, gain = 1.0, max_hear_distance = 5,})
 end
 
-vendor.allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+easyvend.allow_metadata_inventory_put = function(pos, listname, index, stack, player)
     if listname=="item" then
         local meta = minetest.get_meta(pos);
         local owner = meta:get_string("owner")
@@ -217,10 +217,10 @@ vendor.allow_metadata_inventory_put = function(pos, listname, index, stack, play
 	return 0
 end
 
-vendor.allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+easyvend.allow_metadata_inventory_take = function(pos, listname, index, stack, player)
 	return 0
 end
 
-vendor.allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+easyvend.allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 	return 0
 end
