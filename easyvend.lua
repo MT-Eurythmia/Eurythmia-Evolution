@@ -81,15 +81,14 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
 		buysell = "buy"
 	end
 	
-	if ( number == nil or number < 1 or number > 99) then
+	if ( number == nil or number < 1 or number > 99) or
+	( cost == nil or cost < 1 or cost > 99) or
+	( itemname == nil or itemname=="") then
+		minetest.chat_send_player(sender:get_player_name(), "Machine has not been configured properly!")
+		easyvend.sound_error(sender:get_player_name())
 		return
 	end
-	if ( cost == nil or cost < 1 or cost > 99) then
-		return
-	end
-	if ( itemname == nil or itemname=="") then
-		return
-	end
+
     
     local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
     if chest.name=="default:chest_locked" and sender and sender:is_player() then
@@ -100,46 +99,83 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
             
             local stack = {name=itemname, count=number, wear=0, metadata=""} 
             local price = {name="default:gold_ingot", count=cost, wear=0, metadata=""}
+            local chest_has, player_has, chest_free, player_free
             if buysell == "sell" then
-                if chest_inv:contains_item("main", stack) and player_inv:contains_item("main", price) and
-                   chest_inv:room_for_item("main", price) and player_inv:room_for_item("main", stack) then
+                chest_has = chest_inv:contains_item("main", stack)
+                player_has = player_inv:contains_item("main", price)
+                chest_free = chest_inv:room_for_item("main", stack)
+                player_free = chest_inv:room_for_item("main", price)
+                if chest_has and player_has and chest_free and player_free then
                    player_inv:remove_item("main", price)
                    stack = chest_inv:remove_item("main", stack)
                    chest_inv:add_item("main", price)
                    player_inv:add_item("main", stack)
                    minetest.chat_send_player(sender:get_player_name(), "You bought item.")
                    easyvend.sound_vend(pos)
-                elseif chest_inv:contains_item("main", stack) and player_inv:contains_item("main", price) then
-                    minetest.chat_send_player(sender:get_player_name(), "No room in inventory!")
+                elseif chest_has and player_has then
+                    local msg
+                    if not player_free and not chest_free then
+                        msg = "No room in neither your nor the chest's inventory!"
+                    elseif not player_free then
+                        msg = "No room in your inventory!"
+                    elseif not chest_free then
+                        msg = "No room in the chest's inventory!"
+                    end
+                    minetest.chat_send_player(sender:get_player_name(), msg)
                     easyvend.sound_error(sender:get_player_name())
                 else
-                    minetest.chat_send_player(sender:get_player_name(), "Not enough materials!")
+                    if not chest_has and not player_has then
+                        msg = "You can't afford this item, and the vending machine has insufficient materials!"
+                    elseif not chest_has then
+                        msg = "The vending machine has insufficient materials!"
+                    elseif not player_has then
+                        msg = "You can't afford this item!"
+                    end
+                    minetest.chat_send_player(sender:get_player_name(), msg)
                     easyvend.sound_error(sender:get_player_name())
                 end
             else
-                if chest_inv:contains_item("main", price) and player_inv:contains_item("main", stack) and
-                   chest_inv:room_for_item("main", stack) and player_inv:room_for_item("main", price) then
+                chest_has = chest_inv:contains_item("main", price)
+                player_has = player_inv:contains_item("main", stack)
+                chest_free = chest_inv:room_for_item("main", price)
+                player_free = chest_inv:room_for_item("main", stack)
+                if chest_has and player_has and chest_free and player_free then
                    stack = player_inv:remove_item("main", stack)
                    chest_inv:remove_item("main", price)
                    chest_inv:add_item("main", stack)
                    player_inv:add_item("main", price)
                    minetest.chat_send_player(sender:get_player_name(), "You sold item.")
                    easyvend.sound_deposit(pos)
-                elseif chest_inv:contains_item("main", price) and player_inv:contains_item("main", stack) then
-                    minetest.chat_send_player(sender:get_player_name(), "No room in inventory!")
+                elseif chest_has and player_has then
+                    local msg
+                    if not player_free and not chest_free then
+                        msg = "No room in neither your nor the chest's inventory!"
+                    elseif not player_free then
+                        msg = "No room in your inventory!"
+                    elseif not chest_free then
+                        msg = "No room in the chest's inventory!"
+                    end
+                    minetest.chat_send_player(sender:get_player_name(), msg)
                     easyvend.sound_error(sender:get_player_name())
                 else
-                    minetest.chat_send_player(sender:get_player_name(), "Not enough materials!")
+                    if not chest_has and not player_has then
+                        msg = "You have insufficient materials, and the depositing machine can't afford to pay you!"
+                    elseif not chest_has then
+                        msg = "The depositing machine can't afford to pay you!"
+                    elseif not player_has then
+                        msg = "You have insufficient materials!"
+                    end
+                    minetest.chat_send_player(sender:get_player_name(), msg)
                     easyvend.sound_error(sender:get_player_name())
                 end
             end
         else
-            minetest.chat_send_player(sender:get_player_name(), "Wrong chest!")
+            minetest.chat_send_player(sender:get_player_name(), "The machine's storage can't be accessed because it is owned by a different person!")
             easyvend.sound_error(sender:get_player_name())
         end
     else
         if sender and sender:is_player() then
-            minetest.chat_send_player(sender:get_player_name(), "Place chest under machine!")
+            minetest.chat_send_player(sender:get_player_name(), "Machine has no storage; it requires a locked chest below it to function.")
             easyvend.sound_error(sender:get_player_name())
         end
     end
