@@ -111,8 +111,10 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                    easyvend.sound_vend(pos)
                 elseif chest_inv:contains_item("main", stack) and player_inv:contains_item("main", price) then
                     minetest.chat_send_player(sender:get_player_name(), "No room in inventory!")
+                    easyvend.sound_error(sender:get_player_name())
                 else
                     minetest.chat_send_player(sender:get_player_name(), "Not enough materials!")
+                    easyvend.sound_error(sender:get_player_name())
                 end
             else
                 if chest_inv:contains_item("main", price) and player_inv:contains_item("main", stack) and
@@ -125,16 +127,20 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                    easyvend.sound_deposit(pos)
                 elseif chest_inv:contains_item("main", price) and player_inv:contains_item("main", stack) then
                     minetest.chat_send_player(sender:get_player_name(), "No room in inventory!")
+                    easyvend.sound_error(sender:get_player_name())
                 else
                     minetest.chat_send_player(sender:get_player_name(), "Not enough materials!")
+                    easyvend.sound_error(sender:get_player_name())
                 end
             end
         else
             minetest.chat_send_player(sender:get_player_name(), "Wrong chest!")
+            easyvend.sound_error(sender:get_player_name())
         end
     else
         if sender and sender:is_player() then
             minetest.chat_send_player(sender:get_player_name(), "Place chest under machine!")
+            easyvend.sound_error(sender:get_player_name())
         end
     end
 
@@ -190,6 +196,10 @@ easyvend.on_receive_fields = function(pos, formname, fields, sender)
     else
         easyvend.on_receive_fields_customer(pos, formname, fields, sender)
 	end
+end
+
+easyvend.sound_error = function(playername) 
+	minetest.sound_play("easyvend_error", {to_player = playername, gain = 1.0})
 end
 
 easyvend.sound_vend = function(pos) 
