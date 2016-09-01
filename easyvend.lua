@@ -18,8 +18,23 @@
 --Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ---
 
+-- TODO: Improve mod compability
+local slots_max = 31
 local currency = "default:gold_ingot"
-local maxcost = ItemStack(currency):get_stack_max()
+local cost_stack_max = ItemStack(currency):get_stack_max()
+local maxcost = cost_stack_max * slots_max
+
+easyvend.free_slots= function(inv, listname)
+	local size = inv:get_size(listname)
+	local free = 0
+	for i=1,size do
+		local stack = inv:get_stack(listname, i)
+		if stack:is_empty() then
+			free = free + 1
+		end
+	end
+	return free
+end
 
 easyvend.set_formspec = function(pos, player)
 	local meta = minetest.get_meta(pos)
@@ -64,7 +79,8 @@ easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
 
     local oldnumber = meta:get_int("number")
     local oldcost = meta:get_int("cost")
-    local maxnumber = itemstack:get_stack_max()
+    local number_stack_max = itemstack:get_stack_max()
+    local maxnumber = number_stack_max * slots_max
 	
         if ( itemstack == nil or itemstack:is_empty() ) then
                 minetest.chat_send_player(sender:get_player_name(), "You must specify an item!")
@@ -121,12 +137,14 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
     local number = meta:get_int("number")
     local cost = meta:get_int("cost")
     local itemname=meta:get_string("itemname")
+    local item=meta:get_inventory():get_stack("item", 1)
     local buysell =  "sell"
 	if ( node.name == "easyvend:depositor" ) then	
 		buysell = "buy"
 	end
 	
-        local maxnumber = ItemStack(itemname):get_stack_max()
+        local number_stack_max = item:get_stack_max()
+        local maxnumber = number_stack_max * slots_max
 	if ( number == nil or number < 1 or number > maxnumber ) or
 	( cost == nil or cost < 1 or cost > maxcost ) or
 	( itemname == nil or itemname=="") then
@@ -152,12 +170,65 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                 chest_free = chest_inv:room_for_item("main", stack)
                 player_free = chest_inv:room_for_item("main", price)
                 if chest_has and player_has and chest_free and player_free then
-                   player_inv:remove_item("main", price)
-                   stack = chest_inv:remove_item("main", stack)
-                   chest_inv:add_item("main", price)
-                   player_inv:add_item("main", stack)
-                   minetest.chat_send_player(sender:get_player_name(), "You bought item.")
-                   easyvend.sound_vend(pos)
+                   if cost <= cost_stack_max and number <= number_stack_max then
+                       player_inv:remove_item("main", price)
+                       stack = chest_inv:remove_item("main", stack)
+                       chest_inv:add_item("main", price)
+                       player_inv:add_item("main", stack)
+                       easyvend.sound_vend(pos)
+                   else
+                       -- Large item counts (multiple stacks)
+                       local coststacks = math.modf(cost / cost_stack_max)
+                       local costremainder = math.fmod(cost, cost_stack_max)
+                       local numberstacks = math.modf(number / number_stack_max)
+                       local numberremainder = math.fmod(number, number_stack_max)
+                       local numberfree = numberstacks
+                       local costfree = coststacks
+                       if numberremainder > 0 then numberfree = numberfree + 1 end
+                       if costremainder > 0 then costfree = costfree + 1 end
+                       if easyvend.free_slots(player_inv, "main") < numberfree then
+                           minetest.chat_send_player(sender:get_player_name(),
+                               string.format("No room in your inventory (%d empty slots required)!", numberfree) )
+                           easyvend.sound_error(sender:get_player_name())
+                       elseif easyvend.free_slots(chest_inv, "main") < costfree then
+                           minetest.chat_send_player(sender:get_player_name(), "No room in the chest's inventory!")
+                           easyvend.sound_error(sender:get_player_name())
+                       else
+                           for i=1, coststacks do
+                               price.count = cost_stack_max
+                               player_inv:remove_item("main", price)
+                           end
+                           if costremainder > 0 then
+                               price.count = costremainder
+                               player_inv:remove_item("main", price)
+                           end
+                           for i=1, numberstacks do
+                               stack.count = number_stack_max
+                               chest_inv:remove_item("main", stack)
+                           end
+                           if numberremainder > 0 then
+                               stack.count = numberremainder
+                               chest_inv:remove_item("main", stack)
+                           end
+                           for i=1, coststacks do
+                               price.count = cost_stack_max
+                               chest_inv:add_item("main", price)
+                           end
+                           if costremainder > 0 then
+                               price.count = costremainder
+                               chest_inv:add_item("main", price)
+                           end
+                           for i=1, numberstacks do
+                               stack.count = number_stack_max
+                               player_inv:add_item("main", stack)
+                           end
+                           if numberremainder > 0 then
+                               stack.count = numberremainder
+                               player_inv:add_item("main", stack)
+                           end
+                           easyvend.sound_vend(pos)
+                       end
+                   end
                 elseif chest_has and player_has then
                     local msg
                     if not player_free and not chest_free then
@@ -186,12 +257,66 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                 chest_free = chest_inv:room_for_item("main", price)
                 player_free = chest_inv:room_for_item("main", stack)
                 if chest_has and player_has and chest_free and player_free then
-                   stack = player_inv:remove_item("main", stack)
-                   chest_inv:remove_item("main", price)
-                   chest_inv:add_item("main", stack)
-                   player_inv:add_item("main", price)
-                   minetest.chat_send_player(sender:get_player_name(), "You sold item.")
-                   easyvend.sound_deposit(pos)
+                   if cost <= cost_stack_max and number <= number_stack_max then
+                       stack = player_inv:remove_item("main", stack)
+                       chest_inv:remove_item("main", price)
+                       chest_inv:add_item("main", stack)
+                       player_inv:add_item("main", price)
+                       minetest.chat_send_player(sender:get_player_name(), "You sold item.")
+                       easyvend.sound_deposit(pos)
+                   else
+                       -- Large item counts (multiple stacks)
+                       local coststacks = math.modf(cost / cost_stack_max)
+                       local costremainder = math.fmod(cost, cost_stack_max)
+                       local numberstacks = math.modf(number / number_stack_max)
+                       local numberremainder = math.fmod(number, number_stack_max)
+                       local numberfree = numberstacks
+                       local costfree = coststacks
+                       if numberremainder > 0 then numberfree = numberfree + 1 end
+                       if costremainder > 0 then costfree = costfree + 1 end
+                       if easyvend.free_slots(player_inv, "main") < costfree then
+                           minetest.chat_send_player(sender:get_player_name(),
+                               string.format("No room in your inventory (%d empty slots required)!", costfree) )
+                           easyvend.sound_error(sender:get_player_name())
+                       elseif easyvend.free_slots(chest_inv, "main") < numberfree then
+                           minetest.chat_send_player(sender:get_player_name(), "No room in the chest's inventory!")
+                           easyvend.sound_error(sender:get_player_name())
+                       else
+                           for i=1, coststacks do
+                               price.count = cost_stack_max
+                               chest_inv:remove_item("main", price)
+                           end
+                           if costremainder > 0 then
+                               price.count = costremainder
+                               chest_inv:remove_item("main", price)
+                           end
+                           for i=1, numberstacks do
+                               stack.count = number_stack_max
+                               player_inv:remove_item("main", stack)
+                           end
+                           if numberremainder > 0 then
+                               stack.count = numberremainder
+                               player_inv:remove_item("main", stack)
+                           end
+                           for i=1, coststacks do
+                               price.count = cost_stack_max
+                               player_inv:add_item("main", price)
+                           end
+                           if costremainder > 0 then
+                               price.count = costremainder
+                               player_inv:add_item("main", price)
+                           end
+                           for i=1, numberstacks do
+                               stack.count = number_stack_max
+                               chest_inv:add_item("main", stack)
+                           end
+                           if numberremainder > 0 then
+                               stack.count = numberremainder
+                               chest_inv:add_item("main", stack)
+                           end
+                           easyvend.sound_deposit(pos)
+                       end
+                    end
                 elseif chest_has and player_has then
                     local msg
                     if not player_free and not chest_free then
