@@ -33,7 +33,7 @@ minetest.register_node("easyvend:vendor", {
 		"easyvend_side.png", "easyvend_side.png", "easyvend_vendor_front.png"},
 	paramtype = "light",
 	paramtype2 = "facedir",
-	groups = {snappy=2,choppy=2,oddly_breakable_by_hand=2},
+	groups = {choppy=2,oddly_breakable_by_hand=2},
 
 	after_place_node = easyvend.after_place_node,
 	can_dig = easyvend.can_dig,
@@ -51,7 +51,7 @@ minetest.register_node("easyvend:depositor", {
 		"easyvend_side.png", "easyvend_side.png", "easyvend_depositor_front.png"},
 	paramtype = "light",
 	paramtype2 = "facedir",
-	groups = {snappy=2,choppy=2,oddly_breakable_by_hand=2},
+	groups = {choppy=2,oddly_breakable_by_hand=2},
 
 	after_place_node = easyvend.after_place_node,
 	can_dig = easyvend.can_dig,
