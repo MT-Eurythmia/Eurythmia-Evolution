@@ -18,6 +18,8 @@
 --Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ---
 
+local maxcost = ItemStack("default:gold_ingot"):get_stack_max()
+
 easyvend.set_formspec = function(pos, player)
 	local meta = minetest.get_meta(pos)
 	local node = minetest.get_node(pos)
@@ -56,25 +58,33 @@ easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
 
     local oldnumber = meta:get_int("number")
     local oldcost = meta:get_int("cost")
+    local maxnumber = itemstack:get_stack_max()
 	
-	if ( number == nil or number < 1 or number > 99) then
-                minetest.chat_send_player(sender:get_player_name(), "Invalid item count; must be between 1 and 99!")
+        if ( itemstack == nil or itemstack:is_empty() ) then
+                minetest.chat_send_player(sender:get_player_name(), "You must specify an item!")
+                easyvend.sound_error(sender:get_player_name())
+                return
+	elseif ( number == nil or number < 1 or number > maxnumber ) then
+                if maxnumber > 1 then
+                         minetest.chat_send_player(sender:get_player_name(), string.format("Invalid item count; must be between 1 and %d!", maxnumber) )
+                else
+                         minetest.chat_send_player(sender:get_player_name(), "Invalid item count; must be exactly 1!")
+                end
                 easyvend.sound_error(sender:get_player_name())
                 meta:set_int("number", oldnumber)
                 easyvend.set_formspec(pos, sender)
                 return
-	elseif ( cost == nil or cost < 1 or cost > 99) then
-                minetest.chat_send_player(sender:get_player_name(), "Invalid price; must be between 1 and 99!")
+	elseif ( cost == nil or cost < 1 or cost > maxcost ) then
+                if maxcost > 1 then
+                         minetest.chat_send_player(sender:get_player_name(), string.format("Invalid cost; must be between 1 and %d!", maxcost) )
+                else
+                         minetest.chat_send_player(sender:get_player_name(), "Invalid cost; must be exactly 1!")
+                end
                 easyvend.sound_error(sender:get_player_name())
                 meta:set_int("cost", oldcost)
                 easyvend.set_formspec(pos, sender)
                 return
-        elseif ( itemstack == nil or itemstack:is_empty() ) then
-                minetest.chat_send_player(sender:get_player_name(), "You must specify an item!")
-                easyvend.sound_error(sender:get_player_name())
-                return
         end
-
         meta:set_int("number", number)
         meta:set_int("cost", cost)
         itemname=itemstack:get_name()
@@ -99,8 +109,9 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
 		buysell = "buy"
 	end
 	
-	if ( number == nil or number < 1 or number > 99) or
-	( cost == nil or cost < 1 or cost > 99) or
+        local maxnumber = ItemStack(itemname):get_stack_max()
+	if ( number == nil or number < 1 or number > maxnumber ) or
+	( cost == nil or cost < 1 or cost > maxcost ) or
 	( itemname == nil or itemname=="") then
 		minetest.chat_send_player(sender:get_player_name(), "Machine has not been configured properly!")
 		easyvend.sound_error(sender:get_player_name())
