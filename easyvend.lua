@@ -69,10 +69,16 @@ easyvend.set_formspec = function(pos, player)
         else
 		return
 	end
+	local status = meta:get_string("status")
+	if status == "" then status = "Unknown." end
+	local message = meta:get_string("message")
+	if message == "" then message = "No message." end
 
 	meta:set_string("formspec", "size[8,7;]"
                 .. bg
-		.."label[3,-0.2;" .. description .. "]"
+		.."label[3,-0.2;" .. minetest.formspec_escape(description) .. "]"
+	.."textarea[3,0.2;5,2;;Status: " .. minetest.formspec_escape(status) .. ";]"
+	.."textarea[3,1.2;5,2;;Last message: " .. minetest.formspec_escape(message) .. ";]"
 
         .."list[current_name;item;0,0.5;1,1;]"
 		.."label[0,0.05;"..numbertext.."]"
@@ -170,7 +176,7 @@ easyvend.machine_check = function(pos, node)
 						end
 					elseif not chest_has then
 						active = false
-						status = "Vending machine has insufficient materials!"
+						status = "The vending machine has insufficient materials!"
 					elseif not chest_free then
 						active = false
 						status = "No room in the locked chest's inventory!"
@@ -187,7 +193,7 @@ easyvend.machine_check = function(pos, node)
 						end
 					elseif not chest_has then
 						active = false
-						status = "Depositing machine has insufficient money!"
+						status = "The depositing machine has insufficient money!"
 					elseif not chest_free then
 						active = false
 						status = "No room in the locked chest's inventory!"
@@ -199,12 +205,14 @@ easyvend.machine_check = function(pos, node)
 			end
 		else
 			active = false
-			status = "The locked chest can't be accessed because it is owned by a different person!"
+                        status = "The machine's storage can't be accessed because it is owned by a different person!"
 		end
 	else
 		active = false
-		status = "Storage is missing. The machine requires a locked chest below it to function."
+                status = "Machine has no storage; it requires a locked chest below it to function."
         end
+
+	meta:set_string("status", status)
 
 	if not itemstack:is_empty() then
 		if itemname == nil or itemname == "" then
@@ -215,11 +223,14 @@ easyvend.machine_check = function(pos, node)
 	itemname=itemstack:get_name()
 	meta:set_string("itemname", itemname)
 
+	local change
 	if node.name == "easyvend:vendor" or node.name == "easyvend:depositor" then
-		if active then return easyvend.machine_enable(pos, node) end
+		if active then change = easyvend.machine_enable(pos, node) end
 	elseif node.name == "easyvend:vendor_on" or node.name == "easyvend:depositor_on" then
-		if not active then return easyvend.machine_disable(pos, node) end
+		if not active then change = easyvend.machine_disable(pos, node) end
 	end
+        easyvend.set_formspec(pos, sender)
+	return change
 end
 
 easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
@@ -243,27 +254,29 @@ easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
     local maxnumber = number_stack_max * slots_max
 	
         if ( itemstack == nil or itemstack:is_empty() ) then
-                minetest.chat_send_player(sender:get_player_name(), "You must specify an item!")
+                meta:set_string("status", "The machine has not been configured yet.")
+		meta:set_string("message", "You must specify an item.")
                 easyvend.sound_error(sender:get_player_name())
+                easyvend.set_formspec(pos, sender)
                 return
 	elseif ( number == nil or number < 1 or number > maxnumber ) then
                 if maxnumber > 1 then
-                         minetest.chat_send_player(sender:get_player_name(), string.format("Invalid item count; must be between 1 and %d!", maxnumber) )
+			meta:set_string("message", string.format("Invalid item count; must be between 1 and %d!", maxnumber))
                 else
-                         minetest.chat_send_player(sender:get_player_name(), "Invalid item count; must be exactly 1!")
+			meta:set_string("message", "Invalid item count; must be exactly 1!")
                 end
-                easyvend.sound_error(sender:get_player_name())
                 meta:set_int("number", oldnumber)
+                easyvend.sound_error(sender:get_player_name())
                 easyvend.set_formspec(pos, sender)
                 return
 	elseif ( cost == nil or cost < 1 or cost > maxcost ) then
                 if maxcost > 1 then
-                         minetest.chat_send_player(sender:get_player_name(), string.format("Invalid cost; must be between 1 and %d!", maxcost) )
+			meta:set_string("message", string.format("Invalid cost; must be between 1 and %d!", maxcost))
                 else
-                         minetest.chat_send_player(sender:get_player_name(), "Invalid cost; must be exactly 1!")
+			meta:set_string("message", "Invalid cost; must be exactly 1!")
                 end
-                easyvend.sound_error(sender:get_player_name())
                 meta:set_int("cost", oldcost)
+                easyvend.sound_error(sender:get_player_name())
                 easyvend.set_formspec(pos, sender)
                 return
         end
@@ -275,10 +288,12 @@ easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
         easyvend.set_formspec(pos, sender)
 
         local change = easyvend.machine_check(pos, node)
+	meta:set_string("message", "Reconfiguration successful.")
 
 	if not change then
 		if (node.name == "easyvend:vendor_on" or node.name == "easyvend:depositor_on") then
 			easyvend.sound_setup(pos)
+			meta:set_string("status", "Ready.")
 		else
 			easyvend.sound_disable(pos)
 		end
@@ -317,7 +332,7 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
 	if ( number == nil or number < 1 or number > maxnumber ) or
 	( cost == nil or cost < 1 or cost > maxcost ) or
 	( itemname == nil or itemname=="") then
-		minetest.chat_send_player(sendername, "Machine has not been configured properly!")
+		meta:set_string("status", "Invalid item count or price!")
 	        easyvend.machine_disable(pos, node, sendername)
 		return
 	end
@@ -346,6 +361,7 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                        stack = chest_inv:remove_item("main", stack)
                        chest_inv:add_item("main", price)
                        player_inv:add_item("main", stack)
+                       meta:set_string("message", "Item bought.")
                        easyvend.sound_vend(pos)
                    else
                        -- Large item counts (multiple stacks)
@@ -363,9 +379,9 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                            else
                                msg = "No room in your inventory!"
                            end
-                           minetest.chat_send_player(sendername, msg)
+                           meta:set_string("message", msg)
                        elseif easyvend.free_slots(chest_inv, "main") < costfree then
-                           minetest.chat_send_player(sendername, "No room in the chest's inventory!")
+                           meta:set_string("status", "No room in the chest's inventory!")
 	                   easyvend.machine_disable(pos, node, sendername)
                        else
                            easyvend.machine_enable(pos, node)
@@ -401,33 +417,30 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                                stack.count = numberremainder
                                player_inv:add_item("main", stack)
                            end
+                           meta:set_string("message", "Item bought.")
                            easyvend.sound_vend(pos)
                        end
                    end
                 elseif chest_has and player_has then
-                    if not player_free and not chest_free then
-                        msg = "No room in neither your nor the chest's inventory!"
-	                easyvend.machine_disable(pos, node, sendername)
-                    elseif not player_free then
+                    if not player_free then
                         msg = "No room in your inventory!"
+                        meta:set_string("message", msg)
                         easyvend.sound_error(sendername)
                     elseif not chest_free then
                         msg = "No room in the chest's inventory!"
+                        meta:set_string("status", msg)
 	                easyvend.machine_disable(pos, node, sendername)
                     end
-                    minetest.chat_send_player(sendername, msg)
                 else
-                    if not chest_has and not player_has then
-                        msg = "You can't afford this item, and the vending machine has insufficient materials!"
-	                easyvend.machine_disable(pos, node, sendername)
-                    elseif not chest_has then
+                    if not chest_has then
                         msg = "The vending machine has insufficient materials!"
+                        meta:set_string("status", msg)
 	                easyvend.machine_disable(pos, node, sendername)
                     elseif not player_has then
                         msg = "You can't afford this item!"
+                        meta:set_string("message", msg)
                         easyvend.sound_error(sendername)
                     end
-                    minetest.chat_send_player(sendername, msg)
                 end
             else
                 chest_has = chest_inv:contains_item("main", price)
@@ -441,7 +454,7 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                        chest_inv:remove_item("main", price)
                        chest_inv:add_item("main", stack)
                        player_inv:add_item("main", price)
-                       minetest.chat_send_player(sender:get_player_name(), "You sold item.")
+                       meta:set_string("message", "Item sold.")
                        easyvend.sound_deposit(pos)
                    else
                        -- Large item counts (multiple stacks)
@@ -459,10 +472,9 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                            else
                                msg = "No room in your inventory!"
                            end
-                           minetest.chat_send_player(sendername, msg)
+                           meta:set_string("status", msg)
                            easyvend.sound_error(sendername)
                        elseif easyvend.free_slots(chest_inv, "main") < numberfree then
-                           minetest.chat_send_player(sendername, "No room in the chest's inventory!")
 	                   easyvend.machine_disable(pos, node, sendername)
                        else
                            easyvend.machine_enable(pos, node)
@@ -498,48 +510,44 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                                stack.count = numberremainder
                                chest_inv:add_item("main", stack)
                            end
+                           meta:set_string("message", "Item sold.")
                            easyvend.sound_deposit(pos)
                        end
                     end
                 elseif chest_has and player_has then
-                    if not player_free and not chest_free then
-                        msg = "No room in neither your nor the chest's inventory!"
-	                easyvend.machine_disable(pos, node, sendername)
-                    elseif not player_free then
+                    if not player_free then
                         msg = "No room in your inventory!"
+                        meta:set_string("message", msg)
                         easyvend.sound_error(sendername)
                     elseif not chest_free then
                         msg = "No room in the chest's inventory!"
+                        meta:set_string("status", msg)
 	                easyvend.machine_disable(pos, node, sendername)
                     end
-                    minetest.chat_send_player(sendername, msg)
                 else
-                    if not chest_has and not player_has then
-                        msg = "You have insufficient materials, and the depositing machine can't afford to pay you!"
-	                easyvend.machine_disable(pos, node, sendername)
-                    elseif not chest_has then
-                        msg = "The depositing machine can't afford to pay you!"
-	                easyvend.machine_disable(pos, node, sendername)
-                    elseif not player_has then
+                    if not player_has then
                         msg = "You have insufficient materials!"
+                        meta:set_string("message", msg)
                         easyvend.sound_error(sendername)
+                    elseif not chest_has then
+                        msg = "The depositing machine is out of money!"
+                        meta:set_string("status", msg)
+	                easyvend.machine_disable(pos, node, sendername)
                     end
-                    minetest.chat_send_player(sendername, msg)
                 end
             end
         else
-            minetest.chat_send_player(sendername, "The machine's storage can't be accessed because it is owned by a different person!")
+            meta:set_string("status", "The machine's storage can't be accessed because it is owned by a different person!")
 	    easyvend.machine_disable(pos, node, sendername)
         end
     else
         if sender and sender:is_player() then
-            minetest.chat_send_player(sendername, "Machine has no storage; it requires a locked chest below it to function.")
+            meta:set_string("status", "Machine has no storage; it requires a locked chest below it to function.")
 	    easyvend.machine_disable(pos, node, sendername)
         end
     end
 
-    
-    --do transaction here
+    easyvend.set_formspec(pos, sender)
     
 end
 
@@ -560,6 +568,13 @@ easyvend.after_place_node = function(pos, placer)
         d = string.format("New depositing machine (owned by %s)", player_name)
     end
     meta:set_string("infotext", d)
+    local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
+    if chest.name=="default:chest_locked" then
+        meta:set_string("status", "The machine has not been configured yet.")
+    else
+        meta:set_string("status", "Machine has no storage; it requires a locked chest below it to function.")
+    end
+    meta:set_string("message", "Welcome! Please prepare the machine.")
     meta:set_int("number", 1)
     meta:set_int("cost", 1)
 	meta:set_string("itemname", "")
