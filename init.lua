@@ -34,8 +34,8 @@ end
 
 minetest.register_node("easyvend:vendor", {
 	description = "Vending Machine",
-	tile_images ={"easyvend_side.png", "easyvend_side.png", "easyvend_side.png",
-		"easyvend_side.png", "easyvend_side.png", "easyvend_vendor_front.png"},
+	tile_images ={"easyvend_vendor_side.png", "easyvend_vendor_bottom.png", "easyvend_vendor_side.png",
+		"easyvend_vendor_side.png", "easyvend_vendor_side.png", "easyvend_vendor_front.png"},
 	paramtype = "light",
 	paramtype2 = "facedir",
 	groups = {choppy=2,oddly_breakable_by_hand=2},
@@ -52,8 +52,8 @@ minetest.register_node("easyvend:vendor", {
 
 minetest.register_node("easyvend:depositor", {
 	description = "Depositing Machine",
-	tile_images ={"easyvend_side.png", "easyvend_side.png", "easyvend_side.png",
-		"easyvend_side.png", "easyvend_side.png", "easyvend_depositor_front.png"},
+	tile_images ={"easyvend_depositor_side.png", "easyvend_depositor_bottom.png", "easyvend_depositor_side.png",
+		"easyvend_depositor_side.png", "easyvend_depositor_side.png", "easyvend_depositor_front.png"},
 	paramtype = "light",
 	paramtype2 = "facedir",
 	groups = {choppy=2,oddly_breakable_by_hand=2},
