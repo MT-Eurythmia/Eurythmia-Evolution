@@ -109,15 +109,14 @@ easyvend.set_formspec = function(pos, player)
 		.."label[0,-0.15;"..numbertext.."]"
 		.."label[0,1.2;"..costtext.."]"
         .."list[current_player;main;0,3.5;8,4;]"
-        .."listring[current_player;main]"
-        .."listring[current_name;item]"
-
 	if configmode then
 		local wear = "false"
 		if meta:get_int("wear") == 1 then wear = "true" end
 		formspec = formspec
                 .."list[current_name;gold;0,1.65;1,1;]"
                 .."list[current_name;item;0,0.35;1,1;]"
+                .."listring[current_player;main]"
+                .."listring[current_name;item]"
 		.."field[1.3,0.65;1.5,1;number;;" .. number .. "]"
 		.."tooltip[number;"..numbertooltip.."]"
 		.."field[1.3,1.95;1.5,1;cost;;" .. cost .. "]"
