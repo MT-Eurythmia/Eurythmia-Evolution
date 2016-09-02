@@ -636,11 +636,11 @@ easyvend.sound_error = function(playername)
 end
 
 easyvend.sound_setup = function(pos)
-	minetest.sound_play("easyvend_activate", {pos = pos, gain = 1.0, max_hear_distance = 10,})
+	minetest.sound_play("easyvend_activate", {pos = pos, gain = 1.0, max_hear_distance = 12,})
 end
 
 easyvend.sound_disable = function(pos)
-	minetest.sound_play("easyvend_disable", {pos = pos, gain = 1.0, max_hear_distance = 10,})
+	minetest.sound_play("easyvend_disable", {pos = pos, gain = 1.0, max_hear_distance = 12,})
 end
 
 easyvend.sound_vend = function(pos) 
