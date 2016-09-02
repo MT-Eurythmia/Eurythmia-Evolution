@@ -68,11 +68,16 @@ easyvend.machine_disable = function(pos, node, playername)
 	if node.name == "easyvend:vendor_on" then
                 easyvend.sound_disable(pos)
 		minetest.swap_node(pos, {name="easyvend:vendor", param2 = node.param2})
+		return true
 	elseif node.name == "easyvend:depositor_on" then
                 easyvend.sound_disable(pos)
 		minetest.swap_node(pos, {name="easyvend:depositor", param2 = node.param2})
-	elseif playername ~= nil then
-		easyvend.sound_error(playername)
+		return true
+	else
+		if playername ~= nil then
+			easyvend.sound_error(playername)
+		end
+		return false
 	end
 end
 
@@ -80,9 +85,13 @@ easyvend.machine_enable = function(pos, node)
         if node.name == "easyvend:vendor" then
                 easyvend.sound_setup(pos)
 		minetest.swap_node(pos, {name="easyvend:vendor_on", param2 = node.param2})
+		return true
 	elseif node.name == "easyvend:depositor" then
                 easyvend.sound_setup(pos)
 		minetest.swap_node(pos, {name="easyvend:depositor_on", param2 = node.param2})
+		return true
+	else
+		return false
 	end
 end
 
@@ -155,9 +164,9 @@ easyvend.machine_check = function(pos, node)
         end
 
 	if node.name == "easyvend:vendor" or node.name == "easyvend:depositor" then
-		if active then easyvend.machine_enable(pos, node) end
+		if active then return easyvend.machine_enable(pos, node) end
 	elseif node.name == "easyvend:vendor_on" or node.name == "easyvend:depositor_on" then
-		if not active then easyvend.machine_disable(pos, node) end
+		if not active then return easyvend.machine_disable(pos, node) end
 	end
 end
 
@@ -224,7 +233,14 @@ easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
         end
         meta:set_string("infotext", d)
 
-        easyvend.machine_check(pos, node)
+        local change = easyvend.machine_check(pos, node)
+	if not change then
+		if (node.name == "easyvend:vendor_on" or node.name == "easyvend:depositor_on") then
+			easyvend.sound_setup(pos)
+		else
+			easyvend.sound_disable(pos)
+		end
+	end
 end
 
 easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
@@ -536,7 +552,7 @@ easyvend.sound_error = function(playername)
 	minetest.sound_play("easyvend_error", {to_player = playername, gain = 1.0})
 end
 
-easyvend.sound_setup= function(pos)
+easyvend.sound_setup = function(pos)
 	minetest.sound_play("easyvend_activate", {pos = pos, gain = 1.0, max_hear_distance = 10,})
 end
 
