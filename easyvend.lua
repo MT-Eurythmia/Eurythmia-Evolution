@@ -410,8 +410,8 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                        if costremainder > 0 then costfree = costfree + 1 end
                        if easyvend.free_slots(player_inv, "main") < costfree then
                            local msg
-                           if numberfree > 1 then
-                               msg = string.format("No room in your inventory (%d empty slots required)!", numberfree)
+                           if costfree > 1 then
+                               msg = string.format("No room in your inventory (%d empty slots required)!", costfree)
                            else
                                msg = "No room in your inventory!"
                            end
