@@ -126,12 +126,25 @@ easyvend.machine_check = function(pos, node)
 				local price = {name=currency, count=cost, wear=0, metadata=""}
 
 				local chest_has, chest_free
+
+				local coststacks = math.modf(cost / cost_stack_max)
+				local costremainder = math.fmod(cost, cost_stack_max)
+				local numberstacks = math.modf(number / number_stack_max)
+				local numberremainder = math.fmod(number, number_stack_max)
+				local numberfree = numberstacks
+				local costfree = coststacks
+				if numberremainder > 0 then numberfree = numberfree + 1 end
+				if costremainder > 0 then costfree = costfree + 1 end
+
 				if buysell == "sell" then
 					chest_has = chest_inv:contains_item("main", stack)
 					chest_free = chest_inv:room_for_item("main", price)
 			                if chest_has and chest_free then
 						if cost <= cost_stack_max and number <= number_stack_max then
 							active = true
+						elseif easyvend.free_slots(chest_inv, "main") < costfree then
+							active = false
+							message =  "No room in the chest's inventory!"
 						end
 					elseif not chest_has then
 						active = false
@@ -146,6 +159,9 @@ easyvend.machine_check = function(pos, node)
 			                if chest_has and chest_free then
 						if cost <= cost_stack_max and number <= number_stack_max then
 							active = true
+						elseif easyvend.free_slots(chest_inv, "main") < numberfree then
+							active = false
+							message =  "No room in the chest's inventory!"
 						end
 					elseif not chest_has then
 						active = false
