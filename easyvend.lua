@@ -217,10 +217,10 @@ easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
         if iname == nil then iname = itemname end
         local d = ""
         local owner = meta:get_string("owner")
-        if node.name == "easyvend:vendor" then
-            d = string.format("Vending machine selling %s %d:%d (owned by %s)", iname, number, cost, owner)
-        elseif node.name == "easyvend:depositor" then
-            d = string.format("Depositing machine buying %s %d:%d (owned by %s)", iname, number, cost, owner)
+        if node.name == "easyvend:vendor" or "easyvend:vendor_on" then
+            d = string.format("Vending machine selling %s at %d:%d (owned by %s)", iname, number, cost, owner)
+        elseif node.name == "easyvend:depositor" or "easyvend:depositor_on" then
+            d = string.format("Depositing machine buying %s at %d:%d (owned by %s)", iname, number, cost, owner)
         end
         meta:set_string("infotext", d)
 
