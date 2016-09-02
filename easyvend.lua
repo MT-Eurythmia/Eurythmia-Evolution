@@ -123,8 +123,16 @@ easyvend.set_formspec = function(pos, player)
 		.."field[1.3,1.95;1.5,1;cost;;" .. cost .. "]"
 		.."tooltip[cost;"..costtooltip.."]"
 		.."button[6,2.8;2,0.5;save;Confirm]"
-		.."checkbox[2,2.4;wear;Accept worn-out tools;"..wear.."]"
-		.."tooltip[wear;If disabled\\, only tools in perfect condition are accepted from sellers.]"
+		local weartext, weartooltip
+		if buysell == "buy" then
+			weartext = "Accept used tools"
+			weartooltip = "If disabled, only tools in perfect condition will be bought from sellers."
+		else
+			weartext = "Sell used tools"
+			weartooltip = "If disabled, only tools in perfect condition will be sold."
+		end
+		formspec = formspec .."checkbox[2,2.4;wear;"..minetest.formspec_escape(weartext)..";"..wear.."]"
+		.."tooltip[wear;"..minetest.formspec_escape(weartooltip).."]"
 	else
 		local itemname = meta:get_string("itemname")
 		formspec = formspec
@@ -677,6 +685,7 @@ end
 
 easyvend.on_receive_fields = function(pos, formname, fields, sender)
 	local meta = minetest.get_meta(pos)
+	local node = minetest.get_node(pos)
 	local owner = meta:get_string("owner")
     
 	if fields.config or fields.save or fields.usermode then
@@ -691,10 +700,18 @@ easyvend.on_receive_fields = function(pos, formname, fields, sender)
 	elseif fields.wear ~= nil then
 		if sender:get_player_name() == owner then
 			if fields.wear == "true" then
-				meta:set_string("message", "Worn-out tools are now accepted.")
+				if easyvend.buysell(node.name) == "buy" then
+					meta:set_string("message", "Used tools are now accepted.")
+				else
+					meta:set_string("message", "Used tools are now for sale.")
+				end
 				meta:set_int("wear", 1)
 			elseif fields.wear == "false" then
-				meta:set_string("message", "Worn-out tools are now rejected.")
+				if easyvend.buysell(node.name) == "buy" then
+					meta:set_string("message", "Used tools are now rejected.")
+				else
+					meta:set_string("message", "Used tools won't be sold anymore.")
+				end
 				meta:set_int("wear", 0)
 			end
 			easyvend.set_formspec(pos, sender)
