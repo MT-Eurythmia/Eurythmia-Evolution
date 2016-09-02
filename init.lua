@@ -52,6 +52,7 @@ vendor_on.description = "Vending Machine"
 vendor_on.tile_images ={"easyvend_vendor_side.png", "easyvend_vendor_bottom.png", "easyvend_vendor_side.png",
 	"easyvend_vendor_side.png", "easyvend_vendor_side.png", "easyvend_vendor_front_on.png"}
 vendor_on.groups.not_in_creative_inventory = 1
+vendor_on.groups.not_in_doc = 1
 vendor_on.drop = "easyvend:vendor"
 
 local vendor_off = table.copy(machine_template)
@@ -64,6 +65,7 @@ depositor_on.description = "Depositing Machine"
 depositor_on.tile_images ={"easyvend_depositor_side.png", "easyvend_depositor_bottom.png", "easyvend_depositor_side.png",
 	"easyvend_depositor_side.png", "easyvend_depositor_side.png", "easyvend_depositor_front_on.png"}
 depositor_on.groups.not_in_creative_inventory = 1
+depositor_on.groups.not_in_doc = 1
 depositor_on.drop = "easyvend:depositor"
 
 local depositor_off = table.copy(machine_template)
