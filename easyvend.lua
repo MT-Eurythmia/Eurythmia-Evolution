@@ -115,49 +115,54 @@ easyvend.machine_check = function(pos, node)
 			local cost = meta:get_int("cost")
 			local inv = meta:get_inventory()
 			local itemstack = inv:get_stack("item",1)
-			local number_stack_max = itemstack:get_stack_max()
-			local maxnumber = number_stack_max * slots_max
+			if not itemstack:is_empty() then
 
-			local itemname=meta:get_string("itemname")
+				local number_stack_max = itemstack:get_stack_max()
+				local maxnumber = number_stack_max * slots_max
 
-			local stack = {name=itemname, count=number, wear=0, metadata=""}
-			local price = {name=currency, count=cost, wear=0, metadata=""}
+				local itemname=meta:get_string("itemname")
 
-			local chest_has, chest_free
-			if buysell == "sell" then
-				chest_has = chest_inv:contains_item("main", stack)
-				chest_free = chest_inv:room_for_item("main", price)
-		                if chest_has and chest_free then
-					if cost <= cost_stack_max and number <= number_stack_max then
-						active = true
+				local stack = {name=itemname, count=number, wear=0, metadata=""}
+				local price = {name=currency, count=cost, wear=0, metadata=""}
+
+				local chest_has, chest_free
+				if buysell == "sell" then
+					chest_has = chest_inv:contains_item("main", stack)
+					chest_free = chest_inv:room_for_item("main", price)
+			                if chest_has and chest_free then
+						if cost <= cost_stack_max and number <= number_stack_max then
+							active = true
+						end
+					elseif not chest_has then
+						active = false
+						status = "Vending machine has insufficient materials!"
+					elseif not chest_free then
+						active = false
+						status = "No room in the locked chest's inventory!"
 					end
-				elseif not chest_has then
-					active = false
-					status = "Vending machine has insufficient materials!"
-				elseif not chest_free then
-					active = false
-					status = "No room in the locked chest's inventory!"
-				end
-			elseif buysell == "buy" then
-				chest_has = chest_inv:contains_item("main", price)
-				chest_free = chest_inv:room_for_item("main", stack)
-		                if chest_has and chest_free then
-					if cost <= cost_stack_max and number <= number_stack_max then
-						active = true
+				elseif buysell == "buy" then
+					chest_has = chest_inv:contains_item("main", price)
+					chest_free = chest_inv:room_for_item("main", stack)
+			                if chest_has and chest_free then
+						if cost <= cost_stack_max and number <= number_stack_max then
+							active = true
+						end
+					elseif not chest_has then
+						active = false
+						status = "Depositing machine has insufficient money!"
+					elseif not chest_free then
+						active = false
+						status = "No room in the locked chest's inventory!"
 					end
-				elseif not chest_has then
-					active = false
-					status = "Depositing machine has insufficient money!"
-				elseif not chest_free then
-					active = false
-					status = "No room in the locked chest's inventory!"
 				end
+			else
+				active = false
+				status = "The machine has not been configured yet."
 			end
 		else
 			active = false
 			status = "The locked chest can't be accessed because it is owned by a different person!"
 		end
-
 	else
 		active = false
 		status = "Storage is missing. The machine requires a locked chest below it to function."
@@ -592,3 +597,13 @@ end
 easyvend.allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 	return 0
 end
+
+minetest.register_abm({
+	nodenames = {"easyvend:vendor", "easyvend:vendor_on", "easyvend:depositor", "easyvend:depositor_on"},
+	interval = 5,
+	chance = 1,
+	catch_up = false,
+	action = function(pos, node, active_object_count, active_object_count_wider)
+		easyvend.machine_check(pos, node)
+	end
+})
