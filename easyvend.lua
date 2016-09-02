@@ -65,24 +65,25 @@ easyvend.set_formspec = function(pos, player)
 	local number = meta:get_int("number")
 	local cost = meta:get_int("cost")
         local bg = ""
+	local configmode = meta:get_int("configmode") == 1
         if minetest.get_modpath("default") then
             bg = default.gui_bg .. default.gui_bg_img .. default.gui_slots
         end
 
-        local numbertext, costtext
+        local numbertext, costtext, numbertooltip, costtooltip, buysellbuttontext
         local buysell = easyvend.buysell(node.name)
         if buysell == "sell" then
 		numbertext = "Offered item"
 		numbertooltip = "Number of items being sold for the specified price"
 		costtext = "Price"
 		costtooltip = "How much the user is asked to pay for the offered item"
-		oktooltip = "Buy items / configure machine"
+		buysellbuttontext = "Buy"
         elseif buysell == "buy" then
 		numbertext = "Requested item"
 		numbertooltip = "Number of items the user is asked to supply"
 		costtext = "Payment"
 		costtooltip = "How much will be given to the user in return"
-		oktooltip = "Sell items / configure machine"
+		buysellbuttontext = "Sell"
         else
 		return
 	end
@@ -97,29 +98,45 @@ easyvend.set_formspec = function(pos, player)
 		status_image = "easyvend_status_off.png"
 	end
 
-	meta:set_string("formspec", "size[8,7.3;]"
-                .. bg
+	local formspec = "size[8,7.3;]"
+        .. bg
 	.."label[3,-0.2;" .. minetest.formspec_escape(description) .. "]"
 
 	.."image[7.5,0.2;0.5,1;" .. status_image .. "]"
 	.."textarea[2.8,0.2;5.1,2;;Status: " .. minetest.formspec_escape(status) .. ";]"
 	.."textarea[2.8,1.3;5.6,2;;Message: " .. minetest.formspec_escape(message) .. ";]"
 
-        .."list[current_name;item;0,0.5;1,1;]"
-		.."label[0,0.05;"..numbertext.."]"
-		.."field[1.3,0.8;1.5,1;number;;" .. number .. "]"
-		.."tooltip[number;"..numbertooltip.."]"
-
-        .."list[current_name;gold;0,1.8;1,1;]"
-		.."label[0,1.35;"..costtext.."]"
-		.."field[1.3,2.1;1.5,1;cost;;" .. cost .. "]"
-		.."tooltip[cost;"..costtooltip.."]"
-
-	.."button[3,2.7;2,0.5;save;OK]"
-	.."tooltip[save;"..oktooltip.."]"
+		.."label[0,-0.15;"..numbertext.."]"
+		.."label[0,1.2;"..costtext.."]"
         .."list[current_player;main;0,3.5;8,4;]"
         .."listring[current_player;main]"
-        .."listring[current_name;item]")
+        .."listring[current_name;item]"
+
+	if configmode then
+		local wear = "false"
+		if meta:get_int("wear") == 1 then wear = "true" end
+		formspec = formspec
+                .."list[current_name;gold;0,1.65;1,1;]"
+                .."list[current_name;item;0,0.35;1,1;]"
+		.."field[1.3,0.65;1.5,1;number;;" .. number .. "]"
+		.."tooltip[number;"..numbertooltip.."]"
+		.."field[1.3,1.95;1.5,1;cost;;" .. cost .. "]"
+		.."tooltip[cost;"..costtooltip.."]"
+		.."button[6,2.8;2,0.5;save;Confirm]"
+		.."checkbox[2,2.4;wear;Accept worn-out tools;"..wear.."]"
+		.."tooltip[wear;If disabled\\, only tools in perfect condition are accepted from sellers.]"
+	else
+		local itemname = meta:get_string("itemname")
+		formspec = formspec
+                .."item_image_button[0,1.65;1,1;"..currency..";currency_image;]"
+                .."item_image_button[0,0.35;1,1;"..itemname..";item_image;]"
+		.."label[1,1.85;×" .. cost .. "]"
+		.."label[1,0.55;×" .. number .. "]"
+		.."button[6,2.8;2,0.5;config;Configure]"
+		.."button[0,2.8;2,0.5;buysell;"..buysellbuttontext.."]"
+	end
+
+	meta:set_string("formspec", formspec)
 end
 
 easyvend.machine_disable = function(pos, node, playername)
@@ -240,6 +257,10 @@ easyvend.machine_check = function(pos, node)
 		active = false
                 status = "No storage; machine needs a locked chest below it."
         end
+	if meta:get_int("configmode") == 1 then
+		active = false
+		status = "Awaiting configuration by owner."
+	end
 
 	meta:set_string("status", status)
 
@@ -258,21 +279,27 @@ easyvend.machine_check = function(pos, node)
 	elseif node.name == "easyvend:vendor_on" or node.name == "easyvend:depositor_on" then
 		if not active then change = easyvend.machine_disable(pos, node) end
 	end
-        easyvend.set_formspec(pos, sender)
+        easyvend.set_formspec(pos)
 	return change
 end
 
-easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
-    if not fields.save then
-        return
-    end
-
+easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
     local node = minetest.get_node(pos)
 	local meta = minetest.get_meta(pos)
 
 	local number = tonumber(fields.number)
 	local cost = tonumber(fields.cost)
     local inv_self = meta:get_inventory()
+
+    if fields.config then
+        meta:set_int("configmode", 1)
+	easyvend.machine_check(pos, node)
+	return
+    end
+
+    if not fields.save then
+        return
+    end
 
     local itemstack = inv_self:get_stack("item",1)
     local itemname=""
@@ -313,11 +340,10 @@ easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
         meta:set_int("cost", cost)
         itemname=itemstack:get_name()
 	meta:set_string("itemname", itemname)
+        meta:set_int("configmode", 0)
     
-        easyvend.set_formspec(pos, sender)
-
         local change = easyvend.machine_check(pos, node)
-	meta:set_string("message", "Reconfiguration successful.")
+	meta:set_string("message", "Configuration successful.")
 
 	if not change then
 		if (node.name == "easyvend:vendor_on" or node.name == "easyvend:depositor_on") then
@@ -327,6 +353,7 @@ easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
 			easyvend.sound_disable(pos)
 		end
 	end
+        easyvend.machine_check(pos, node)
 end
 
 easyvend.make_infotext = function(nodename, owner, cost, number, itemstring)
@@ -352,14 +379,15 @@ easyvend.make_infotext = function(nodename, owner, cost, number, itemstring)
 	return d
 end
 
-easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
-    if not fields.save then
+easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
+    local sendername = sender:get_player_name()
+    local meta = minetest.get_meta(pos)
+
+    if not fields.buysell then
         return
     end
 
-    local sendername = sender:get_player_name()
 	local node = minetest.get_node(pos)
-	local meta = minetest.get_meta(pos)
     local number = meta:get_int("number")
     local cost = meta:get_int("cost")
     local itemname=meta:get_string("itemname")
@@ -620,6 +648,9 @@ easyvend.after_place_node = function(pos, placer)
     meta:set_string("message", "Welcome! Please prepare the machine.")
     meta:set_int("number", 1)
     meta:set_int("cost", 1)
+    meta:set_int("configmode", 1)
+    -- TODO: Implement wear check
+    meta:set_int("wear", 0)
 	meta:set_string("itemname", "")
 
 	meta:set_string("owner", player_name or "")
@@ -648,10 +679,34 @@ easyvend.on_receive_fields = function(pos, formname, fields, sender)
 	local meta = minetest.get_meta(pos)
 	local owner = meta:get_string("owner")
     
-	if sender:get_player_name() == owner then
-		easyvend.on_receive_fields_owner(pos, formname, fields, sender)
-    else
-        easyvend.on_receive_fields_customer(pos, formname, fields, sender)
+	if fields.config or fields.save or fields.usermode then
+		if sender:get_player_name() == owner then
+			easyvend.on_receive_fields_config(pos, formname, fields, sender)
+		else
+			meta:set_string("message", "Access denied.")
+			easyvend.sound_error(sendername)
+			easyvend.set_formspec(pos, sender)
+			return
+		end
+	elseif fields.wear ~= nil then
+		if sender:get_player_name() == owner then
+			if fields.wear == "true" then
+				meta:set_string("message", "Worn-out tools are now accepted.")
+				meta:set_int("wear", 1)
+			elseif fields.wear == "false" then
+				meta:set_string("message", "Worn-out tools are now rejected.")
+				meta:set_int("wear", 0)
+			end
+			easyvend.set_formspec(pos, sender)
+			return
+		else
+			meta:set_string("message", "Access denied.")
+			easyvend.sound_error(sendername)
+			easyvend.set_formspec(pos, sender)
+			return
+		end
+	elseif fields.buysell then
+		easyvend.on_receive_fields_buysell(pos, formname, fields, sender)
 	end
 end
 
