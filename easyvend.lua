@@ -73,12 +73,20 @@ easyvend.set_formspec = function(pos, player)
 	if status == "" then status = "Unknown." end
 	local message = meta:get_string("message")
 	if message == "" then message = "No message." end
+	local status_image
+	if node.name == "easyvend:vendor_on" or node.name == "easyvend:depositor_on" then
+		status_image = "easyvend_status_on.png"
+	else
+		status_image = "easyvend_status_off.png"
+	end
 
 	meta:set_string("formspec", "size[8,7.3;]"
                 .. bg
-		.."label[3,-0.2;" .. minetest.formspec_escape(description) .. "]"
-	.."textarea[3,0.2;5,2;;Status: " .. minetest.formspec_escape(status) .. ";]"
-	.."textarea[3,1.2;5,2;;Last message: " .. minetest.formspec_escape(message) .. ";]"
+	.."label[3,-0.2;" .. minetest.formspec_escape(description) .. "]"
+
+	.."image[7.5,0.2;0.5,1;" .. status_image .. "]"
+	.."textarea[2.8,0.2;5.1,2;;Status: " .. minetest.formspec_escape(status) .. ";]"
+	.."textarea[2.8,1.3;5.6,2;;Last message: " .. minetest.formspec_escape(message) .. ";]"
 
         .."list[current_name;item;0,0.5;1,1;]"
 		.."label[0,0.05;"..numbertext.."]"
