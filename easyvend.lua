@@ -21,6 +21,7 @@
 -- TODO: Improve mod compability
 local slots_max = 31
 local currency = "default:gold_ingot"
+local currency_desc = minetest.registered_items[currency].description
 local registered_chests = {}
 local cost_stack_max = ItemStack(currency):get_stack_max()
 local maxcost = cost_stack_max * slots_max
@@ -332,10 +333,21 @@ easyvend.make_infotext = function(nodename, owner, cost, number, itemstring)
 	local iname = minetest.registered_items[itemstring].description
 	if iname == nil then iname = itemstring end
 	local d = ""
+	local printitem, printcost
+	if number == 1 then
+		printitem = iname
+	else
+		printitem = string.format("%d×%s", number, iname)
+	end
+	if cost == 1 then
+		printcost = currency_desc
+	else
+		printcost = string.format("%d×%s", cost, currency_desc)
+	end
 	if nodename == "easyvend:vendor" or nodename == "easyvend:vendor_on" then
-		d = string.format("Vending machine selling %s at %d:%d (owned by %s)", iname, number, cost, owner)
+		d = string.format("Vending machine (owned by %s)\nSelling: %s\nPrice: %s", owner, printitem, printcost)
 	elseif nodename == "easyvend:depositor" or nodename == "easyvend:depositor_on" then
-		d = string.format("Depositing machine buying %s at %d:%d (owned by %s)", iname, number, cost, owner)
+		d = string.format("Depositing machine (owned by %s)\nBuying: %s\nPayment: %s", owner, printitem, printcost)
 	end
 	return d
 end
