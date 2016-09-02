@@ -103,7 +103,7 @@ easyvend.set_formspec = function(pos, player)
 
 	.."image[7.5,0.2;0.5,1;" .. status_image .. "]"
 	.."textarea[2.8,0.2;5.1,2;;Status: " .. minetest.formspec_escape(status) .. ";]"
-	.."textarea[2.8,1.3;5.6,2;;Last message: " .. minetest.formspec_escape(message) .. ";]"
+	.."textarea[2.8,1.3;5.6,2;;Message: " .. minetest.formspec_escape(message) .. ";]"
 
         .."list[current_name;item;0,0.5;1,1;]"
 		.."label[0,0.05;"..numbertext.."]"
