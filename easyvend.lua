@@ -205,11 +205,11 @@ easyvend.machine_check = function(pos, node)
 			end
 		else
 			active = false
-                        status = "The machine's storage can't be accessed because it is owned by a different person!"
+                        status = "Storage can't be accessed because it is owned by a different person!"
 		end
 	else
 		active = false
-                status = "Machine has no storage; it requires a locked chest below it to function."
+                status = "No storage; machine needs a locked chest below it."
         end
 
 	meta:set_string("status", status)
@@ -537,12 +537,12 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                 end
             end
         else
-            meta:set_string("status", "The machine's storage can't be accessed because it is owned by a different person!")
+            meta:set_string("status", "Storage can't be accessed because it is owned by a different person!")
 	    easyvend.machine_disable(pos, node, sendername)
         end
     else
         if sender and sender:is_player() then
-            meta:set_string("status", "Machine has no storage; it requires a locked chest below it to function.")
+            meta:set_string("status", "No storage; machine needs a locked chest below it.")
 	    easyvend.machine_disable(pos, node, sendername)
         end
     end
@@ -572,7 +572,7 @@ easyvend.after_place_node = function(pos, placer)
     if chest.name=="default:chest_locked" then
         meta:set_string("status", "The machine has not been configured yet.")
     else
-        meta:set_string("status", "Machine has no storage; it requires a locked chest below it to function.")
+        meta:set_string("status", "No storage; machine needs a locked chest below it.")
     end
     meta:set_string("message", "Welcome! Please prepare the machine.")
     meta:set_int("number", 1)
