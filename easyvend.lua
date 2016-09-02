@@ -371,6 +371,7 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                     end
                     minetest.chat_send_player(sendername, msg)
                 else
+                    local msg
                     if not chest_has and not player_has then
                         msg = "You can't afford this item, and the vending machine has insufficient materials!"
 	                easyvend.machine_disable(pos, node, sendername)
@@ -470,6 +471,7 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                     end
                     minetest.chat_send_player(sendername, msg)
                 else
+                    local msg
                     if not chest_has and not player_has then
                         msg = "You have insufficient materials, and the depositing machine can't afford to pay you!"
 	                easyvend.machine_disable(pos, node, sendername)
