@@ -74,7 +74,7 @@ easyvend.set_formspec = function(pos, player)
 	local message = meta:get_string("message")
 	if message == "" then message = "No message." end
 
-	meta:set_string("formspec", "size[8,7;]"
+	meta:set_string("formspec", "size[8,7.3;]"
                 .. bg
 		.."label[3,-0.2;" .. minetest.formspec_escape(description) .. "]"
 	.."textarea[3,0.2;5,2;;Status: " .. minetest.formspec_escape(status) .. ";]"
@@ -88,8 +88,8 @@ easyvend.set_formspec = function(pos, player)
 		.."label[0,1.35;"..costtext.."]"
 		.."field[1.3,2.1;1.5,1;cost;;" .. cost .. "]"
 
-	.."button[3,2;2,0.5;save;OK]"
-        .."list[current_player;main;0,3;8,4;]"
+	.."button[3,2.7;2,0.5;save;OK]"
+        .."list[current_player;main;0,3.5;8,4;]"
         .."listring[current_player;main]"
         .."listring[current_name;item]")
 end
