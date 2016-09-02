@@ -101,26 +101,27 @@ easyvend.machine_check = function(pos, node)
 
 	local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
 	local meta = minetest.get_meta(pos)
+	local number = meta:get_int("number")
+	local cost = meta:get_int("cost")
+	local inv = meta:get_inventory()
+	local itemstack = inv:get_stack("item",1)
+	local itemname=meta:get_string("itemname")
+	local machine_owner = meta:get_string("owner")
+
 	if chest.name=="default:chest_locked" then
 		local chest_meta = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z})
 		local chest_inv = chest_meta:get_inventory()
 
-		if ( chest_meta:get_string("owner") == meta:get_string("owner") and chest_inv ~= nil ) then
+		if ( chest_meta:get_string("owner") == machine_owner and chest_inv ~= nil ) then
 			local buysell =  "sell"
 			if ( node.name == "easyvend:depositor" or node.name == "easyvend:depositor_on" ) then
 				buysell = "buy"
 			end
 
-			local number = meta:get_int("number")
-			local cost = meta:get_int("cost")
-			local inv = meta:get_inventory()
-			local itemstack = inv:get_stack("item",1)
 			if not itemstack:is_empty() then
 
 				local number_stack_max = itemstack:get_stack_max()
 				local maxnumber = number_stack_max * slots_max
-
-				local itemname=meta:get_string("itemname")
 
 				local stack = {name=itemname, count=number, wear=0, metadata=""}
 				local price = {name=currency, count=cost, wear=0, metadata=""}
@@ -161,7 +162,7 @@ easyvend.machine_check = function(pos, node)
 							active = true
 						elseif easyvend.free_slots(chest_inv, "main") < numberfree then
 							active = false
-							message =  "No room in the chest's inventory!"
+							status =  "No room in the chest's inventory!"
 						end
 					elseif not chest_has then
 						active = false
@@ -183,6 +184,13 @@ easyvend.machine_check = function(pos, node)
 		active = false
 		status = "Storage is missing. The machine requires a locked chest below it to function."
         end
+
+	if not itemstack:is_empty() then
+		if itemname == nil or itemname == "" then
+			itemname = itemstack:get_name()
+		end
+		meta:set_string("infotext", easyvend.make_infotext(node.name, machine_owner, cost, number, itemname))
+	end
 
 	if node.name == "easyvend:vendor" or node.name == "easyvend:depositor" then
 		if active then return easyvend.machine_enable(pos, node) end
@@ -243,18 +251,8 @@ easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
     
         easyvend.set_formspec(pos, sender)
 
-        local iname = minetest.registered_items[itemname].description
-        if iname == nil then iname = itemname end
-        local d = ""
-        local owner = meta:get_string("owner")
-        if node.name == "easyvend:vendor" or "easyvend:vendor_on" then
-            d = string.format("Vending machine selling %s at %d:%d (owned by %s)", iname, number, cost, owner)
-        elseif node.name == "easyvend:depositor" or "easyvend:depositor_on" then
-            d = string.format("Depositing machine buying %s at %d:%d (owned by %s)", iname, number, cost, owner)
-        end
-        meta:set_string("infotext", d)
-
         local change = easyvend.machine_check(pos, node)
+
 	if not change then
 		if (node.name == "easyvend:vendor_on" or node.name == "easyvend:depositor_on") then
 			easyvend.sound_setup(pos)
@@ -262,6 +260,18 @@ easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
 			easyvend.sound_disable(pos)
 		end
 	end
+end
+
+easyvend.make_infotext = function(nodename, owner, cost, number, itemstring)
+	local iname = minetest.registered_items[itemstring].description
+	if iname == nil then iname = itemstring end
+	local d = ""
+	if nodename == "easyvend:vendor" or nodename == "easyvend:vendor_on" then
+		d = string.format("Vending machine selling %s at %d:%d (owned by %s)", iname, number, cost, owner)
+	elseif nodename == "easyvend:depositor" or nodename == "easyvend:depositor_on" then
+		d = string.format("Depositing machine buying %s at %d:%d (owned by %s)", iname, number, cost, owner)
+	end
+	return d
 end
 
 easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
