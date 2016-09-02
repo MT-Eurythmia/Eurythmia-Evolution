@@ -302,6 +302,7 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
             local stack = {name=itemname, count=number, wear=0, metadata=""} 
             local price = {name=currency, count=cost, wear=0, metadata=""}
             local chest_has, player_has, chest_free, player_free
+            local msg = ""
             if buysell == "sell" then
                 chest_has = chest_inv:contains_item("main", stack)
                 player_has = player_inv:contains_item("main", price)
@@ -326,7 +327,6 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                        if numberremainder > 0 then numberfree = numberfree + 1 end
                        if costremainder > 0 then costfree = costfree + 1 end
                        if easyvend.free_slots(player_inv, "main") < numberfree then
-                           local msg
                            if numberfree > 1 then
                                msg = string.format("No room in your inventory (%d empty slots required)!", numberfree)
                            else
@@ -374,7 +374,6 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                        end
                    end
                 elseif chest_has and player_has then
-                    local msg
                     if not player_free and not chest_free then
                         msg = "No room in neither your nor the chest's inventory!"
 	                easyvend.machine_disable(pos, node, sendername)
@@ -387,7 +386,6 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                     end
                     minetest.chat_send_player(sendername, msg)
                 else
-                    local msg
                     if not chest_has and not player_has then
                         msg = "You can't afford this item, and the vending machine has insufficient materials!"
 	                easyvend.machine_disable(pos, node, sendername)
@@ -425,7 +423,6 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                        if numberremainder > 0 then numberfree = numberfree + 1 end
                        if costremainder > 0 then costfree = costfree + 1 end
                        if easyvend.free_slots(player_inv, "main") < costfree then
-                           local msg
                            if costfree > 1 then
                                msg = string.format("No room in your inventory (%d empty slots required)!", costfree)
                            else
@@ -474,7 +471,6 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                        end
                     end
                 elseif chest_has and player_has then
-                    local msg
                     if not player_free and not chest_free then
                         msg = "No room in neither your nor the chest's inventory!"
 	                easyvend.machine_disable(pos, node, sendername)
@@ -487,7 +483,6 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                     end
                     minetest.chat_send_player(sendername, msg)
                 else
-                    local msg
                     if not chest_has and not player_has then
                         msg = "You have insufficient materials, and the depositing machine can't afford to pay you!"
 	                easyvend.machine_disable(pos, node, sendername)
