@@ -101,3 +101,17 @@ if minetest.get_modpath("default") ~= nil then
 	        }
 	})
 end
+
+if minetest.get_modpath("doc_items") ~= nil then
+	doc.add_entry_alias("nodes", "easyvend:vendor", "easyvend:vendor_on")
+	doc.add_entry_alias("nodes", "easyvend:depositor", "easyvend:depositor_on")
+	doc.sub.items.set_items_longdesc({
+		["easyvend:vendor"] = "A vending machine allows its owner to offer a certain item in exchange for gold ingots. The users can pay with gold ingots and will get the item or items in return.",
+		["easyvend:depositor"] = "A depositing machine allows its owner to offer gold ingots in exchange for a certain item. The users can supply the depositing machine with the requested item and will get gold ingots in return.",
+	})
+	doc.sub.items.set_items_usagehelp({
+		["easyvend:vendor"] = "For customers: The vending machine has to be ready to be used. If a green LED lights up, it is ready. Point the vending machine to see its owner and what it has to offer and at which price (item count first). Rightclick the vending machine to open the buying menu. You will pay with the number of items shown at “Price” and you will get the item at “Offered item” in return. Click on “OK” to buy this offer once, repeat this as often as you like.\nFor owners: First, place a locked chest and fill it with the item you want to sell, make sure you leave some inventory slots empty for the gold ingots. Place the vending machine directly on top of the locked chest. Rightclick the machine. Set the offered item by moving an item from your invenory into the slot. The price item can not be changed. Now set the number of items per sale and their price and click on “OK” to confirm. Check the message and status for any errors. If the status is “Ready.”, the machine works properly. All other status messages are errors. The earnings of the vending machine can be retrieved from the locked chest.",
+
+		["easyvend:depositor"] = "For users: The depositing machine has to be ready to be used. If a green LED lights up, it is ready. Point the depositing machine to see its owner and what item it asks for and at which payment (item count first). Rightclick the depositing machine to open the selling menu. You will pay with the number of items shown at “Requested items” and you will get the items at “Payment” in return. Click on “OK” to start a single exchange, repeat this as often as you like.\nFor owners: First, place a locked chest and supply it with gold ingots, make sure you leave some inventory slots empty for the items you want to retrieve. Place the depositing machine directly on top of the locked chest. Rightclick the machine. Set the requested item by moving an item from your invenory into the slot. The payment item can not be changed. Now set the number of requested items and their price and click on “OK” to confirm. Check the message and status for any errors. If the status is “Ready.”, the machine works properly, all other status messages are errors. The deposited items can be retrieved from the locked chest.",
+	})
+end
