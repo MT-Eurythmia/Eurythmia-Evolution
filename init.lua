@@ -22,10 +22,15 @@ easyvend.version = 1.02
 
 dofile(minetest.get_modpath("easyvend") .. "/easyvend.lua")
 
-local sounds = default.node_sound_wood_defaults({
-		place = { name = "easyvend_activate", gain = 1 },
-		dug = { name = "easyvend_disable", gain = 1 },
-})
+local sounds
+local soundsplus = {
+	place = { name = "easyvend_activate", gain = 1 },
+	dug = { name = "easyvend_disable", gain = 1 }, }
+if minetest.get_modpath("default") ~= nil then
+	sounds = default.node_sound_wood_defaults(soundsplus)
+else
+	sounds = soundsplus
+end
 
 minetest.register_node("easyvend:vendor", {
 	description = "Vending Machine",
@@ -63,20 +68,22 @@ minetest.register_node("easyvend:depositor", {
     allow_metadata_inventory_move = easyvend.allow_metadata_inventory_move,
 })
 
-minetest.register_craft({
-	output = 'easyvend:vendor',
-	recipe = {
-                {'group:wood', 'group:wood', 'group:wood'},
-                {'group:wood', 'default:steel_ingot', 'group:wood'},
-                {'group:wood', 'default:steel_ingot', 'group:wood'},
-        }
-})
+if minetest.get_modpath("default") ~= nil then
+	minetest.register_craft({
+		output = 'easyvend:vendor',
+		recipe = {
+	                {'group:wood', 'group:wood', 'group:wood'},
+	                {'group:wood', 'default:steel_ingot', 'group:wood'},
+	                {'group:wood', 'default:steel_ingot', 'group:wood'},
+	        }
+	})
 
-minetest.register_craft({
-	output = 'easyvend:depositor',
-	recipe = {
-                {'group:wood', 'default:steel_ingot', 'group:wood'},
-                {'group:wood', 'default:steel_ingot', 'group:wood'},
-                {'group:wood', 'group:wood', 'group:wood'},
-        }
-})
+	minetest.register_craft({
+		output = 'easyvend:depositor',
+		recipe = {
+	                {'group:wood', 'default:steel_ingot', 'group:wood'},
+	                {'group:wood', 'default:steel_ingot', 'group:wood'},
+	                {'group:wood', 'group:wood', 'group:wood'},
+	        }
+	})
+end
