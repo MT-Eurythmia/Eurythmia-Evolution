@@ -59,7 +59,9 @@ easyvend.set_formspec = function(pos, player)
 		.."field[1.3,2.3;1,1;cost;Price:;" .. cost .. "]"
 
 		.."button[3,2;2,0.5;save;OK]"
-        .."list[current_player;main;0,3;8,4;]")
+        .."list[current_player;main;0,3;8,4;]"
+        .."listring[current_player;main]"
+        .."listring[current_name;item]")
 end
 
 easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
