@@ -191,6 +191,8 @@ easyvend.machine_check = function(pos, node)
 		end
 		meta:set_string("infotext", easyvend.make_infotext(node.name, machine_owner, cost, number, itemname))
 	end
+	itemname=itemstack:get_name()
+	meta:set_string("itemname", itemname)
 
 	if node.name == "easyvend:vendor" or node.name == "easyvend:depositor" then
 		if active then return easyvend.machine_enable(pos, node) end
