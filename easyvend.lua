@@ -71,7 +71,7 @@ easyvend.machine_disable = function(pos, node, playername)
 	elseif node.name == "easyvend:depositor_on" then
                 easyvend.sound_disable(pos)
 		minetest.swap_node(pos, {name="easyvend:depositor", param2 = node.param2})
-	else
+	elseif playername ~= nil then
 		easyvend.sound_error(playername)
 	end
 end
@@ -83,6 +83,81 @@ easyvend.machine_enable = function(pos, node)
 	elseif node.name == "easyvend:depositor" then
                 easyvend.sound_setup(pos)
 		minetest.swap_node(pos, {name="easyvend:depositor_on", param2 = node.param2})
+	end
+end
+
+easyvend.machine_check = function(pos, node)
+	local active = true
+	local status = "Ready."
+
+	local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
+	local meta = minetest.get_meta(pos)
+	if chest.name=="default:chest_locked" then
+		local chest_meta = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z})
+		local chest_inv = chest_meta:get_inventory()
+
+		if ( chest_meta:get_string("owner") == meta:get_string("owner") and chest_inv ~= nil ) then
+			local buysell =  "sell"
+			if ( node.name == "easyvend:depositor" or node.name == "easyvend:depositor_on" ) then
+				buysell = "buy"
+			end
+
+			local number = meta:get_int("number")
+			local cost = meta:get_int("cost")
+			local inv = meta:get_inventory()
+			local itemstack = inv:get_stack("item",1)
+			local number_stack_max = itemstack:get_stack_max()
+			local maxnumber = number_stack_max * slots_max
+
+			local itemname=meta:get_string("itemname")
+
+			local stack = {name=itemname, count=number, wear=0, metadata=""}
+			local price = {name=currency, count=cost, wear=0, metadata=""}
+
+			local chest_has, chest_free
+			if buysell == "sell" then
+				chest_has = chest_inv:contains_item("main", stack)
+				chest_free = chest_inv:room_for_item("main", price)
+		                if chest_has and chest_free then
+					if cost <= cost_stack_max and number <= number_stack_max then
+						active = true
+					end
+				elseif not chest_has then
+					active = false
+					status = "Vending machine has insufficient materials!"
+				elseif not chest_free then
+					active = false
+					status = "No room in the locked chest's inventory!"
+				end
+			elseif buysell == "buy" then
+				chest_has = chest_inv:contains_item("main", price)
+				chest_free = chest_inv:room_for_item("main", stack)
+		                if chest_has and chest_free then
+					if cost <= cost_stack_max and number <= number_stack_max then
+						active = true
+					end
+				elseif not chest_has then
+					active = false
+					status = "Depositing machine has insufficient money!"
+				elseif not chest_free then
+					active = false
+					status = "No room in the locked chest's inventory!"
+				end
+			end
+		else
+			active = false
+			status = "The locked chest can't be accessed because it is owned by a different person!"
+		end
+
+	else
+		active = false
+		status = "Storage is missing. The machine requires a locked chest below it to function."
+        end
+
+	if node.name == "easyvend:vendor" or node.name == "easyvend:depositor" then
+		if active then easyvend.machine_enable(pos, node) end
+	elseif node.name == "easyvend:vendor_on" or node.name == "easyvend:depositor_on" then
+		if not active then easyvend.machine_disable(pos, node) end
 	end
 end
 
@@ -149,7 +224,7 @@ easyvend.on_receive_fields_owner = function(pos, formname, fields, sender)
         end
         meta:set_string("infotext", d)
 
-        easyvend.machine_enable(pos, node)
+        easyvend.machine_check(pos, node)
 end
 
 easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
@@ -197,6 +272,7 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                 player_free = player_inv:room_for_item("main", price)
                 if chest_has and player_has and chest_free and player_free then
                    if cost <= cost_stack_max and number <= number_stack_max then
+                       easyvend.machine_enable(pos, node)
                        player_inv:remove_item("main", price)
                        stack = chest_inv:remove_item("main", stack)
                        chest_inv:add_item("main", price)
@@ -224,6 +300,7 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                            minetest.chat_send_player(sendername, "No room in the chest's inventory!")
 	                   easyvend.machine_disable(pos, node, sendername)
                        else
+                           easyvend.machine_enable(pos, node)
                            for i=1, coststacks do
                                price.count = cost_stack_max
                                player_inv:remove_item("main", price)
@@ -292,6 +369,7 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                 player_free = chest_inv:room_for_item("main", stack)
                 if chest_has and player_has and chest_free and player_free then
                    if cost <= cost_stack_max and number <= number_stack_max then
+                       easyvend.machine_enable(pos, node)
                        stack = player_inv:remove_item("main", stack)
                        chest_inv:remove_item("main", price)
                        chest_inv:add_item("main", stack)
@@ -321,6 +399,7 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                            minetest.chat_send_player(sendername, "No room in the chest's inventory!")
 	                   easyvend.machine_disable(pos, node, sendername)
                        else
+                           easyvend.machine_enable(pos, node)
                            for i=1, coststacks do
                                price.count = cost_stack_max
                                chest_inv:remove_item("main", price)

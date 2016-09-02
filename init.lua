@@ -44,6 +44,7 @@ local machine_template = {
 	allow_metadata_inventory_put = easyvend.allow_metadata_inventory_put,
 	allow_metadata_inventory_take = easyvend.allow_metadata_inventory_take,
 	allow_metadata_inventory_move = easyvend.allow_metadata_inventory_move,
+	on_punch = easyvend.machine_check,
 }
 
 local vendor_on = table.copy(machine_template)
