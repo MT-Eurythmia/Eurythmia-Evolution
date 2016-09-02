@@ -247,7 +247,7 @@ easyvend.machine_check = function(pos, node)
 						end
 					elseif not chest_has then
 						active = false
-						status = "The depositing machine has insufficient money!"
+						status = "The depositing machine is out of money!"
 					elseif not chest_free then
 						active = false
 						status = "No room in the chest's inventory!"
