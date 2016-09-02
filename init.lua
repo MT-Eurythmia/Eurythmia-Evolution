@@ -32,11 +32,7 @@ else
 	sounds = soundsplus
 end
 
-minetest.register_node("easyvend:vendor", {
-	description = "Vending Machine",
-	tile_images ={"easyvend_vendor_side.png", "easyvend_vendor_bottom.png", "easyvend_vendor_side.png",
-		"easyvend_vendor_side.png", "easyvend_vendor_side.png", "easyvend_vendor_front.png"},
-	paramtype = "light",
+local machine_template = {
 	paramtype2 = "facedir",
 	groups = {choppy=2,oddly_breakable_by_hand=2},
 
@@ -45,28 +41,39 @@ minetest.register_node("easyvend:vendor", {
 	on_receive_fields = easyvend.on_receive_fields,
 	sounds = sounds,
 
-    allow_metadata_inventory_put = easyvend.allow_metadata_inventory_put,
-    allow_metadata_inventory_take = easyvend.allow_metadata_inventory_take,
-    allow_metadata_inventory_move = easyvend.allow_metadata_inventory_move,
-})
+	allow_metadata_inventory_put = easyvend.allow_metadata_inventory_put,
+	allow_metadata_inventory_take = easyvend.allow_metadata_inventory_take,
+	allow_metadata_inventory_move = easyvend.allow_metadata_inventory_move,
+}
 
-minetest.register_node("easyvend:depositor", {
-	description = "Depositing Machine",
-	tile_images ={"easyvend_depositor_side.png", "easyvend_depositor_bottom.png", "easyvend_depositor_side.png",
-		"easyvend_depositor_side.png", "easyvend_depositor_side.png", "easyvend_depositor_front.png"},
-	paramtype = "light",
-	paramtype2 = "facedir",
-	groups = {choppy=2,oddly_breakable_by_hand=2},
+local vendor_on = table.copy(machine_template)
+vendor_on.description = "Vending Machine"
+vendor_on.tile_images ={"easyvend_vendor_side.png", "easyvend_vendor_bottom.png", "easyvend_vendor_side.png",
+	"easyvend_vendor_side.png", "easyvend_vendor_side.png", "easyvend_vendor_front_on.png"}
+vendor_on.groups.not_in_creative_inventory = 1
+vendor_on.drop = "easyvend:vendor"
 
-	after_place_node = easyvend.after_place_node,
-	can_dig = easyvend.can_dig,
-	on_receive_fields = easyvend.on_receive_fields,
-	sounds = sounds,
+local vendor_off = table.copy(machine_template)
+vendor_off.description = vendor_on.description
+vendor_off.tile_images = table.copy(vendor_on.tile_images)
+vendor_off.tile_images[6] = "easyvend_vendor_front_off.png"
 
-    allow_metadata_inventory_put = easyvend.allow_metadata_inventory_put,
-    allow_metadata_inventory_take = easyvend.allow_metadata_inventory_take,
-    allow_metadata_inventory_move = easyvend.allow_metadata_inventory_move,
-})
+local depositor_on = table.copy(machine_template)
+depositor_on.description = "Depositing Machine"
+depositor_on.tile_images ={"easyvend_depositor_side.png", "easyvend_depositor_bottom.png", "easyvend_depositor_side.png",
+	"easyvend_depositor_side.png", "easyvend_depositor_side.png", "easyvend_depositor_front_on.png"}
+depositor_on.groups.not_in_creative_inventory = 1
+depositor_on.drop = "easyvend:depositor"
+
+local depositor_off = table.copy(machine_template)
+depositor_off.description = depositor_on.description
+depositor_off.tile_images = table.copy(depositor_on.tile_images)
+depositor_off.tile_images[6] = "easyvend_depositor_front_off.png"
+
+minetest.register_node("easyvend:vendor", vendor_off)
+minetest.register_node("easyvend:vendor_on", vendor_on)
+minetest.register_node("easyvend:depositor", depositor_off)
+minetest.register_node("easyvend:depositor_on", depositor_on)
 
 if minetest.get_modpath("default") ~= nil then
 	minetest.register_craft({
