@@ -21,8 +21,18 @@
 -- TODO: Improve mod compability
 local slots_max = 31
 local currency = "default:gold_ingot"
+local registered_chests = {}
 local cost_stack_max = ItemStack(currency):get_stack_max()
 local maxcost = cost_stack_max * slots_max
+
+-- Allow for other mods to register custom chests
+easyvend.register_chest = function(node_name, inv_list, meta_owner)
+	registered_chests[node_name] = { inv_list = inv_list, meta_owner = meta_owner }
+end
+
+if minetest.get_modpath("default") ~= nil then
+	easyvend.register_chest("default:chest_locked", "main", "owner")
+end
 
 easyvend.free_slots= function(inv, listname)
 	local size = inv:get_size(listname)
@@ -154,12 +164,13 @@ easyvend.machine_check = function(pos, node)
 	local itemstack = inv:get_stack("item",1)
 	local itemname=meta:get_string("itemname")
 	local machine_owner = meta:get_string("owner")
+	local chestdef = registered_chests[chest.name]
 
-	if chest.name=="default:chest_locked" then
+	if chestdef then
 		local chest_meta = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z})
 		local chest_inv = chest_meta:get_inventory()
 
-		if ( chest_meta:get_string("owner") == machine_owner and chest_inv ~= nil ) then
+		if ( chest_meta:get_string(chestdef.meta_owner) == machine_owner and chest_inv ~= nil ) then
 			local buysell = easyvend.buysell(node.name)
 
 			if not itemstack:is_empty() then
@@ -182,12 +193,12 @@ easyvend.machine_check = function(pos, node)
 				if costremainder > 0 then costfree = costfree + 1 end
 
 				if buysell == "sell" then
-					chest_has = chest_inv:contains_item("main", stack)
-					chest_free = chest_inv:room_for_item("main", price)
+					chest_has = chest_inv:contains_item(chestdef.inv_list, stack)
+					chest_free = chest_inv:room_for_item(chestdef.inv_list, price)
 			                if chest_has and chest_free then
 						if cost <= cost_stack_max and number <= number_stack_max then
 							active = true
-						elseif easyvend.free_slots(chest_inv, "main") < costfree then
+						elseif easyvend.free_slots(chest_inv, chestdef.inv_list) < costfree then
 							active = false
 							status =  "No room in the chest's inventory!"
 						end
@@ -196,15 +207,15 @@ easyvend.machine_check = function(pos, node)
 						status = "The vending machine has insufficient materials!"
 					elseif not chest_free then
 						active = false
-						status = "No room in the locked chest's inventory!"
+						status = "No room in the chest's inventory!"
 					end
 				elseif buysell == "buy" then
-					chest_has = chest_inv:contains_item("main", price)
-					chest_free = chest_inv:room_for_item("main", stack)
+					chest_has = chest_inv:contains_item(chestdef.inv_list, price)
+					chest_free = chest_inv:room_for_item(chestdef.inv_list, stack)
 			                if chest_has and chest_free then
 						if cost <= cost_stack_max and number <= number_stack_max then
 							active = true
-						elseif easyvend.free_slots(chest_inv, "main") < numberfree then
+						elseif easyvend.free_slots(chest_inv, chestdef.inv_list) < numberfree then
 							active = false
 							status =  "No room in the chest's inventory!"
 						end
@@ -213,7 +224,7 @@ easyvend.machine_check = function(pos, node)
 						status = "The depositing machine has insufficient money!"
 					elseif not chest_free then
 						active = false
-						status = "No room in the locked chest's inventory!"
+						status = "No room in the chest's inventory!"
 					end
 				end
 			else
@@ -356,11 +367,12 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
 
     
     local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
-    if chest.name=="default:chest_locked" and sender and sender:is_player() then
+    local chestdef = registered_chests[chest.name]
+    if chestdef and sender and sender:is_player() then
         local chest_meta = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z})
         local chest_inv = chest_meta:get_inventory()
         local player_inv = sender:get_inventory()
-        if ( chest_meta:get_string("owner") == meta:get_string("owner") and chest_inv ~= nil and player_inv ~= nil ) then
+        if ( chest_meta:get_string(chestdef.meta_owner) == meta:get_string("owner") and chest_inv ~= nil and player_inv ~= nil ) then
             
             local stack = {name=itemname, count=number, wear=0, metadata=""} 
             local price = {name=currency, count=cost, wear=0, metadata=""}
@@ -588,7 +600,7 @@ easyvend.after_place_node = function(pos, placer)
     end
     meta:set_string("infotext", d)
     local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
-    if chest.name=="default:chest_locked" then
+    if registered_chests[chest.name] then
         meta:set_string("status", "The machine has not been configured yet.")
     else
         meta:set_string("status", "No storage; machine needs a locked chest below it.")
@@ -606,7 +618,7 @@ end
 easyvend.can_dig = function(pos, player)
     local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
     local meta_chest = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z});
-    if chest.name=="default:chest_locked" then
+    if registered_chests[chest.name] then
          if player and player:is_player() then
             local owner_chest = meta_chest:get_string("owner")
             local name = player:get_player_name()
