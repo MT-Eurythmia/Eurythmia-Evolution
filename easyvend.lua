@@ -36,6 +36,16 @@ easyvend.free_slots= function(inv, listname)
 	return free
 end
 
+easyvend.buysell = function(nodename)
+	local buysell = nil
+	if ( nodename == "easyvend:depositor" or nodename == "easyvend:depositor_on" ) then
+		buysell = "buy"
+	elseif ( nodename == "easyvend:vendor" or nodename == "easyvend:vendor_on" ) then
+		buysell = "sell"
+	end
+	return buysell
+end
+
 easyvend.set_formspec = function(pos, player)
 	local meta = minetest.get_meta(pos)
 	local node = minetest.get_node(pos)
@@ -48,17 +58,31 @@ easyvend.set_formspec = function(pos, player)
             bg = default.gui_bg .. default.gui_bg_img .. default.gui_slots
         end
 
+        local numbertext, costtext
+        local buysell = easyvend.buysell(node.name)
+        if buysell == "sell" then
+		numbertext = "Offered item"
+		costtext = "Price"
+        elseif buysell == "buy" then
+		numbertext = "Requested item"
+		costtext = "Payment"
+        else
+		return
+	end
+
 	meta:set_string("formspec", "size[8,7;]"
                 .. bg
-		.."label[0,0;" .. description .. "]"
+		.."label[3,-0.2;" .. description .. "]"
 
-        .."list[current_name;item;0,1;1,1;]"
-		.."field[1.3,1.3;1,1;number;Count:;" .. number .. "]"
+        .."list[current_name;item;0,0.5;1,1;]"
+		.."label[0,0.05;"..numbertext.."]"
+		.."field[1.3,0.8;1.5,1;number;;" .. number .. "]"
 
-        .."list[current_name;gold;0,2;1,1;]"
-		.."field[1.3,2.3;1,1;cost;Price:;" .. cost .. "]"
+        .."list[current_name;gold;0,1.8;1,1;]"
+		.."label[0,1.35;"..costtext.."]"
+		.."field[1.3,2.1;1.5,1;cost;;" .. cost .. "]"
 
-		.."button[3,2;2,0.5;save;OK]"
+	.."button[3,2;2,0.5;save;OK]"
         .."list[current_player;main;0,3;8,4;]"
         .."listring[current_player;main]"
         .."listring[current_name;item]")
@@ -113,10 +137,7 @@ easyvend.machine_check = function(pos, node)
 		local chest_inv = chest_meta:get_inventory()
 
 		if ( chest_meta:get_string("owner") == machine_owner and chest_inv ~= nil ) then
-			local buysell =  "sell"
-			if ( node.name == "easyvend:depositor" or node.name == "easyvend:depositor_on" ) then
-				buysell = "buy"
-			end
+			local buysell = easyvend.buysell(node.name)
 
 			if not itemstack:is_empty() then
 
@@ -145,7 +166,7 @@ easyvend.machine_check = function(pos, node)
 							active = true
 						elseif easyvend.free_slots(chest_inv, "main") < costfree then
 							active = false
-							message =  "No room in the chest's inventory!"
+							status =  "No room in the chest's inventory!"
 						end
 					elseif not chest_has then
 						active = false
@@ -288,10 +309,8 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
     local cost = meta:get_int("cost")
     local itemname=meta:get_string("itemname")
     local item=meta:get_inventory():get_stack("item", 1)
-    local buysell =  "sell"
-	if ( node.name == "easyvend:depositor" or node.name == "easyvend:depositor_on" ) then	
-		buysell = "buy"
-	end
+
+    local buysell = easyvend.buysell(node.name)
 	
         local number_stack_max = item:get_stack_max()
         local maxnumber = number_stack_max * slots_max
