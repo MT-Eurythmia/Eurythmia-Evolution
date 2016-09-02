@@ -62,10 +62,16 @@ easyvend.set_formspec = function(pos, player)
         local buysell = easyvend.buysell(node.name)
         if buysell == "sell" then
 		numbertext = "Offered item"
+		numbertooltip = "Number of items being sold for the specified price"
 		costtext = "Price"
+		costtooltip = "How much the user is asked to pay for the offered item"
+		oktooltip = "Buy items / configure machine"
         elseif buysell == "buy" then
 		numbertext = "Requested item"
+		numbertooltip = "Number of items the user is asked to supply"
 		costtext = "Payment"
+		costtooltip = "How much will be given to the user in return"
+		oktooltip = "Sell items / configure machine"
         else
 		return
 	end
@@ -91,12 +97,15 @@ easyvend.set_formspec = function(pos, player)
         .."list[current_name;item;0,0.5;1,1;]"
 		.."label[0,0.05;"..numbertext.."]"
 		.."field[1.3,0.8;1.5,1;number;;" .. number .. "]"
+		.."tooltip[number;"..numbertooltip.."]"
 
         .."list[current_name;gold;0,1.8;1,1;]"
 		.."label[0,1.35;"..costtext.."]"
 		.."field[1.3,2.1;1.5,1;cost;;" .. cost .. "]"
+		.."tooltip[cost;"..costtooltip.."]"
 
 	.."button[3,2.7;2,0.5;save;OK]"
+	.."tooltip[save;"..oktooltip.."]"
         .."list[current_player;main;0,3.5;8,4;]"
         .."listring[current_player;main]"
         .."listring[current_name;item]")
