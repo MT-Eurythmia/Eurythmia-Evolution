@@ -168,7 +168,7 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                 chest_has = chest_inv:contains_item("main", stack)
                 player_has = player_inv:contains_item("main", price)
                 chest_free = chest_inv:room_for_item("main", stack)
-                player_free = chest_inv:room_for_item("main", price)
+                player_free = player_inv:room_for_item("main", price)
                 if chest_has and player_has and chest_free and player_free then
                    if cost <= cost_stack_max and number <= number_stack_max then
                        player_inv:remove_item("main", price)
@@ -187,8 +187,13 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                        if numberremainder > 0 then numberfree = numberfree + 1 end
                        if costremainder > 0 then costfree = costfree + 1 end
                        if easyvend.free_slots(player_inv, "main") < numberfree then
-                           minetest.chat_send_player(sender:get_player_name(),
-                               string.format("No room in your inventory (%d empty slots required)!", numberfree) )
+                           local msg
+                           if numberfree > 1 then
+                               msg = string.format("No room in your inventory (%d empty slots required)!", numberfree)
+                           else
+                               msg = "No room in your inventory!"
+                           end
+                           minetest.chat_send_player(sender:get_player_name(), msg)
                            easyvend.sound_error(sender:get_player_name())
                        elseif easyvend.free_slots(chest_inv, "main") < costfree then
                            minetest.chat_send_player(sender:get_player_name(), "No room in the chest's inventory!")
@@ -275,8 +280,13 @@ easyvend.on_receive_fields_customer = function(pos, formname, fields, sender)
                        if numberremainder > 0 then numberfree = numberfree + 1 end
                        if costremainder > 0 then costfree = costfree + 1 end
                        if easyvend.free_slots(player_inv, "main") < costfree then
-                           minetest.chat_send_player(sender:get_player_name(),
-                               string.format("No room in your inventory (%d empty slots required)!", costfree) )
+                           local msg
+                           if numberfree > 1 then
+                               msg = string.format("No room in your inventory (%d empty slots required)!", numberfree)
+                           else
+                               msg = "No room in your inventory!"
+                           end
+                           minetest.chat_send_player(sender:get_player_name(), msg)
                            easyvend.sound_error(sender:get_player_name())
                        elseif easyvend.free_slots(chest_inv, "main") < numberfree then
                            minetest.chat_send_player(sender:get_player_name(), "No room in the chest's inventory!")
