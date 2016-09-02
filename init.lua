@@ -18,7 +18,11 @@
 ---
 
 easyvend = {}
-easyvend.version = 1.02
+easyvend.VERSION = {}
+easyvend.VERSION.MAJOR = 1
+easyvend.VERSION.MINOR = 0
+easyvend.VERSION.PATCH = 0
+easyvend.VERSION.STRING = easyvend.VERSION.MAJOR .. "." .. easyvend.VERSION.MINOR .. "." .. easyvend.VERSION.PATCH
 
 dofile(minetest.get_modpath("easyvend") .. "/easyvend.lua")
 
