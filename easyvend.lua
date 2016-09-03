@@ -487,7 +487,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                    if cost <= cost_stack_max and number <= number_stack_max then
                        easyvend.machine_enable(pos, node)
                        player_inv:remove_item("main", price)
-                       if check_wear then
+                       if check_wear and minetest.registered_tools[itemname] then
                            chest_inv:set_stack("main", chest_out[1].id, "")
                            player_inv:add_item("main", chest_out[1].item)
                        else
@@ -582,7 +582,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                 if chest_has and player_has and chest_free and player_free then
                    if cost <= cost_stack_max and number <= number_stack_max then
                        easyvend.machine_enable(pos, node)
-                       if check_wear then
+                       if check_wear and minetest.registered_tools[itemname] then
                            player_inv:set_stack("main", player_out[1].id, "")
                            chest_inv:add_item("main", player_out[1].item)
                        else
