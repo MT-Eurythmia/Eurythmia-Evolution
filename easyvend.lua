@@ -177,6 +177,21 @@ easyvend.set_formspec = function(pos, player)
 		.."label[1,0.55;×" .. number .. "]"
 		.."button[6,2.8;2,0.5;config;Configure]"
 		.."button[0,2.8;2,0.5;buysell;"..buysellbuttontext.."]"
+		if minetest.registered_tools[itemname] ~= nil then
+			local weartext
+			if meta:get_int("wear") == 0 then
+				if buysell == "buy" then
+					weartext = "Only intact tools are bought."
+				else
+					weartext = "Only intact tools are sold."
+				end
+			elseif buysell == "sell" then
+				weartext = "Warning: Might sell damaged tools."
+			end
+			if weartext ~= nil then
+				formspec = formspec .."textarea[2.3,2.6;3,1;;"..minetest.formspec_escape(weartext)..";]"
+			end
+		end
 	end
 
 	meta:set_string("formspec", formspec)
