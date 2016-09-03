@@ -20,7 +20,13 @@
 
 -- TODO: Improve mod compability
 local slots_max = 31
-local currency = "default:gold_ingot"
+
+-- Set item which is used as payment for vending and depositing machines
+local currency = minetest.setting_get("easyvend_currency")
+if currency == nil or minetest.registered_items[currency] == nil then
+	currency = "default:gold_ingot"
+end
+
 local currency_desc = minetest.registered_items[currency].description
 local registered_chests = {}
 local cost_stack_max = ItemStack(currency):get_stack_max()
@@ -146,7 +152,7 @@ easyvend.set_formspec = function(pos, player)
 		local wear = "false"
 		if meta:get_int("wear") == 1 then wear = "true" end
 		formspec = formspec
-                .."list[current_name;gold;0,1.65;1,1;]"
+                .."item_image_button[0,1.65;1,1;"..currency..";currency_image;]"
                 .."list[current_name;item;0,0.35;1,1;]"
                 .."listring[current_player;main]"
                 .."listring[current_name;item]"

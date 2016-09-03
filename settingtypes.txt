@@ -1,0 +1,5 @@
+# Specify the item (as an itemstring) which is used as currency for vending
+# and depositing machines. Vending machines take this item as payment and
+# depositing machines give this item in return for items.
+# Default: Gold Ingot.
+easyvend_currency (Currency item for vending and depositing machines) string default:gold_ingot
