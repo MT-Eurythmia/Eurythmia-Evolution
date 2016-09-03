@@ -34,21 +34,32 @@ end
 -- This is a workaround for a bug in Minetest which makes contains_item useless to count
 -- the number of tools in an inventory reliably.
 -- FIXME: Remove the workaround when Minetest's contains_item is fixed
-easyvend.contains_item = function(inventory, listname, itemtable)
+easyvend.contains_item = function(inventory, listname, itemtable, check_wear)
 	local itemstring = itemtable.name
 	local minimum = itemtable.count
+	if check_wear == nil then check_wear = false end
+	local get_items = {}
 	-- Tool workaround
 	if minetest.registered_tools[itemstring] ~= nil then
 		local count = 0
+		local ok = false
 		for i=1,inventory:get_size(listname) do
-			if inventory:get_stack(listname, i):get_name() == itemstring then
-				count = count + 1
-				if count >= minimum then
-					return true
+			local stack = inventory:get_stack(listname, i)
+			if stack:get_name() == itemstring then
+				if not check_wear or stack:get_wear() == 0 then
+					count = count + 1
+					if count >= minimum then
+						ok = true
+					end
+					table.insert(get_items, {id=i, item=stack})
 				end
 			end
 		end
-		return false
+		if ok then
+			return true, get_items
+		else
+			return false
+		end
 	else
 		-- The function which we should have used normally
 		return inventory:contains_item(listname, ItemStack(itemtable))
@@ -214,6 +225,7 @@ easyvend.machine_check = function(pos, node)
 	local itemstack = inv:get_stack("item",1)
 	local itemname=meta:get_string("itemname")
 	local machine_owner = meta:get_string("owner")
+	local check_wear = meta:get_int("wear") == 0
 	local chestdef = registered_chests[chest.name]
 
 	if chestdef then
@@ -243,7 +255,7 @@ easyvend.machine_check = function(pos, node)
 				if costremainder > 0 then costfree = costfree + 1 end
 
 				if buysell == "sell" then
-					chest_has = easyvend.contains_item(chest_inv, chestdef.inv_list, stack)
+					chest_has = easyvend.contains_item(chest_inv, chestdef.inv_list, stack, check_wear)
 					chest_free = chest_inv:room_for_item(chestdef.inv_list, price)
 			                if chest_has and chest_free then
 						if cost <= cost_stack_max and number <= number_stack_max then
@@ -260,7 +272,7 @@ easyvend.machine_check = function(pos, node)
 						status = "No room in the chest's inventory!"
 					end
 				elseif buysell == "buy" then
-					chest_has = easyvend.contains_item(chest_inv, chestdef.inv_list, price)
+					chest_has = easyvend.contains_item(chest_inv, chestdef.inv_list, price, check_wear)
 					chest_free = chest_inv:room_for_item(chestdef.inv_list, stack)
 			                if chest_has and chest_free then
 						if cost <= cost_stack_max and number <= number_stack_max then
@@ -424,6 +436,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
     local cost = meta:get_int("cost")
     local itemname=meta:get_string("itemname")
     local item=meta:get_inventory():get_stack("item", 1)
+    local check_wear = meta:get_int("wear") == 0
 
     local buysell = easyvend.buysell(node.name)
 	
@@ -448,20 +461,25 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
             
             local stack = {name=itemname, count=number, wear=0, metadata=""} 
             local price = {name=currency, count=cost, wear=0, metadata=""}
-            local chest_has, player_has, chest_free, player_free
+            local chest_has, player_has, chest_free, player_free, chest_out, player_out
             local msg = ""
             if buysell == "sell" then
-                chest_has = easyvend.contains_item(chest_inv, "main", stack)
-                player_has = easyvend.contains_item(player_inv, "main", price)
+                chest_has, chest_out = easyvend.contains_item(chest_inv, "main", stack, check_wear)
+                player_has, player_out = easyvend.contains_item(player_inv, "main", price, check_wear)
                 chest_free = chest_inv:room_for_item("main", price)
                 player_free = player_inv:room_for_item("main", stack)
                 if chest_has and player_has and chest_free and player_free then
                    if cost <= cost_stack_max and number <= number_stack_max then
                        easyvend.machine_enable(pos, node)
                        player_inv:remove_item("main", price)
-                       stack = chest_inv:remove_item("main", stack)
+                       if check_wear then
+                           chest_inv:set_stack("main", chest_out[1].id, "")
+                           player_inv:add_item("main", chest_out[1].item)
+                       else
+                           stack = chest_inv:remove_item("main", stack)
+                           player_inv:add_item("main", stack)
+                       end
                        chest_inv:add_item("main", price)
-                       player_inv:add_item("main", stack)
                        meta:set_string("status", "Ready.")
                        meta:set_string("message", "Item bought.")
                        easyvend.sound_vend(pos)
@@ -545,16 +563,21 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                     end
                 end
             else
-                chest_has = easyvend.contains_item(chest_inv, "main", price)
-                player_has = easyvend.contains_item(player_inv, "main", stack)
+                chest_has, chest_out = easyvend.contains_item(chest_inv, "main", price, check_wear)
+                player_has, player_out = easyvend.contains_item(player_inv, "main", stack, check_wear)
                 chest_free = chest_inv:room_for_item("main", stack)
                 player_free = player_inv:room_for_item("main", price)
                 if chest_has and player_has and chest_free and player_free then
                    if cost <= cost_stack_max and number <= number_stack_max then
                        easyvend.machine_enable(pos, node)
-                       stack = player_inv:remove_item("main", stack)
+                       if check_wear then
+                           player_inv:set_stack("main", player_out[1].id, "")
+                           chest_inv:add_item("main", player_out[1].item)
+                       else
+                           stack = player_inv:remove_item("main", stack)
+                           chest_inv:add_item("main", stack)
+                       end
                        chest_inv:remove_item("main", price)
-                       chest_inv:add_item("main", stack)
                        player_inv:add_item("main", price)
                        meta:set_string("status", "Ready.")
                        meta:set_string("message", "Item sold.")
@@ -681,7 +704,6 @@ easyvend.after_place_node = function(pos, placer)
     meta:set_int("number", 1)
     meta:set_int("cost", 1)
     meta:set_int("configmode", 1)
-    -- TODO: Implement wear check
     meta:set_int("wear", 0)
 	meta:set_string("itemname", "")
 
