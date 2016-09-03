@@ -13,7 +13,7 @@ local tindagcap = {
         }
 
 minetest.register_tool("tincraft:tin_dagger", {
-        description = "Tin Dagger",
+        description = "Cheap Tin Dagger",
         inventory_image = "tincraft_tin_dagger.png",
         tool_capabilities = tindagcap, -- overridden by use of on_use ....
 	on_use = function(itemstack,user,pointedthing)
