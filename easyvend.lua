@@ -719,8 +719,10 @@ easyvend.after_place_node = function(pos, placer)
     local d = ""
     if node.name == "easyvend:vendor" then
         d = string.format("New vending machine (owned by %s)", player_name)
+        meta:set_int("wear", 1)
     elseif node.name == "easyvend:depositor" then
         d = string.format("New depositing machine (owned by %s)", player_name)
+        meta:set_int("wear", 0)
     end
     meta:set_string("infotext", d)
     local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
@@ -733,7 +735,6 @@ easyvend.after_place_node = function(pos, placer)
     meta:set_int("number", 1)
     meta:set_int("cost", 1)
     meta:set_int("configmode", 1)
-    meta:set_int("wear", 0)
 	meta:set_string("itemname", "")
 
 	meta:set_string("owner", player_name or "")
