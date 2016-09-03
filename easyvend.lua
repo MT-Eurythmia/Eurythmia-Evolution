@@ -31,6 +31,31 @@ easyvend.register_chest = function(node_name, inv_list, meta_owner)
 	registered_chests[node_name] = { inv_list = inv_list, meta_owner = meta_owner }
 end
 
+-- This is a workaround for a bug in Minetest which makes contains_item useless to count
+-- the number of tools in an inventory reliably.
+-- FIXME: Remove the workaround when Minetest's contains_item is fixed
+easyvend.contains_item = function(inventory, listname, itemtable)
+	local itemstring = itemtable.name
+	local minimum = itemtable.count
+	-- Tool workaround
+	if minetest.registered_tools[itemstring] ~= nil then
+		local count = 0
+		for i=1,inventory:get_size(listname) do
+			if inventory:get_stack(listname, i):get_name() == itemstring then
+				count = count + 1
+				if count >= minimum then
+					return true
+				end
+			end
+		end
+		return false
+	else
+		-- The function which we should have used normally
+		return inventory:contains_item(listname, ItemStack(itemtable))
+	end
+end
+
+
 if minetest.get_modpath("default") ~= nil then
 	easyvend.register_chest("default:chest_locked", "main", "owner")
 end
@@ -218,7 +243,7 @@ easyvend.machine_check = function(pos, node)
 				if costremainder > 0 then costfree = costfree + 1 end
 
 				if buysell == "sell" then
-					chest_has = chest_inv:contains_item(chestdef.inv_list, stack)
+					chest_has = easyvend.contains_item(chest_inv, chestdef.inv_list, stack)
 					chest_free = chest_inv:room_for_item(chestdef.inv_list, price)
 			                if chest_has and chest_free then
 						if cost <= cost_stack_max and number <= number_stack_max then
@@ -235,7 +260,7 @@ easyvend.machine_check = function(pos, node)
 						status = "No room in the chest's inventory!"
 					end
 				elseif buysell == "buy" then
-					chest_has = chest_inv:contains_item(chestdef.inv_list, price)
+					chest_has = easyvend.contains_item(chest_inv, chestdef.inv_list, price)
 					chest_free = chest_inv:room_for_item(chestdef.inv_list, stack)
 			                if chest_has and chest_free then
 						if cost <= cost_stack_max and number <= number_stack_max then
@@ -426,8 +451,8 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
             local chest_has, player_has, chest_free, player_free
             local msg = ""
             if buysell == "sell" then
-                chest_has = chest_inv:contains_item("main", stack)
-                player_has = player_inv:contains_item("main", price)
+                chest_has = easyvend.contains_item(chest_inv, "main", stack)
+                player_has = easyvend.contains_item(player_inv, "main", price)
                 chest_free = chest_inv:room_for_item("main", price)
                 player_free = player_inv:room_for_item("main", stack)
                 if chest_has and player_has and chest_free and player_free then
@@ -520,8 +545,8 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                     end
                 end
             else
-                chest_has = chest_inv:contains_item("main", price)
-                player_has = player_inv:contains_item("main", stack)
+                chest_has = easyvend.contains_item(chest_inv, "main", price)
+                player_has = easyvend.contains_item(player_inv, "main", stack)
                 chest_free = chest_inv:room_for_item("main", stack)
                 player_free = player_inv:room_for_item("main", price)
                 if chest_has and player_has and chest_free and player_free then
