@@ -273,14 +273,14 @@ easyvend.machine_check = function(pos, node)
 							active = true
 						elseif easyvend.free_slots(chest_inv, chestdef.inv_list) < costfree then
 							active = false
-							status =  "No room in the chest's inventory!"
+							status = "No room in the machine’s storage!"
 						end
 					elseif not chest_has then
 						active = false
 						status = "The vending machine has insufficient materials!"
 					elseif not chest_free then
 						active = false
-						status = "No room in the chest's inventory!"
+						status = "No room in the machine’s storage!"
 					end
 				elseif buysell == "buy" then
 					chest_has = easyvend.check_and_get_items(chest_inv, chestdef.inv_list, price, check_wear)
@@ -290,14 +290,14 @@ easyvend.machine_check = function(pos, node)
 							active = true
 						elseif easyvend.free_slots(chest_inv, chestdef.inv_list) < numberfree then
 							active = false
-							status =  "No room in the chest's inventory!"
+							status = "No room in the machine’s storage!"
 						end
 					elseif not chest_has then
 						active = false
 						status = "The depositing machine is out of money!"
 					elseif not chest_free then
 						active = false
-						status = "No room in the chest's inventory!"
+						status = "No room in the machine’s storage!"
 					end
 				end
 			else
@@ -306,7 +306,7 @@ easyvend.machine_check = function(pos, node)
 			end
 		else
 			active = false
-                        status = "Storage can't be accessed because it is owned by a different person!"
+                        status = "Storage can’t be accessed because it is owned by a different person!"
 		end
 	else
 		active = false
@@ -559,7 +559,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            end
                            meta:set_string("message", msg)
                        elseif easyvend.free_slots(chest_inv, "main") < costfree then
-                           meta:set_string("status", "No room in the chest's inventory!")
+                           meta:set_string("status", "No room in the machine’s storage!")
 	                   easyvend.machine_disable(pos, node, sendername)
                        else
                            -- Remember items for transfer
@@ -614,7 +614,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                         meta:set_string("message", msg)
                         easyvend.sound_error(sendername)
                     elseif not chest_free then
-                        msg = "No room in the chest's inventory!"
+                        msg = "No room in the machine’s storage!"
                         meta:set_string("status", msg)
 	                easyvend.machine_disable(pos, node, sendername)
                     end
@@ -624,7 +624,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                         meta:set_string("status", msg)
 	                easyvend.machine_disable(pos, node, sendername)
                     elseif not player_has then
-                        msg = "You can't afford this item!"
+                        msg = "You can’t afford this item!"
                         meta:set_string("message", msg)
                         easyvend.sound_error(sendername)
                     end
@@ -727,7 +727,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                         meta:set_string("message", msg)
                         easyvend.sound_error(sendername)
                     elseif not chest_free then
-                        msg = "No room in the chest's inventory!"
+                        msg = "No room in the machine’s storage!"
                         meta:set_string("status", msg)
 	                easyvend.machine_disable(pos, node, sendername)
                     end
@@ -744,7 +744,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                 end
             end
         else
-            meta:set_string("status", "Storage can't be accessed because it is owned by a different person!")
+            meta:set_string("status", "Storage can’t be accessed because it is owned by a different person!")
 	    easyvend.machine_disable(pos, node, sendername)
         end
     else
@@ -846,7 +846,7 @@ easyvend.on_receive_fields = function(pos, formname, fields, sender)
 				if easyvend.buysell(node.name) == "buy" then
 					meta:set_string("message", "Used tools are now rejected.")
 				else
-					meta:set_string("message", "Used tools won't be sold anymore.")
+					meta:set_string("message", "Used tools won’t be sold anymore.")
 				end
 				meta:set_int("wear", 0)
 			end
@@ -869,7 +869,7 @@ end
 local jokes_vendor = {
 	"Thank you. You have made a vending machine very happy.",
 	"Humans have a strange sense of humor.",
-	"Let's get this over with …",
+	"Let’s get this over with …",
 	"Item “bought”.",
 	"Tit for tat.",
 	"Do you realize what you’ve just bought?",
