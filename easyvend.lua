@@ -691,14 +691,19 @@ easyvend.after_place_node = function(pos, placer)
 end
 
 easyvend.can_dig = function(pos, player)
+    local meta = minetest.get_meta(pos)
+    local name = player:get_player_name()
+    -- Owner can always dig shop
+    if meta:get_string("owner") == name then
+        return true
+    end
     local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
     local meta_chest = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z});
     if registered_chests[chest.name] then
          if player and player:is_player() then
-            local owner_chest = meta_chest:get_string("owner")
-            local name = player:get_player_name()
+            local owner_chest = meta_chest:get_string(registered_chests[chest.name].meta_owner)
             if name == owner_chest then
-                return true --chest owner can dig shop
+                return true --chest owner can also dig shop
             end
          end
          return false
