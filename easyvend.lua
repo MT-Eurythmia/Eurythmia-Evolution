@@ -341,11 +341,9 @@ end
 easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
     local node = minetest.get_node(pos)
 	local meta = minetest.get_meta(pos)
-
-	local number = tonumber(fields.number)
-	local cost = tonumber(fields.cost)
     local inv_self = meta:get_inventory()
-
+    local itemstack = inv_self:get_stack("item",1)
+ 
     if fields.config then
         meta:set_int("configmode", 1)
 	easyvend.machine_check(pos, node)
@@ -356,8 +354,37 @@ easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
         return
     end
 
-    local itemstack = inv_self:get_stack("item",1)
-    local itemname=""
+	local number = fields.number
+	local cost = fields.cost
+
+    --[[ Convenience function:
+    When appending “s” or “S” to the number, it is multiplied
+    by the maximum stack size.
+    TODO: Expose this in user documentation ]]
+    local number_stack_max = itemstack:get_stack_max()
+    local ss = string.sub(number, #number, #number)
+    if ss == "s" or ss == "S" then
+        local n = tonumber(string.sub(number, 1, #number-1))
+        if string.len(number) == 1 then n = 1 end
+	if n ~= nil then
+		number = n * number_stack_max
+	end
+    end
+    ss = string.sub(cost, #cost, #cost)
+    if ss == "s" or ss == "S" then
+        local n = tonumber(string.sub(cost, 1, #cost-1))
+        if string.len(cost) == 1 then n = 1 end
+	if n ~= nil then
+		cost = n * cost_stack_max
+	end
+    end
+    number = tonumber(number)
+    cost = tonumber(cost)
+
+
+
+
+   local itemname=""
 
     local oldnumber = meta:get_int("number")
     local oldcost = meta:get_int("cost")
