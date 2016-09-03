@@ -160,10 +160,10 @@ easyvend.set_formspec = function(pos, player)
 		.."button[6,2.8;2,0.5;save;Confirm]"
 		local weartext, weartooltip
 		if buysell == "buy" then
-			weartext = "Accept used tools"
+			weartext = "Accept worn tools"
 			weartooltip = "If disabled, only tools in perfect condition will be bought from sellers."
 		else
-			weartext = "Sell used tools"
+			weartext = "Sell worn tools"
 			weartooltip = "If disabled, only tools in perfect condition will be sold."
 		end
 		formspec = formspec .."checkbox[2,2.4;wear;"..minetest.formspec_escape(weartext)..";"..wear.."]"
@@ -186,7 +186,7 @@ easyvend.set_formspec = function(pos, player)
 					weartext = "Only intact tools are sold."
 				end
 			elseif buysell == "sell" then
-				weartext = "Warning: Might sell damaged tools."
+				weartext = "Warning: Might sell worn tools."
 			end
 			if weartext ~= nil then
 				formspec = formspec .."textarea[2.3,2.6;3,1;;"..minetest.formspec_escape(weartext)..";]"
