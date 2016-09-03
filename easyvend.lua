@@ -302,7 +302,7 @@ easyvend.machine_check = function(pos, node)
 				end
 			else
 				active = false
-				status = "The machine has not been configured yet."
+				status = "Awaiting configuration by owner."
 			end
 		else
 			active = false
@@ -365,7 +365,7 @@ easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
     local maxnumber = number_stack_max * slots_max
 	
         if ( itemstack == nil or itemstack:is_empty() ) then
-                meta:set_string("status", "The machine has not been configured yet.")
+                meta:set_string("status", "Awaiting configuration by owner.")
 		meta:set_string("message", "You must specify an item.")
                 easyvend.sound_error(sender:get_player_name())
                 easyvend.set_formspec(pos, sender)
@@ -725,7 +725,7 @@ easyvend.after_place_node = function(pos, placer)
     meta:set_string("infotext", d)
     local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
     if registered_chests[chest.name] then
-        meta:set_string("status", "The machine has not been configured yet.")
+        meta:set_string("status", "Awaiting configuration by owner.")
     else
         meta:set_string("status", "No storage; machine needs a locked chest below it.")
     end
