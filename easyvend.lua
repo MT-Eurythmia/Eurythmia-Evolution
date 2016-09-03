@@ -428,8 +428,8 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
             if buysell == "sell" then
                 chest_has = chest_inv:contains_item("main", stack)
                 player_has = player_inv:contains_item("main", price)
-                chest_free = chest_inv:room_for_item("main", stack)
-                player_free = player_inv:room_for_item("main", price)
+                chest_free = chest_inv:room_for_item("main", price)
+                player_free = player_inv:room_for_item("main", stack)
                 if chest_has and player_has and chest_free and player_free then
                    if cost <= cost_stack_max and number <= number_stack_max then
                        easyvend.machine_enable(pos, node)
@@ -522,8 +522,8 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
             else
                 chest_has = chest_inv:contains_item("main", price)
                 player_has = player_inv:contains_item("main", stack)
-                chest_free = chest_inv:room_for_item("main", price)
-                player_free = player_inv:room_for_item("main", stack)
+                chest_free = chest_inv:room_for_item("main", stack)
+                player_free = player_inv:room_for_item("main", price)
                 if chest_has and player_has and chest_free and player_free then
                    if cost <= cost_stack_max and number <= number_stack_max then
                        easyvend.machine_enable(pos, node)
