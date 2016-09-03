@@ -26,6 +26,8 @@ local registered_chests = {}
 local cost_stack_max = ItemStack(currency):get_stack_max()
 local maxcost = cost_stack_max * slots_max
 
+local joketimer_start = 3
+
 -- Allow for other mods to register custom chests
 easyvend.register_chest = function(node_name, inv_list, meta_owner)
 	registered_chests[node_name] = { inv_list = inv_list, meta_owner = meta_owner }
@@ -315,6 +317,17 @@ easyvend.machine_check = function(pos, node)
 		status = "Awaiting configuration by owner."
 	end
 
+        if itemname == currency and number == cost and active then
+            local jt = meta:get_int("joketimer")
+            if jt > 0 then
+                jt = jt - 1
+            end
+            if jt == 0 then
+                meta:set_string("message", "Ready.")
+                jt = -1
+            end
+            meta:set_int("joketimer", jt)
+        end
 	meta:set_string("status", status)
 
 	if not itemstack:is_empty() then
@@ -341,6 +354,7 @@ easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
 	local meta = minetest.get_meta(pos)
     local inv_self = meta:get_inventory()
     local itemstack = inv_self:get_stack("item",1)
+    local buysell = easyvend.buysell(node.name)
  
     if fields.config then
         meta:set_int("configmode", 1)
@@ -419,7 +433,14 @@ easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
         meta:set_int("configmode", 0)
     
         local change = easyvend.machine_check(pos, node)
-	meta:set_string("message", "Configuration successful.")
+
+        if itemname == currency and number == cost and cost <= cost_stack_max then
+	    meta:set_string("message", "Configuration successful. I am feeling funny.")
+	    meta:set_int("joketimer", joketimer_start)
+	    meta:set_int("joke_id", easyvend.assign_joke(buysell))
+        else
+	    meta:set_string("message", "Configuration successful.")
+        end
 
 	if not change then
 		if (node.name == "easyvend:vendor_on" or node.name == "easyvend:depositor_on") then
@@ -513,7 +534,12 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                        end
                        chest_inv:add_item("main", price)
                        meta:set_string("status", "Ready.")
-                       meta:set_string("message", "Item bought.")
+                       if itemname == currency and number == cost and cost <= cost_stack_max then
+                           meta:set_string("message", easyvend.get_joke(buysell, meta:get_int("joke_id")))
+                           meta:set_int("joketimer", joketimer_start)
+                       else
+                           meta:set_string("message", "Item bought.")
+                       end
                        easyvend.sound_vend(pos)
                    else
                        -- Large item counts (multiple stacks)
@@ -621,7 +647,12 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                        chest_inv:remove_item("main", price)
                        player_inv:add_item("main", price)
                        meta:set_string("status", "Ready.")
-                       meta:set_string("message", "Item sold.")
+                       if itemname == currency and number == cost and cost <= cost_stack_max then
+                           meta:set_string("message", easyvend.get_joke(buysell, meta:get_int("joke_id")))
+                           meta:set_int("joketimer", joketimer_start)
+                       else
+                           meta:set_string("message", "Item sold.")
+                       end
                        easyvend.sound_deposit(pos)
                    else
                        -- Large item counts (multiple stacks)
@@ -756,6 +787,8 @@ easyvend.after_place_node = function(pos, placer)
     meta:set_int("number", 1)
     meta:set_int("cost", 1)
     meta:set_int("configmode", 1)
+    meta:set_int("joketimer", -1)
+    meta:set_int("joke_id", 1)
 	meta:set_string("itemname", "")
 
 	meta:set_string("owner", player_name or "")
@@ -828,6 +861,53 @@ easyvend.on_receive_fields = function(pos, formname, fields, sender)
 	elseif fields.buysell then
 		easyvend.on_receive_fields_buysell(pos, formname, fields, sender)
 	end
+end
+
+-- Jokes: Appear when machine exchanges currency for currency at equal rate
+
+-- Vendor
+local jokes_vendor = {
+	"Thank you. You have made a vending machine very happy.",
+	"Humans have a strange sense of humor.",
+	"Let's get this over with …",
+	"Item “bought”.",
+	"Tit for tat.",
+	"Do you realize what you’ve just bought?",
+}
+-- Depositor
+local jokes_depositor = {
+	"Thank you, the money started to smell inside.",
+	"Money doesn’t grow on trees, you know?",
+	"Sanity sold.",
+	"Well, that was an awkward exchange.",
+	"Are you having fun?",
+	"Is this really trading?",
+}
+
+easyvend.assign_joke = function(buysell)
+	local jokes
+	if buysell == "sell" then
+		jokes = jokes_vendor
+	elseif buysell == "buy" then
+		jokes = jokes_depositor
+	end
+	local r = math.random(1,#jokes)
+	return r
+end
+
+easyvend.get_joke = function(buysell, id)
+	if buysell == nil or id == nil then
+		-- Fallback message (should never happen)
+		return "Items exchanged."
+	end
+	if buysell == "sell" then
+		joke = jokes_vendor[id]
+		if joke == nil then joke = jokes_vendor[1] end
+	elseif buysell == "buy" then
+		joke = jokes_depositor[id]
+		if joke == nil then joke = jokes_depositor[1] end
+	end
+	return joke
 end
 
 easyvend.sound_error = function(playername) 
