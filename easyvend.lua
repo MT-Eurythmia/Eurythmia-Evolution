@@ -519,6 +519,8 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            meta:set_string("status", "No room in the chest's inventory!")
 	                   easyvend.machine_disable(pos, node, sendername)
                        else
+                           -- Remember items for transfer
+                           local cheststacks = {}
                            easyvend.machine_enable(pos, node)
                            for i=1, coststacks do
                                price.count = cost_stack_max
@@ -530,11 +532,11 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            end
                            for i=1, numberstacks do
                                stack.count = number_stack_max
-                               chest_inv:remove_item("main", stack)
+                               table.insert(cheststacks, chest_inv:remove_item("main", stack))
                            end
                            if numberremainder > 0 then
                                stack.count = numberremainder
-                               chest_inv:remove_item("main", stack)
+                               table.insert(cheststacks, chest_inv:remove_item("main", stack))
                            end
                            for i=1, coststacks do
                                price.count = cost_stack_max
@@ -544,13 +546,8 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                                price.count = costremainder
                                chest_inv:add_item("main", price)
                            end
-                           for i=1, numberstacks do
-                               stack.count = number_stack_max
-                               player_inv:add_item("main", stack)
-                           end
-                           if numberremainder > 0 then
-                               stack.count = numberremainder
-                               player_inv:add_item("main", stack)
+                           for i=1,#cheststacks do
+                               player_inv:add_item("main", cheststacks[i])
                            end
                            meta:set_string("message", "Item bought.")
                            easyvend.sound_vend(pos)
@@ -619,6 +616,8 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
 	                   easyvend.machine_disable(pos, node, sendername)
                        else
                            easyvend.machine_enable(pos, node)
+                           -- Remember removed items for transfer
+                           local playerstacks = {}
                            for i=1, coststacks do
                                price.count = cost_stack_max
                                chest_inv:remove_item("main", price)
@@ -629,11 +628,11 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            end
                            for i=1, numberstacks do
                                stack.count = number_stack_max
-                               player_inv:remove_item("main", stack)
+                               table.insert(playerstacks, player_inv:remove_item("main", stack))
                            end
                            if numberremainder > 0 then
                                stack.count = numberremainder
-                               player_inv:remove_item("main", stack)
+                               table.insert(playerstacks, player_inv:remove_item("main", stack))
                            end
                            for i=1, coststacks do
                                price.count = cost_stack_max
@@ -643,13 +642,8 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                                price.count = costremainder
                                player_inv:add_item("main", price)
                            end
-                           for i=1, numberstacks do
-                               stack.count = number_stack_max
-                               chest_inv:add_item("main", stack)
-                           end
-                           if numberremainder > 0 then
-                               stack.count = numberremainder
-                               chest_inv:add_item("main", stack)
+                           for i=1,#playerstacks do
+                               chest_inv:add_item("main", playerstacks[i])
                            end
                            meta:set_string("message", "Item sold.")
                            easyvend.sound_deposit(pos)
