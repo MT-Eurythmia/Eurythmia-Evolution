@@ -42,7 +42,6 @@ easyvend.check_and_get_items = function(inventory, listname, itemtable, check_we
 	-- Tool workaround
 	if minetest.registered_tools[itemstring] ~= nil then
 		local count = 0
-		local ok = false
 		for i=1,inventory:get_size(listname) do
 			local stack = inventory:get_stack(listname, i)
 			if stack:get_name() == itemstring then
@@ -249,7 +248,6 @@ easyvend.machine_check = function(pos, node)
 			if not itemstack:is_empty() then
 
 				local number_stack_max = itemstack:get_stack_max()
-				local maxnumber = number_stack_max * slots_max
 
 				local stack = {name=itemname, count=number, wear=0, metadata=""}
 				local price = {name=currency, count=cost, wear=0, metadata=""}
@@ -381,14 +379,10 @@ easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
     number = tonumber(number)
     cost = tonumber(cost)
 
-
-
-
-   local itemname=""
+    local itemname=""
 
     local oldnumber = meta:get_int("number")
     local oldcost = meta:get_int("cost")
-    local number_stack_max = itemstack:get_stack_max()
     local maxnumber = number_stack_max * slots_max
 	
         if ( itemstack == nil or itemstack:is_empty() ) then
@@ -795,6 +789,7 @@ easyvend.on_receive_fields = function(pos, formname, fields, sender)
 	local meta = minetest.get_meta(pos)
 	local node = minetest.get_node(pos)
 	local owner = meta:get_string("owner")
+	local sendername = sender:get_player_name(sender)
     
 	if fields.config or fields.save or fields.usermode then
 		if sender:get_player_name() == owner then
