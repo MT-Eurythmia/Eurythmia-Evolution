@@ -19,7 +19,7 @@ minetest.register_tool("tincraft:tin_dagger", {
 	on_use = function(itemstack,user,pointedthing)
 		if pointedthing.type == "object" then
 			pointedthing.ref:punch(user,1,tindagcap)
-		        itemstack:add_wear(math.ceil(65536/15))
+		        itemstack:add_wear(math.ceil(65536/25))
 		end
 	        return itemstack
 	end
