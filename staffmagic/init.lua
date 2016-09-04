@@ -13,6 +13,7 @@ staffmagic.forbidden_nodes = {
 	"default:stone_with",
 	"moreores:mineral_",
 	"default:nyancat",
+	"farming:.+",
 	"steel_bottle",
 	".+steelblock", -- lua does not include the "|" operator which is a PAIN.
 	".+copperblock",
