@@ -6,7 +6,8 @@ staffmagic = {}
 
 staffmagic.staff_power = {
 	boom = "anycoin:coin_bronze",
-	stack = "anycoin:anycoin"
+	stack = "anycoin:anycoin",
+	clone = "anycoin:coin_iron"
 }
 
 staffmagic.forbidden_nodes = {
@@ -230,9 +231,17 @@ minetest.register_tool("staffmagic:staff_clone", { -- this will be the floor sta
 
 		local targetnode = minetest.get_node(pos).name
 		local userpos = user:getpos()
+		local range = 2 + staffmagic:countpower(user,"clone")
 
+		-- first pos needs all coords smaller than end pos - normalize here
 		local startpos = {x = staffmagic:min(pos.x,playerpos.x),y = pos.y,z = staffmagic:min(pos.z,playerpos.z)}
 		local endpos = {x = staffmagic:max(pos.x,playerpos.x),y = pos.y,z = staffmagic:max(pos.z,playerpos.z)}
+
+		local vdist = vector.distance(startpos,endpos)
+		if vdist > range then
+			minetest.chat_send_player(user:get_player_name(),"You are too far ("..math.ceil(vdist).."m). Your range is "..range.."m")
+			return
+		end
 
 		if staffmagic:isforbidden(targetnode) and stafflevel < 90 then
 			targetnode = "default:dirt"
@@ -442,7 +451,14 @@ minetest.register_tool("staffmagic:staff_melt", {
 		vivarium:bomf(pos,breadth*2)
 
                 for _,fpos in pairs(frostarea) do
-				local replname = minetest.get_node({x=fpos.x,y=fpos.y-1,z=fpos.z}).name
+			local targetnode = minetest.get_node({x=fpos.x,y=fpos.y-1,z=fpos.z})
+			if targetnode.nssm ~= nil then
+				local oldnode = targetnode.nssm
+				local pos = targetnode:getpos()
+				minetest.swap_node(pos, {name = "air" }) -- } --- operate on the space without causing reflow
+				minetest.set_node(oldnode)               -- } /
+			else -- node saving not enabled
+				local replname = targetnode.name
 				if replname == "default:ice" or replname == "default:snowblock" then
 					local newreplname = minetest.get_node({x=fpos.x,y=fpos.y+1,z=fpos.z}).name
 					if newreplname ~= "air" then --  don't dig down so much
@@ -459,6 +475,7 @@ minetest.register_tool("staffmagic:staff_melt", {
 					replname = "default:dirt"
 				end
 				minetest.swap_node(fpos, {name = replname })
+			end
 		end
 
 		if staffmagic:staffcheck(user) < 90 then itemstack = staffmagic:wearitem(itemstack,50); end
