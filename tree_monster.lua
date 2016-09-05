@@ -7,6 +7,7 @@ mobs:register_mob("mobs_monster:tree_monster", {
 	type = "monster",
 	passive = false,
 	attack_type = "dogfight",
+	attack_animals = true,
 	reach = 2,
 	damage = 2,
 	hp_min = 7,
