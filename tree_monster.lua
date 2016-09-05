@@ -8,6 +8,7 @@ mobs:register_mob("mobs_monster:tree_monster", {
 	passive = false,
 	attack_type = "dogfight",
 	attack_animals = true,
+	--specific_attack = {"player", "mobs_animal:chicken"},
 	reach = 2,
 	damage = 2,
 	hp_min = 7,
