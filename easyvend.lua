@@ -410,7 +410,7 @@ easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
 	
         if ( itemstack == nil or itemstack:is_empty() ) then
                 meta:set_string("status", "Awaiting configuration by owner.")
-		meta:set_string("message", "You must specify an item.")
+		meta:set_string("message", "No item specified.")
                 easyvend.sound_error(sender:get_player_name())
                 easyvend.set_formspec(pos, sender)
                 return
