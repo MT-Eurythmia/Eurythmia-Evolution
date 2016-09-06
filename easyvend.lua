@@ -700,7 +700,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            else
                                msg = "No room in your inventory!"
                            end
-                           meta:set_string("status", msg)
+                           meta:set_string("message", msg)
                            easyvend.sound_error(sendername)
                        elseif easyvend.free_slots(chest_inv, "main") < numberfree then
 	                   easyvend.machine_disable(pos, node, sendername)
