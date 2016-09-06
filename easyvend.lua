@@ -812,11 +812,7 @@ easyvend.after_place_node = function(pos, placer)
     end
     meta:set_string("infotext", d)
     local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
-    if registered_chests[chest.name] then
-        meta:set_string("status", "Awaiting configuration by owner.")
-    else
-        meta:set_string("status", "No storage; machine needs a locked chest below it.")
-    end
+    meta:set_string("status", "Awaiting configuration by owner.")
     meta:set_string("message", "Welcome! Please prepare the machine.")
     meta:set_int("number", 1)
     meta:set_int("cost", 1)
