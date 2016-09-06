@@ -179,7 +179,6 @@ easyvend.set_formspec = function(pos, player)
 			.."tooltip[wear;"..minetest.formspec_escape(weartooltip).."]"
 		end
 	else
-		local itemname = meta:get_string("itemname")
 		formspec = formspec
                 .."item_image_button[0,1.65;1,1;"..easyvend.currency..";easyvend.currency_image;]"
                 .."item_image_button[0,0.35;1,1;"..itemname..";item_image;]"
@@ -946,6 +945,7 @@ easyvend.assign_joke = function(buysell)
 end
 
 easyvend.get_joke = function(buysell, id)
+	local joke
 	if buysell == nil or id == nil then
 		-- Fallback message (should never happen)
 		return "Items exchanged."
