@@ -1,6 +1,6 @@
 minetest.register_privilege("staffer","Trust players to use staves")
 minetest.register_privilege("super_staffer","Trust players to use staves responsibly")
-minetest.register_privilege("staff_master","I trust you.")
+minetest.register_privilege("staff_master","Full trust.")
 
 staffmagic = {}
 
@@ -41,18 +41,20 @@ function staffmagic:tellem(player,message)
 	minetest.chat_send_player(player:get_player_name() , message)
 end
 
+function staffmagic:hurtplayer(user)
+	local hp = user:get_hp()
+	user:set_hp(math.floor(hp/2))
+end
+
 function staffmagic:wearitem(itemstack,maxuses)
 	itemstack:add_wear(math.ceil(65536/maxuses))
 	return itemstack
 end
 
-function staffmagic:staffcheck(player)
-	local stafflevel = 0
-	if minetest.check_player_privs(player:get_player_name(), {staffer=true}) then stafflevel = 1; end
-	if minetest.check_player_privs(player:get_player_name(), {super_staffer=true}) then stafflevel = 51; end
-	if minetest.check_player_privs(player:get_player_name(), {staff_master=true}) then stafflevel = 91; end
-	--minetest.chat_send_all("Staff level : "..stafflevel)
-	return stafflevel
+function staffmagic:staffcheck(player,priv)
+	local privset = {}
+	privset[priv]= true
+	return minetest.check_player_privs(player:get_player_name(), privset)
 end
 
 function staffmagic:isforbidden(nodename)
@@ -122,29 +124,16 @@ function staffmagic:mobtransform(user,luae, forced)
 	end
 end
 
--- Staff of X (based on Staff of Light by Xanthin)
-
 minetest.register_tool("staffmagic:staff_stack", { -- this will be the wall staff
-	description = "Column Staff (make walls)",
+	description = "Stack Staff",
 	inventory_image = "staffmagic_staff.png^[colorize:yellow:90",
 	wield_image = "staffmagic_staff.png^[colorize:yellow:90",
 	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
-		local stafflevel = staffmagic:staffcheck(user)
-		if stafflevel < 1 then return; end
+		if not staffmagic:staffcheck(user,"staffer") then return end
 
 		if pointed_thing.type ~= "node" then
-			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
-			if stafflevel < 50 then return; end
-
-			if pointed_thing.type == "object" then
-				local newpos = pointed_thing.ref:getpos()
-				vivarium:bomf(newpos,2 )
-				local luae = pointed_thing.ref:get_luaentity()
-				
-				staffmagic:mobtransform(user,luae,true)
-			end
 			return
 		end
 
@@ -166,7 +155,9 @@ minetest.register_tool("staffmagic:staff_stack", { -- this will be the wall staf
 		local lower = 0 ; local higher = 0
 
 		if staffmagic:isforbidden(targetnode) and stafflevel < 90 then
-			targetnode = "default:dirt"
+			staffmagic:hurtplayer(user)
+			return
+			--targetnode = "default:dirt"
 		end
 
 
@@ -188,34 +179,23 @@ minetest.register_tool("staffmagic:staff_stack", { -- this will be the wall staf
                 for _,fpos in pairs(airnodes) do
 			minetest.swap_node(fpos, {name = targetnode })
 		end
-		if staffmagic:staffcheck(user) < 90 then itemstack = staffmagic:wearitem(itemstack,50); end
+
+		itemstack = staffmagic:wearitem(itemstack,50);
 		return itemstack
 
 	end,
 })
 
-minetest.register_tool("staffmagic:staff_clone", { -- this will be the floor staff
-	description = "Staff of Cloning (make floors)",
+minetest.register_tool("staffmagic:staff_clone", {
+	description = "Floor Staff",
 	inventory_image = "staffmagic_staff.png^[colorize:green:90",
 	wield_image = "staffmagic_staff.png^[colorize:green:90",
-	range = 12,
+	range = 10,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
-		local stafflevel = staffmagic:staffcheck(user)
-		if stafflevel < 1 then return; end
+		if not staffmagic:staffcheck(user,"staffer") then return end
 
 		if pointed_thing.type ~= "node" then
-			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
-
-			if stafflevel < 50 then -- can only clone mobs if super staffer else abuse
-				return
-			end
-			if pointed_thing.type == "object" then
-				local newpos = pointed_thing.ref:getpos()
-				newpos = {x=newpos.x+math.random(-1,1), y=newpos.y+0.5, z=newpos.z+math.random(-1,1)}
-				vivarium:bomf(newpos,2 )
-				minetest.add_entity(newpos, pointed_thing.ref:get_luaentity().name)
-			end
 			return
 		end
 
@@ -244,7 +224,8 @@ minetest.register_tool("staffmagic:staff_clone", { -- this will be the floor sta
 		end
 
 		if staffmagic:isforbidden(targetnode) and stafflevel < 90 then
-			targetnode = "default:dirt"
+			staffmagic:hurtplayer(user)
+			return
 		end
 
                 local airnodes = minetest.find_nodes_in_area(
@@ -259,35 +240,31 @@ minetest.register_tool("staffmagic:staff_clone", { -- this will be the floor sta
 			minetest.swap_node(fpos, {name = targetnode })
 		end
 
-		if staffmagic:staffcheck(user) < 90 then itemstack = staffmagic:wearitem(itemstack,50); end
+		itemstack = staffmagic:wearitem(itemstack,50)
 		return itemstack
 
 	end,
 })
 
-minetest.register_tool("staffmagic:staff_creative", { -- this will be the super creative staff
-	description = "Creator Staff (make blocks or blocks)",
+minetest.register_tool("staffmagic:staff_sending",{
+	description = "Sending Staff",
 	inventory_image = "staffmagic_staff.png^[colorize:purple:90",
 	wield_image = "staffmagic_staff.png^[colorize:purple:90",
-	range = 15,
+	range = 5,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
-		local stafflevel = staffmagic:staffcheck(user)
-		if stafflevel < 50 then return; end -- really do not want to give this to regular staffers
-
-		local playerpos = user:getpos()
-		local pname = user:get_player_name()
-
+		if not staffmagic:staffcheck(user,"staffer") then return end
 		if pointed_thing.type ~= "node" then
 			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
 			if pointed_thing.type == "object" then
 				local mobpos = pointed_thing.ref:getpos()
 				local newpos = mobpos
-				local distance = 30
+				local playerpos = user:getpos()
+				local distance = 10
 				if pointed_thing.ref:get_luaentity().view_range then
 					distance = math.ceil(pointed_thing.ref:get_luaentity().view_range * 1.5)
 				end
-				if stafflevel < 90 and distance > 30 then
+				if distance > 30 then -- TODO this should be function of powerups
 					distance = 30
 				end
 				
@@ -305,58 +282,25 @@ minetest.register_tool("staffmagic:staff_creative", { -- this will be the super 
 				vivarium:bomf( mobpos , 3)
 				vivarium:bomf( newpos , 5)
 				staffmagic:tellem(user,"You sent the " ..pointed_thing.ref:get_luaentity().name .. " packing "..math.ceil(vector.distance(mobpos,newpos)).."m away")
-				pointed_thing.ref:setpos(newpos)
+				pointed_thing.ref:moveto(newpos,true)
+				itemstack = staffmagic:wearitem(itemstack,50)
+				return itemstack
 			end
 			return
 		end
-
-		local pos = pointed_thing.under
-		if minetest.is_protected(pos, pname) then
-			minetest.record_protection_violation(pos, pname)
-			return
-		end
-
-
-		local targetnode = minetest.get_node(pos).name
-		local userpos = user:getpos()
-
-		local startpos = {x = staffmagic:min(pos.x,playerpos.x),y = staffmagic:min(pos.y,playerpos.y),z = staffmagic:min(pos.z,playerpos.z)}
-		local endpos = {x = staffmagic:max(pos.x,playerpos.x),y = staffmagic:max(pos.y,playerpos.y-1),z = staffmagic:max(pos.z,playerpos.z)}
-
-		if staffmagic:isforbidden(targetnode) and stafflevel < 90 then
-			targetnode = "default:dirt"
-		end
-
-                local airnodes = minetest.find_nodes_in_area(
-                        startpos,
-			endpos,
-                        {"air","default:water_source","default:lava_source","default:river_water_source"}
-		)
-		
-		vivarium:bomf({x = (playerpos.x+pos.x)/2 , y = (playerpos.y+pos.y)/2 , z = (playerpos.z+pos.z)/2},4)
-
-                for _,fpos in pairs(airnodes) do
-			minetest.swap_node(fpos, {name = targetnode })
-		end
-
-		if staffmagic:staffcheck(user) < 90 then itemstack = staffmagic:wearitem(itemstack,50); end
-		return itemstack
-
-	end,
+	end
 })
 
 minetest.register_tool("staffmagic:staff_boom", {
-	description = "Bomf Staff (delete nodes)",
+	description = "Boom Staff (delete nodes)",
 	inventory_image = "staffmagic_staff.png^[colorize:black:140",
 	wield_image = "staffmagic_staff.png^[colorize:black:140",
 	range = 12,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
-		local stafflevel = staffmagic:staffcheck(user)
+		if not staffmagic:staffcheck(user,"staffer") then return end
 
-		local radius = 1
-
-		if stafflevel < 20 then return; end -- allow regular staffers to bomf animals
+		local radius = 5
 		radius = radius + staffmagic:countpower(user,"boom")
 
 		if pointed_thing.type ~= "node" then
@@ -377,7 +321,7 @@ minetest.register_tool("staffmagic:staff_boom", {
 			return
 		end
 
-		if stafflevel < 50 then return; end -- allow super staffers to dig
+		if not staffmagic:staffcheck(user,"super_staffer") then return end
 
 		local pos = pointed_thing.under
 		local pname = user:get_player_name()
@@ -420,15 +364,6 @@ minetest.register_tool("staffmagic:staff_melt", {
 	on_use = function(itemstack, user, pointed_thing)
 
 		if pointed_thing.type ~= "node" then
-			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
-			if pointed_thing.type == "object" then
-				local newpos = pointed_thing.ref:getpos()
-				vivarium:bomf(newpos,2 )
-				local luae = pointed_thing.ref:get_luaentity()
-				
-				staffmagic:mobheal(user,luae)
-				staffmagic:mobtransform(user,luae)
-			end
 			return
 		end
 
@@ -445,19 +380,17 @@ minetest.register_tool("staffmagic:staff_melt", {
                 local frostarea = minetest.find_nodes_in_area(
                         {x = pos.x - breadth, y = pos.y, z = pos.z - breadth},
                         {x = pos.x + breadth, y = pos.y, z = pos.z + breadth},
-                        {"default:ice","default:snowblock"}
+                        {"default:ice"}
 		)
 
 		vivarium:bomf(pos,breadth*2)
 
                 for _,fpos in pairs(frostarea) do
-			local targetnode = minetest.get_node({x=fpos.x,y=fpos.y-1,z=fpos.z})
-			if targetnode.nssm ~= nil then
-				local oldnode = targetnode.nssm
-				local pos = targetnode:getpos()
-				minetest.swap_node(pos, {name = "air" }) -- } --- operate on the space without causing reflow
-				minetest.set_node(oldnode)               -- } /
+			local oldmeta = minetest.get_meta(fpos)
+			if oldmeta and oldmeta:get_string("nssm") ~= nil then
+				minetest.swap_node(fpos, {name = oldmeta:get_string("nssm") }) -- thre meta data is otherwise already there
 			else -- node saving not enabled
+				local targetnode = minetest.get_node({x=fpos.x,y=fpos.y-1,z=fpos.z})
 				local replname = targetnode.name
 				if replname == "default:ice" or replname == "default:snowblock" then
 					local newreplname = minetest.get_node({x=fpos.x,y=fpos.y+1,z=fpos.z}).name
@@ -472,13 +405,14 @@ minetest.register_tool("staffmagic:staff_melt", {
 				end
 				--minetest.chat_send_all("Replicating "..replname)
 				if staffmagic:isforbidden(replname) then
-					replname = "default:dirt"
+					staffmagic:hurtplayer(user)
+					return
 				end
 				minetest.swap_node(fpos, {name = replname })
 			end
 		end
 
-		if staffmagic:staffcheck(user) < 90 then itemstack = staffmagic:wearitem(itemstack,50); end
+		itemstack = staffmagic:wearitem(itemstack,50)
 		return itemstack
 
 	end,
@@ -488,9 +422,51 @@ minetest.register_craft(
 {
 	output = "staffmagic:staff_melt",
 	recipe = {
-		{"default:mese_crystal_fragment","bucket:bucket_lava","default:mese_crystal_fragment"},
+		{"default:mese_crystal_fragment","bucket:bucket_water","default:mese_crystal_fragment"},
 		{"","default:obsidian_shard",""},
 		{"","default:obsidian_shard",""},
+	}
+}
+)
+
+minetest.register_craft(
+{
+	output = "staffmagic:staff_stack",
+	recipe = {
+		{"bucket:bucket_lava","default:diamond","bucket:bucket_lava"},
+		{"","default:mese_crystal",""},
+		{"","default:mese_crystal",""},
+	}
+}
+)
+
+minetest.register_craft(
+{
+	output = "staffmagic:staff_clone",
+	recipe = {
+		{"default:mese_crystal","default:diamondblock","default:mese_crystal"},
+		{"","default:obsidian_shard",""},
+		{"","default:obsidian_shard",""},
+	}
+}
+)
+minetest.register_craft(
+{
+	output = "staffmagic:staff_sending",
+	recipe = {
+		{"default:mese_crystal_fragment","default:apple","default:mese_crystal_fragment"},
+		{"","default:obsidian_shard",""},
+		{"","default:obsidian_shard",""},
+	}
+}
+)
+minetest.register_craft(
+{
+	output = "staffmagic:staff_boom",
+	recipe = {
+		{"default:mese","bucket:bucket_lava","default:mese"},
+		{"tnt:gunpowder","default:obsidian","tnt:gunpowder"},
+		{"tnt:gunpowder","default:obsidian","tnt:gunpowder"},
 	}
 }
 )
