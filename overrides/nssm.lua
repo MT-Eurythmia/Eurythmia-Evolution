@@ -39,6 +39,7 @@ end
 
 -- function register_energy_ball(itemname,desc,boost,duration)
 register_energy_ball("life_energy","Life Energy",1,2.0)
+register_energy_ball("energy_globe","Energy Globe",1,2.0)
 register_energy_ball("great_energy_globe","Great Energy Globe",2,2.0)
 register_energy_ball("superior_energy_globe","Superior Energy Globe",2,10.0)
 
