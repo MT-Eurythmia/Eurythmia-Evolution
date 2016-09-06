@@ -1,1 +1,1 @@
-Adds vending and depositing machines which allow to buy and sell items with gold ingots.
+Adds vending and depositing machines which allow to buy and sell items from other players.
