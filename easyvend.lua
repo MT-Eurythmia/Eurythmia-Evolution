@@ -456,8 +456,6 @@ easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
         itemname=itemstack:get_name()
 	meta:set_string("itemname", itemname)
         meta:set_int("configmode", 0)
-    
-        local change = easyvend.machine_check(pos, node)
 
         if itemname == currency and number == cost and cost <= cost_stack_max then
 	    meta:set_string("message", "Configuration successful. I am feeling funny.")
@@ -466,6 +464,8 @@ easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
         else
 	    meta:set_string("message", "Configuration successful.")
         end
+
+        local change = easyvend.machine_check(pos, node)
 
 	if not change then
 		if (node.name == "easyvend:vendor_on" or node.name == "easyvend:depositor_on") then
