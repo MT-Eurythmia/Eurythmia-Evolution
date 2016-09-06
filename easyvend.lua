@@ -177,8 +177,10 @@ easyvend.set_formspec = function(pos, player)
 			weartext = "Sell worn tools"
 			weartooltip = "If disabled, only tools in perfect condition will be sold (only settable by owner)"
 		end
-		formspec = formspec .."checkbox[2,2.4;wear;"..minetest.formspec_escape(weartext)..";"..wear.."]"
-		.."tooltip[wear;"..minetest.formspec_escape(weartooltip).."]"
+		if minetest.registered_tools[meta:get_string("itemname")] ~= nil then
+			formspec = formspec .."checkbox[2,2.4;wear;"..minetest.formspec_escape(weartext)..";"..wear.."]"
+			.."tooltip[wear;"..minetest.formspec_escape(weartooltip).."]"
+		end
 	else
 		local itemname = meta:get_string("itemname")
 		formspec = formspec
@@ -969,6 +971,8 @@ easyvend.allow_metadata_inventory_put = function(pos, listname, index, stack, pl
                 inv:set_stack( "item", 1, nil )
             else
                 inv:set_stack( "item", 1, stack:get_name() )
+                meta:set_string("itemname", stack:get_name())
+                easyvend.set_formspec(pos, player)
             end
         end
     end
