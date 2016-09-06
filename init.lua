@@ -28,7 +28,7 @@ dofile(minetest.get_modpath("easyvend") .. "/easyvend.lua")
 
 local sounds
 local soundsplus = {
-	place = { name = "easyvend_activate", gain = 1 },
+	place = { name = "easyvend_disable", gain = 1 },
 	dug = { name = "easyvend_disable", gain = 1 }, }
 if minetest.get_modpath("default") ~= nil then
 	sounds = default.node_sound_wood_defaults(soundsplus)
