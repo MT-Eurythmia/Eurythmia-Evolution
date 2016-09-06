@@ -96,6 +96,16 @@ easyvend.buysell = function(nodename)
 	return buysell
 end
 
+easyvend.is_active = function(nodename)
+	if ( nodename == "easyvend:depositor_on" or nodename == "easyvend:vendor_on" ) then
+		return true
+	elseif ( nodename == "easyvend:depositor" or nodename == "easyvend:vendor" ) then
+		return false
+	else
+		return nil
+	end
+end
+
 easyvend.set_formspec = function(pos, player)
 	local meta = minetest.get_meta(pos)
 	local node = minetest.get_node(pos)
@@ -367,6 +377,12 @@ easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
  
     if fields.config then
         meta:set_int("configmode", 1)
+	local was_active = easyvend.is_active(node.name)
+	if was_active then
+		meta:set_string("message", "Configuration mode activated; machine disabled.")
+	else
+		meta:set_string("message", "Configuration mode activated.")
+	end
 	easyvend.machine_check(pos, node)
 	return
     end
