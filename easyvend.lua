@@ -475,7 +475,6 @@ easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
 			easyvend.sound_disable(pos)
 		end
 	end
-        easyvend.machine_check(pos, node)
 end
 
 easyvend.make_infotext = function(nodename, owner, cost, number, itemstring)
