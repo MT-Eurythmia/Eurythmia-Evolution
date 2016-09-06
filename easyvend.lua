@@ -113,6 +113,7 @@ easyvend.set_formspec = function(pos, player)
 	local description = minetest.registered_nodes[node.name].description;
 	local number = meta:get_int("number")
 	local cost = meta:get_int("cost")
+	local itemname = meta:get_string("itemname")
         local bg = ""
 	local configmode = meta:get_int("configmode") == 1
         if minetest.get_modpath("default") then
@@ -144,6 +145,8 @@ easyvend.set_formspec = function(pos, player)
 		status_image = "easyvend_status_off.png"
 	end
 
+	-- TODO: Expose number of items in stock
+
 	local formspec = "size[8,7.3;]"
         .. bg
 	.."label[3,-0.2;" .. minetest.formspec_escape(description) .. "]"
@@ -155,6 +158,7 @@ easyvend.set_formspec = function(pos, player)
 		.."label[0,-0.15;"..numbertext.."]"
 		.."label[0,1.2;"..costtext.."]"
         .."list[current_player;main;0,3.5;8,4;]"
+
 	if configmode then
 		local wear = "false"
 		if meta:get_int("wear") == 1 then wear = "true" end
@@ -177,7 +181,7 @@ easyvend.set_formspec = function(pos, player)
 			weartext = "Sell worn tools"
 			weartooltip = "If disabled, only tools in perfect condition will be sold (only settable by owner)"
 		end
-		if minetest.registered_tools[meta:get_string("itemname")] ~= nil then
+		if minetest.registered_tools[itemname] ~= nil then
 			formspec = formspec .."checkbox[2,2.4;wear;"..minetest.formspec_escape(weartext)..";"..wear.."]"
 			.."tooltip[wear;"..minetest.formspec_escape(weartooltip).."]"
 		end
@@ -260,13 +264,31 @@ easyvend.machine_check = function(pos, node)
 	local machine_owner = meta:get_string("owner")
 	local check_wear = meta:get_int("wear") == 0
 	local chestdef = registered_chests[chest.name]
+	local chest_meta, chest_inv
 
 	if chestdef then
-		local chest_meta = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z})
-		local chest_inv = chest_meta:get_inventory()
+		chest_meta = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z})
+		chest_inv = chest_meta:get_inventory()
 
 		if ( chest_meta:get_string(chestdef.meta_owner) == machine_owner and chest_inv ~= nil ) then
 			local buysell = easyvend.buysell(node.name)
+
+			local checkstack, checkitem
+			if buysell == "buy" then
+				checkitem = currency
+			else
+				checkitem = itemname
+			end
+			local stock = 0
+			-- Count stock
+			-- FIXME: Ignore tools with bad wear level
+			for i=1,chest_inv:get_size(chestdef.inv_list) do
+				checkstack = chest_inv:get_stack(chestdef.inv_list, i)
+				if checkstack:get_name() == checkitem then
+					stock = stock + checkstack:get_count()
+				end
+			end
+			meta:set_int("stock", stock)
 
 			if not itemstack:is_empty() then
 
@@ -326,10 +348,12 @@ easyvend.machine_check = function(pos, node)
 				status = "Awaiting configuration by owner."
 			end
 		else
+			meta:set_int("stock", 0)
 			active = false
                         status = "Storage can’t be accessed because it is owned by a different person!"
 		end
 	else
+		meta:set_int("stock", 0)
 		active = false
                 status = "No storage; machine needs a locked chest below it."
         end
@@ -476,7 +500,6 @@ easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
 	if not change then
 		if (node.name == "easyvend:vendor_on" or node.name == "easyvend:depositor_on") then
 			easyvend.sound_setup(pos)
-			meta:set_string("status", "Ready.")
 		else
 			easyvend.sound_disable(pos)
 		end
@@ -567,7 +590,6 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            player_inv:add_item("main", stack)
                        end
                        chest_inv:add_item("main", price)
-                       meta:set_string("status", "Ready.")
                        if itemname == currency and number == cost and cost <= cost_stack_max then
                            meta:set_string("message", easyvend.get_joke(buysell, meta:get_int("joke_id")))
                            meta:set_int("joketimer", joketimer_start)
@@ -575,6 +597,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            meta:set_string("message", "Item bought.")
                        end
                        easyvend.sound_vend(pos)
+                       easyvend.machine_check(pos, node)
                    else
                        -- Large item counts (multiple stacks)
                        local coststacks = math.modf(cost / cost_stack_max)
@@ -640,6 +663,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            end
                            meta:set_string("message", "Item bought.")
                            easyvend.sound_vend(pos)
+                           easyvend.machine_check(pos, node)
                        end
                    end
                 elseif chest_has and player_has then
@@ -688,6 +712,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            meta:set_string("message", "Item sold.")
                        end
                        easyvend.sound_deposit(pos)
+                       easyvend.machine_check(pos, node)
                    else
                        -- Large item counts (multiple stacks)
                        local coststacks = math.modf(cost / cost_stack_max)
@@ -753,6 +778,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            end
                            meta:set_string("message", "Item sold.")
                            easyvend.sound_deposit(pos)
+                           easyvend.machine_check(pos, node)
                        end
                     end
                 elseif chest_has and player_has then
@@ -816,6 +842,7 @@ easyvend.after_place_node = function(pos, placer)
     meta:set_string("message", "Welcome! Please prepare the machine.")
     meta:set_int("number", 1)
     meta:set_int("cost", 1)
+    meta:set_int("stock", -1)
     meta:set_int("configmode", 1)
     meta:set_int("joketimer", -1)
     meta:set_int("joke_id", 1)
