@@ -856,7 +856,7 @@ easyvend.on_receive_fields = function(pos, formname, fields, sender)
 		if sender:get_player_name() == owner then
 			easyvend.on_receive_fields_config(pos, formname, fields, sender)
 		else
-			meta:set_string("message", "Only owner may change the configuration.")
+			meta:set_string("message", "Only the owner may change the configuration.")
 			easyvend.sound_error(sendername)
 			easyvend.set_formspec(pos, sender)
 			return
@@ -881,7 +881,7 @@ easyvend.on_receive_fields = function(pos, formname, fields, sender)
 			easyvend.set_formspec(pos, sender)
 			return
 		else
-			meta:set_string("message", "Only owner may change the configuration.")
+			meta:set_string("message", "Only the owner may change the configuration.")
 			easyvend.sound_error(sendername)
 			easyvend.set_formspec(pos, sender)
 			return
