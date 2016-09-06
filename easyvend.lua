@@ -21,15 +21,8 @@
 -- TODO: Improve mod compability
 local slots_max = 31
 
--- Set item which is used as payment for vending and depositing machines
-local currency = minetest.setting_get("easyvend_currency")
-if currency == nil or minetest.registered_items[currency] == nil then
-	currency = "default:gold_ingot"
-end
-
-local currency_desc = minetest.registered_items[currency].description
 local registered_chests = {}
-local cost_stack_max = minetest.registered_items[currency].stack_max
+local cost_stack_max = minetest.registered_items[easyvend.currency].stack_max
 local maxcost = cost_stack_max * slots_max
 
 local joketimer_start = 3
@@ -163,7 +156,7 @@ easyvend.set_formspec = function(pos, player)
 		local wear = "false"
 		if meta:get_int("wear") == 1 then wear = "true" end
 		formspec = formspec
-                .."item_image_button[0,1.65;1,1;"..currency..";currency_image;]"
+                .."item_image_button[0,1.65;1,1;"..easyvend.currency..";easyvend.currency_image;]"
                 .."list[current_name;item;0,0.35;1,1;]"
                 .."listring[current_player;main]"
                 .."listring[current_name;item]"
@@ -188,7 +181,7 @@ easyvend.set_formspec = function(pos, player)
 	else
 		local itemname = meta:get_string("itemname")
 		formspec = formspec
-                .."item_image_button[0,1.65;1,1;"..currency..";currency_image;]"
+                .."item_image_button[0,1.65;1,1;"..easyvend.currency..";easyvend.currency_image;]"
                 .."item_image_button[0,0.35;1,1;"..itemname..";item_image;]"
 		.."label[1,1.85;×" .. cost .. "]"
 		.."label[1,0.55;×" .. number .. "]"
@@ -275,7 +268,7 @@ easyvend.machine_check = function(pos, node)
 
 			local checkstack, checkitem
 			if buysell == "buy" then
-				checkitem = currency
+				checkitem = easyvend.currency
 			else
 				checkitem = itemname
 			end
@@ -295,7 +288,7 @@ easyvend.machine_check = function(pos, node)
 				local number_stack_max = itemstack:get_stack_max()
 
 				local stack = {name=itemname, count=number, wear=0, metadata=""}
-				local price = {name=currency, count=cost, wear=0, metadata=""}
+				local price = {name=easyvend.currency, count=cost, wear=0, metadata=""}
 
 				local chest_has, chest_free
 
@@ -362,7 +355,7 @@ easyvend.machine_check = function(pos, node)
 		status = "Awaiting configuration by owner."
 	end
 
-        if itemname == currency and number == cost and active then
+        if itemname == easyvend.currency and number == cost and active then
             local jt = meta:get_int("joketimer")
             if jt > 0 then
                 jt = jt - 1
@@ -487,7 +480,7 @@ easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
 	meta:set_string("itemname", itemname)
         meta:set_int("configmode", 0)
 
-        if itemname == currency and number == cost and cost <= cost_stack_max then
+        if itemname == easyvend.currency and number == cost and cost <= cost_stack_max then
 	    meta:set_string("message", "Configuration successful. I am feeling funny.")
 	    meta:set_int("joketimer", joketimer_start)
 	    meta:set_int("joke_id", easyvend.assign_joke(buysell))
@@ -517,9 +510,9 @@ easyvend.make_infotext = function(nodename, owner, cost, number, itemstring)
 		printitem = string.format("%d×%s", number, iname)
 	end
 	if cost == 1 then
-		printcost = currency_desc
+		printcost = easyvend.currency_desc
 	else
-		printcost = string.format("%d×%s", cost, currency_desc)
+		printcost = string.format("%d×%s", cost, easyvend.currency_desc)
 	end
 	if nodename == "easyvend:vendor_on" then
 		d = string.format("Vending machine (owned by %s)\nSelling: %s\nPrice: %s", owner, printitem, printcost)
@@ -570,7 +563,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
         if ( chest_meta:get_string(chestdef.meta_owner) == meta:get_string("owner") and chest_inv ~= nil and player_inv ~= nil ) then
             
             local stack = {name=itemname, count=number, wear=0, metadata=""} 
-            local price = {name=currency, count=cost, wear=0, metadata=""}
+            local price = {name=easyvend.currency, count=cost, wear=0, metadata=""}
             local chest_has, player_has, chest_free, player_free, chest_out, player_out
             local msg = ""
             if buysell == "sell" then
@@ -590,7 +583,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            player_inv:add_item("main", stack)
                        end
                        chest_inv:add_item("main", price)
-                       if itemname == currency and number == cost and cost <= cost_stack_max then
+                       if itemname == easyvend.currency and number == cost and cost <= cost_stack_max then
                            meta:set_string("message", easyvend.get_joke(buysell, meta:get_int("joke_id")))
                            meta:set_int("joketimer", joketimer_start)
                        else
@@ -705,7 +698,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                        chest_inv:remove_item("main", price)
                        player_inv:add_item("main", price)
                        meta:set_string("status", "Ready.")
-                       if itemname == currency and number == cost and cost <= cost_stack_max then
+                       if itemname == easyvend.currency and number == cost and cost <= cost_stack_max then
                            meta:set_string("message", easyvend.get_joke(buysell, meta:get_int("joke_id")))
                            meta:set_int("joketimer", joketimer_start)
                        else
@@ -826,7 +819,7 @@ easyvend.after_place_node = function(pos, placer)
     inv:set_size("item", 1)
     inv:set_size("gold", 1)
     
-    inv:set_stack( "gold", 1, currency )
+    inv:set_stack( "gold", 1, easyvend.currency )
 
     local d = ""
     if node.name == "easyvend:vendor" then
