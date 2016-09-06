@@ -344,7 +344,11 @@ easyvend.machine_check = function(pos, node)
                 jt = jt - 1
             end
             if jt == 0 then
-                meta:set_string("message", "Ready.")
+                if buysell == "sell" then
+                    meta:set_string("message", "Item bought.")
+                else
+                    meta:set_string("message", "Item sold.")
+                end
                 jt = -1
             end
             meta:set_int("joketimer", jt)
