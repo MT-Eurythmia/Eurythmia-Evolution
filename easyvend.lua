@@ -477,10 +477,14 @@ easyvend.make_infotext = function(nodename, owner, cost, number, itemstring)
 	else
 		printcost = string.format("%d×%s", cost, currency_desc)
 	end
-	if nodename == "easyvend:vendor" or nodename == "easyvend:vendor_on" then
+	if nodename == "easyvend:vendor_on" then
 		d = string.format("Vending machine (owned by %s)\nSelling: %s\nPrice: %s", owner, printitem, printcost)
-	elseif nodename == "easyvend:depositor" or nodename == "easyvend:depositor_on" then
+	elseif nodename == "easyvend:vendor" then
+		d = string.format("Inactive vending machine (owned by %s)\nSelling: %s\nPrice: %s", owner, printitem, printcost)
+	elseif nodename == "easyvend:depositor_on" then
 		d = string.format("Depositing machine (owned by %s)\nBuying: %s\nPayment: %s", owner, printitem, printcost)
+	elseif nodename == "easyvend:depositor" then
+		d = string.format("Inactive depositing machine (owned by %s)\nBuying: %s\nPayment: %s", owner, printitem, printcost)
 	end
 	return d
 end
@@ -779,10 +783,10 @@ easyvend.after_place_node = function(pos, placer)
 
     local d = ""
     if node.name == "easyvend:vendor" then
-        d = string.format("New vending machine (owned by %s)", player_name)
+        d = string.format("Inactive vending machine (owned by %s)", player_name)
         meta:set_int("wear", 1)
     elseif node.name == "easyvend:depositor" then
-        d = string.format("New depositing machine (owned by %s)", player_name)
+        d = string.format("Inactive depositing machine (owned by %s)", player_name)
         meta:set_int("wear", 0)
     end
     meta:set_string("infotext", d)
