@@ -29,7 +29,7 @@ end
 
 local currency_desc = minetest.registered_items[currency].description
 local registered_chests = {}
-local cost_stack_max = ItemStack(currency):get_stack_max()
+local cost_stack_max = minetest.registered_items[currency].stack_max
 local maxcost = cost_stack_max * slots_max
 
 local joketimer_start = 3
