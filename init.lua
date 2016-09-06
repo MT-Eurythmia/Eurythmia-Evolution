@@ -62,6 +62,10 @@ local machine_template = {
 	on_punch = easyvend.machine_check,
 }
 
+if minetest.get_modpath("screwdriver") ~= nil then
+	machine_template.on_rotate = screwdriver.rotate_simple
+end
+
 local vendor_on = table.copy(machine_template)
 vendor_on.description = "Vending Machine"
 vendor_on.tile_images ={"easyvend_vendor_side.png", "easyvend_vendor_bottom.png", "easyvend_vendor_side.png",
