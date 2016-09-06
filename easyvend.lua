@@ -109,19 +109,16 @@ easyvend.set_formspec = function(pos, player)
             bg = default.gui_bg .. default.gui_bg_img .. default.gui_slots
         end
 
-        local numbertext, costtext, numbertooltip, costtooltip, buysellbuttontext
+        local numbertext, costtext, buysellbuttontext
+	local itemcounttooltip = "Item count (append “s” to multiply with maximum stack size)"
         local buysell = easyvend.buysell(node.name)
         if buysell == "sell" then
 		numbertext = "Offered item"
-		numbertooltip = "Number of items being sold for the specified price"
 		costtext = "Price"
-		costtooltip = "How much the user is asked to pay for the offered item"
 		buysellbuttontext = "Buy"
         elseif buysell == "buy" then
 		numbertext = "Requested item"
-		numbertooltip = "Number of items the user is asked to supply"
 		costtext = "Payment"
-		costtooltip = "How much will be given to the user in return"
 		buysellbuttontext = "Sell"
         else
 		return
@@ -157,17 +154,18 @@ easyvend.set_formspec = function(pos, player)
                 .."listring[current_player;main]"
                 .."listring[current_name;item]"
 		.."field[1.3,0.65;1.5,1;number;;" .. number .. "]"
-		.."tooltip[number;"..numbertooltip.."]"
+		.."tooltip[number;"..itemcounttooltip.."]"
 		.."field[1.3,1.95;1.5,1;cost;;" .. cost .. "]"
-		.."tooltip[cost;"..costtooltip.."]"
+		.."tooltip[cost;"..itemcounttooltip.."]"
 		.."button[6,2.8;2,0.5;save;Confirm]"
+		.."tooltip[save;Confirm configuration and activate machine (only for owner)]"
 		local weartext, weartooltip
 		if buysell == "buy" then
 			weartext = "Accept worn tools"
-			weartooltip = "If disabled, only tools in perfect condition will be bought from sellers."
+			weartooltip = "If disabled, only tools in perfect condition will be bought from sellers (only settable by owner)"
 		else
 			weartext = "Sell worn tools"
-			weartooltip = "If disabled, only tools in perfect condition will be sold."
+			weartooltip = "If disabled, only tools in perfect condition will be sold (only settable by owner)"
 		end
 		formspec = formspec .."checkbox[2,2.4;wear;"..minetest.formspec_escape(weartext)..";"..wear.."]"
 		.."tooltip[wear;"..minetest.formspec_escape(weartooltip).."]"
@@ -179,7 +177,12 @@ easyvend.set_formspec = function(pos, player)
 		.."label[1,1.85;×" .. cost .. "]"
 		.."label[1,0.55;×" .. number .. "]"
 		.."button[6,2.8;2,0.5;config;Configure]"
-		.."button[0,2.8;2,0.5;buysell;"..buysellbuttontext.."]"
+		if buysell == "sell" then
+			formspec = formspec .. "tooltip[config;Configure offered items and price (only for owner)]"
+		else
+			formspec = formspec .. "tooltip[config;Configure requested items and payment (only for owner)]"
+		end
+		formspec = formspec .."button[0,2.8;2,0.5;buysell;"..buysellbuttontext.."]"
 		if minetest.registered_tools[itemname] ~= nil then
 			local weartext
 			if meta:get_int("wear") == 0 then
