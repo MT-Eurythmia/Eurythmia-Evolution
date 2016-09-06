@@ -51,6 +51,7 @@ mobs:register_mob("mobs_monster:lava_flan", {
 	},
 	on_die = function(self, pos)
 		minetest.set_node(pos, {name = "fire:basic_flame"})
+		self.object:remove()
 	end,
 })
 
