@@ -154,7 +154,7 @@ minetest.register_tool("staffmagic:staff_stack", { -- this will be the wall staf
 		local relpos = (userpos.y - pos.y)/math.sqrt((userpos.y - pos.y)^2)
 		local lower = 0 ; local higher = 0
 
-		if staffmagic:isforbidden(targetnode) and stafflevel < 90 then
+		if staffmagic:isforbidden(targetnode) then
 			staffmagic:hurtplayer(user)
 			return
 			--targetnode = "default:dirt"
@@ -223,7 +223,7 @@ minetest.register_tool("staffmagic:staff_clone", {
 			return
 		end
 
-		if staffmagic:isforbidden(targetnode) and stafflevel < 90 then
+		if staffmagic:isforbidden(targetnode) then
 			staffmagic:hurtplayer(user)
 			return
 		end
