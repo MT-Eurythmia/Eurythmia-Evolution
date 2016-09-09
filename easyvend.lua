@@ -1072,30 +1072,13 @@ if minetest.setting_getbool("easyvend_convert_vendor") == true then
 			if itemname == "" or itemname == nil then
 				itemname = meta:get_string("itemtype")
 			end
-			local configmode = 1
-			if itemname == "" or itemname == nil then
-				-- If no itemname set, try to scan first item in chest below
-				local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
-				if chest.name == "default:chest_locked" then
-					local chest_meta = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z})
-					local chest_inv = chest_meta:get_inventory()
-					if ( chest_meta:get_string("owner") == machine_owner and chest_inv ~= nil ) then
-					end
-					for i=1,chest_inv:get_size("main") do
-						checkstack = chest_inv:get_stack("main", i)
-						if not checkstack:is_empty() then
-							itemname = checkstack:get_name()
-							break
-						end
-					end
-				end
-			end
 			if itemname ~= "" and itemname ~= nil then
 				inv:set_stack("item", 1, itemname)
 				meta:set_string("itemname", itemname)
 			end
 
 			-- Check for valid item, item count and price
+			local configmode = 1
 			if itemname ~= "" and itemname ~= nil then
 				local itemstack = inv:get_stack("item", 1)
 				local number_stack_max = itemstack:get_stack_max()
@@ -1103,6 +1086,7 @@ if minetest.setting_getbool("easyvend_convert_vendor") == true then
 				local cost = meta:get_int("cost")
 				local number = meta:get_int("number")
 				if number >= 1 and number <= maxnumber and cost >= 1 and cost <= maxcost then
+					-- Everything's OK, get out of config mode!
 					configmode = 0
 				end
 			end
