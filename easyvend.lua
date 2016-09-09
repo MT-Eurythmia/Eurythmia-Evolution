@@ -1046,7 +1046,9 @@ if minetest.setting_getbool("easyvend_convert_vendor") == true then
 			elseif node.name == "vendor:depositor" then
 				newnodename = "easyvend:depositor"
 			end
-			minetest.swap_node(pos, { name = newnodename, param2 = node.param2 })
+			-- Remove axis rotation; only allow 4 facedirs
+			local p2 = math.fmod(node.param2, 4)
+			minetest.swap_node(pos, { name = newnodename, param2 = p2 })
 
 			-- Initialize metadata
 			local meta = minetest.get_meta(pos)
