@@ -283,56 +283,63 @@ easyvend.machine_check = function(pos, node)
 			meta:set_int("stock", stock)
 
 			if not itemstack:is_empty() then
-
 				local number_stack_max = itemstack:get_stack_max()
+				if number >= 1 and number < number_stack_max and cost >= 1 and cost <= cost_stack_max then
+					local stack = {name=itemname, count=number, wear=0, metadata=""}
+					local price = {name=easyvend.currency, count=cost, wear=0, metadata=""}
 
-				local stack = {name=itemname, count=number, wear=0, metadata=""}
-				local price = {name=easyvend.currency, count=cost, wear=0, metadata=""}
+					local chest_has, chest_free
 
-				local chest_has, chest_free
+					local coststacks = math.modf(cost / cost_stack_max)
+					local costremainder = math.fmod(cost, cost_stack_max)
+					local numberstacks = math.modf(number / number_stack_max)
+					local numberremainder = math.fmod(number, number_stack_max)
+					local numberfree = numberstacks
+					local costfree = coststacks
+					if numberremainder > 0 then numberfree = numberfree + 1 end
+					if costremainder > 0 then costfree = costfree + 1 end
 
-				local coststacks = math.modf(cost / cost_stack_max)
-				local costremainder = math.fmod(cost, cost_stack_max)
-				local numberstacks = math.modf(number / number_stack_max)
-				local numberremainder = math.fmod(number, number_stack_max)
-				local numberfree = numberstacks
-				local costfree = coststacks
-				if numberremainder > 0 then numberfree = numberfree + 1 end
-				if costremainder > 0 then costfree = costfree + 1 end
-
-				if buysell == "sell" then
-					chest_has = easyvend.check_and_get_items(chest_inv, chestdef.inv_list, stack, check_wear)
-					chest_free = chest_inv:room_for_item(chestdef.inv_list, price)
-			                if chest_has and chest_free then
-						if cost <= cost_stack_max and number <= number_stack_max then
-							active = true
-						elseif easyvend.free_slots(chest_inv, chestdef.inv_list) < costfree then
+					if buysell == "sell" then
+						chest_has = easyvend.check_and_get_items(chest_inv, chestdef.inv_list, stack, check_wear)
+						chest_free = chest_inv:room_for_item(chestdef.inv_list, price)
+				                if chest_has and chest_free then
+							if cost <= cost_stack_max and number <= number_stack_max then
+								active = true
+							elseif easyvend.free_slots(chest_inv, chestdef.inv_list) < costfree then
+								active = false
+								status = "No room in the machine’s storage!"
+							end
+						elseif not chest_has then
+							active = false
+							status = "The vending machine has insufficient materials!"
+						elseif not chest_free then
 							active = false
 							status = "No room in the machine’s storage!"
 						end
-					elseif not chest_has then
-						active = false
-						status = "The vending machine has insufficient materials!"
-					elseif not chest_free then
-						active = false
-						status = "No room in the machine’s storage!"
+					elseif buysell == "buy" then
+						chest_has = easyvend.check_and_get_items(chest_inv, chestdef.inv_list, price, check_wear)
+						chest_free = chest_inv:room_for_item(chestdef.inv_list, stack)
+				                if chest_has and chest_free then
+							if cost <= cost_stack_max and number <= number_stack_max then
+								active = true
+							elseif easyvend.free_slots(chest_inv, chestdef.inv_list) < numberfree then
+								active = false
+								status = "No room in the machine’s storage!"
+							end
+						elseif not chest_has then
+							active = false
+							status = "The depositing machine is out of money!"
+						elseif not chest_free then
+							active = false
+							status = "No room in the machine’s storage!"
+						end
 					end
-				elseif buysell == "buy" then
-					chest_has = easyvend.check_and_get_items(chest_inv, chestdef.inv_list, price, check_wear)
-					chest_free = chest_inv:room_for_item(chestdef.inv_list, stack)
-			                if chest_has and chest_free then
-						if cost <= cost_stack_max and number <= number_stack_max then
-							active = true
-						elseif easyvend.free_slots(chest_inv, chestdef.inv_list) < numberfree then
-							active = false
-							status = "No room in the machine’s storage!"
-						end
-					elseif not chest_has then
-						active = false
-						status = "The depositing machine is out of money!"
-					elseif not chest_free then
-						active = false
-						status = "No room in the machine’s storage!"
+				else
+					active = false
+					if buysell == "sell" then
+						status = "Invalid item count or price."
+					else
+						status = "Invalid item count or payment."
 					end
 				end
 			else

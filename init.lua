@@ -149,8 +149,15 @@ if minetest.get_modpath("vendor") == nil then
 					meta:set_string("itemname", itemname)
 				end
 			end
-			if itemname ~= "" and itemname ~= nil and meta:get_int("gold") >= 1 or meta:get_int("number") >= 1 then
-				configmode = 0
+			if itemname ~= "" and itemname ~= nil then
+				local itemstack = inv:get_stack("item", 1)
+				local number_stack_max = itemstack:get_stack_max()
+				local cost_stack_max = 99*31 -- FIXME: Get real cost_stack_max!!!
+				local cost = meta:get_int("cost")
+				local number = meta:get_int("number")
+				if number >= 1 and number <= number_stack_max and cost >= 1 and cost <= cost_stack_max then
+					configmode = 0
+				end
 			end
 
 			local owner = meta:get_string("owner")
