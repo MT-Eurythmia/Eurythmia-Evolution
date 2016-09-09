@@ -21,6 +21,12 @@
 -- TODO: Improve mod compability
 local slots_max = 31
 
+local traversable_node_types = {
+	["easyvend:vendor"] = true,
+	["easyvend:depositor"] = true,
+	["easyvend:vendor_on"] = true,
+	["easyvend:depositor_on"] = true,
+}
 local registered_chests = {}
 local cost_stack_max = minetest.registered_items[easyvend.currency].stack_max
 local maxcost = cost_stack_max * slots_max
@@ -30,6 +36,7 @@ local joketimer_start = 3
 -- Allow for other mods to register custom chests
 easyvend.register_chest = function(node_name, inv_list, meta_owner)
 	registered_chests[node_name] = { inv_list = inv_list, meta_owner = meta_owner }
+	traversable_node_types[node_name] = true
 end
 
 -- Partly a wrapper around contains_item, but does special treatment if the item
@@ -250,24 +257,29 @@ easyvend.machine_check = function(pos, node)
 	local active = true
 	local status = "Ready."
 
-	local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
 	local meta = minetest.get_meta(pos)
+
+	local machine_owner = meta:get_string("owner")
 	local number = meta:get_int("number")
 	local cost = meta:get_int("cost")
+	local itemname = meta:get_string("itemname")
+	local check_wear = meta:get_int("wear") == 0
 	local inv = meta:get_inventory()
 	local itemstack = inv:get_stack("item",1)
-	local itemname=meta:get_string("itemname")
-	local machine_owner = meta:get_string("owner")
-	local check_wear = meta:get_int("wear") == 0
-	local chestdef = registered_chests[chest.name]
-	local chest_meta, chest_inv
+	local buysell = easyvend.buysell(node.name)
+
+        local chest_pos = easyvend.find_connected_chest(machine_owner, pos, itemname, number, buysell == "sell")
+	local chest, chestdef, chest_meta, chest_inv
+	if chest_pos ~= nil then
+		chest = minetest.get_node(chest_pos)
+		chestdef = registered_chests[chest.name]
+	end
 
 	if chestdef then
-		chest_meta = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z})
+		chest_meta = minetest.get_meta(chest_pos)
 		chest_inv = chest_meta:get_inventory()
 
 		if ( chest_meta:get_string(chestdef.meta_owner) == machine_owner and chest_inv ~= nil ) then
-			local buysell = easyvend.buysell(node.name)
 
 			local checkstack, checkitem
 			if buysell == "buy" then
@@ -567,11 +579,14 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
 		return
 	end
 
-    
-    local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
-    local chestdef = registered_chests[chest.name]
+    local chest_pos = easyvend.find_connected_chest(sendername, pos, itemname, number, buysell == "sell")
+    local chest, chestdef
+    if chest_pos ~= nil then
+        chest = minetest.get_node(chest_pos)
+        chestdef = registered_chests[chest.name]
+    end
     if chestdef and sender and sender:is_player() then
-        local chest_meta = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z})
+        local chest_meta = minetest.get_meta(chest_pos)
         local chest_inv = chest_meta:get_inventory()
         local player_inv = sender:get_inventory()
         if ( chest_meta:get_string(chestdef.meta_owner) == meta:get_string("owner") and chest_inv ~= nil and player_inv ~= nil ) then
@@ -844,7 +859,6 @@ easyvend.after_place_node = function(pos, placer)
         meta:set_int("wear", 0)
     end
     meta:set_string("infotext", d)
-    local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
     meta:set_string("status", "Awaiting configuration by owner.")
     meta:set_string("message", "Welcome! Please prepare the machine.")
     meta:set_int("number", 1)
@@ -863,12 +877,17 @@ end
 easyvend.can_dig = function(pos, player)
     local meta = minetest.get_meta(pos)
     local name = player:get_player_name()
+    local owner = meta:get_string("owner")
     -- Owner can always dig shop
-    if meta:get_string("owner") == name then
+    if owner == name then
         return true
     end
-    local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
-    local meta_chest = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z});
+    local chest_pos = easyvend.get_connected_chest(owner, pos)
+    local chest, meta_chest
+    if chest_pos then
+        chest = minetest.get_node(chest_pos)
+        meta_chest = minetest.get_meta(chest_pos)
+    end
     if registered_chests[chest.name] then
          if player and player:is_player() then
             local owner_chest = meta_chest:get_string(registered_chests[chest.name].meta_owner)
@@ -987,7 +1006,7 @@ easyvend.sound_disable = function(pos)
 	minetest.sound_play("easyvend_disable", {pos = pos, gain = 0.9, max_hear_distance = 12,})
 end
 
-easyvend.sound_vend = function(pos) 
+easyvend.sound_vend = function(pos)
 	minetest.sound_play("easyvend_vend", {pos = pos, gain = 0.4, max_hear_distance = 5,})
 end
 
@@ -995,6 +1014,102 @@ easyvend.sound_deposit = function(pos)
 	minetest.sound_play("easyvend_deposit", {pos = pos, gain = 0.4, max_hear_distance = 5,})
 end
 
+--[[ Tower building ]]
+
+easyvend.is_traversable = function(pos)
+	local node = minetest.get_node_or_nil(pos)
+	if (node == nil) then
+		return false
+	end
+	return traversable_node_types[node.name] == true
+end
+
+easyvend.neighboring_nodes = function(pos)
+	local check = {
+		{x=pos.x, y=pos.y+1, z=pos.z},
+		{x=pos.x, y=pos.y-1, z=pos.z},
+	}
+	local trav = {}
+	for i=1,#check do
+		if easyvend.is_traversable(check[i]) then
+			trav[#trav+1] = check[i]
+		end
+	end
+	return trav
+end
+
+easyvend.find_connected_chest = function(owner, pos, nodename, amount, removing)
+	local nodes = easyvend.neighboring_nodes(pos)
+
+	if (#nodes < 1 or  #nodes > 2) then
+		return nil
+	end
+
+	-- Find the stack direction
+	local first = nil
+	local second = nil
+	for i=1,#nodes do
+		if ( first == nil ) then
+			first = nodes[i]
+		else
+			second = nodes[i]
+		end
+	end
+
+	if (first ~= nil and second ~= nil) then
+		local dx = (first.x - second.x)/2
+		local dy = (first.y - second.y)/2
+		local dz = (first.z - second.z)/2
+		-- make sure they are in a column/row
+		if ( (dx * dx + dy * dy + dz * dz) ~= 1 ) then
+			return nil
+		end
+		local chest_pos = easyvend.find_chest(owner, pos, dx, dy, dz, nodename, amount, removing)
+		if ( chest_pos == nil ) then
+			chest_pos = easyvend.find_chest(owner, pos, -dx, -dy, -dz, nodename, amount, removing)
+		end
+		return chest_pos
+	else
+		local dx = first.x - pos.x
+		local dy = first.y - pos.y
+		local dz = first.z - pos.z
+		return easyvend.find_chest(owner, pos, dx, dy, dz, nodename, amount, removing)
+	end
+end
+
+easyvend.find_chest = function(owner, pos, dx, dy, dz, nodename, amount, removing)
+	pos = {x=pos.x + dx, y=pos.y + dy, z=pos.z + dz}
+
+	local node = minetest.get_node_or_nil(pos)
+	if ( node == nil ) then
+		return nil
+	end
+	local chestdef = registered_chests[node.name]
+	if (chestdef ~= nil) then
+		local meta = minetest.get_meta(pos)
+		if (chestdef ~= nil and owner ~= meta:get_string(chestdef.meta_owner)) then
+			return nil
+		end
+		local inv = meta:get_inventory()
+		if (inv ~= nil) then
+			if (nodename ~= nil and amount ~= nil and removing ~= nil) then
+				if (removing and inv:contains_item(chestdef.inv_list, nodename .. " " .. amount)) then
+					return pos
+				elseif ((not removing) and inv:room_for_item(chestdef.inv_list, nodename .. " " .. amount)) then
+					return pos
+				end
+			elseif (not inv:is_empty(chestdef.inv_list)) then
+				return pos
+			end
+		end
+	elseif (node.name ~= "easyvend:vendor" and node.name~="easyvend:depositor" and node.name~="easyvend:vendor_on" and node.name~="easyvend:depositor_on") then
+		return nil
+	end
+
+	return easyvend.find_chest(owner, pos, dx, dy, dz, nodename, amount, removing)
+end
+
+-- Pseudo-inventory handling
 easyvend.allow_metadata_inventory_put = function(pos, listname, index, stack, player)
     if listname=="item" then
         local meta = minetest.get_meta(pos);
