@@ -284,7 +284,8 @@ easyvend.machine_check = function(pos, node)
 
 			if not itemstack:is_empty() then
 				local number_stack_max = itemstack:get_stack_max()
-				if number >= 1 and number < number_stack_max and cost >= 1 and cost <= cost_stack_max then
+				local maxnumber = number_stack_max * slots_max
+				if number >= 1 and number <= maxnumber and cost >= 1 and cost <= maxcost then
 					local stack = {name=itemname, count=number, wear=0, metadata=""}
 					local price = {name=easyvend.currency, count=cost, wear=0, metadata=""}
 
@@ -1046,8 +1047,8 @@ if minetest.setting_getbool("easyvend_convert_vendor") == true then
 			end
 			minetest.swap_node(pos, { name = newnodename, param2 = node.param2 })
 			local meta = minetest.get_meta(pos)
-			meta:set_string("status", "Initializing …")
-			meta:set_string("message", "Upgrade successful.")
+
+			-- Initialize metadata
 			meta:set_int("stock", -1)
 			meta:set_int("joketimer", -1)
 			meta:set_int("joke_id", 1)
@@ -1055,6 +1056,9 @@ if minetest.setting_getbool("easyvend_convert_vendor") == true then
 			inv:set_size("item", 1)
 			inv:set_size("gold", 1)
 			inv:set_stack("gold", 1, easyvend.currency)
+
+			-- In vendor, all machines accepted worn tools
+			meta:set_int("wear", 1)
 
 			local itemname = meta:get_string("itemname")
 			local configmode = 1
@@ -1089,6 +1093,7 @@ if minetest.setting_getbool("easyvend_convert_vendor") == true then
 					configmode = 0
 				end
 			end
+			meta:set_int("configmode", configmode)
 
 			local owner = meta:get_string("owner")
 			if easyvend.buysell(newnodename) == "sell" then
@@ -1097,7 +1102,9 @@ if minetest.setting_getbool("easyvend_convert_vendor") == true then
 				meta:set_string("infotext", string.format("Depositing machine (owned by %s)", owner))
 			end
 
-			meta:set_int("configmode", configmode)
+
+			meta:set_string("status", "Initializing …")
+			meta:set_string("message", "Upgrade successful.")
 			easyvend.machine_check(pos, node)
 		end,
 	})
