@@ -371,12 +371,7 @@ easyvend.machine_check = function(pos, node)
         end
 	meta:set_string("status", status)
 
-	if not itemstack:is_empty() then
-		if itemname == nil or itemname == "" then
-			itemname = itemstack:get_name()
-		end
-		meta:set_string("infotext", easyvend.make_infotext(node.name, machine_owner, cost, number, itemname))
-	end
+	meta:set_string("infotext", easyvend.make_infotext(node.name, machine_owner, cost, number, itemname))
 	itemname=itemstack:get_name()
 	meta:set_string("itemname", itemname)
 
@@ -499,9 +494,17 @@ easyvend.on_receive_fields_config = function(pos, formname, fields, sender)
 end
 
 easyvend.make_infotext = function(nodename, owner, cost, number, itemstring)
+	local d = ""
+	if itemstring == nil or itemstring == "" or number == 0 or cost == 0 then
+		if easyvend.buysell(nodename) == "sell" then
+			d = string.format("Inactive vending machine (owned by %s)", owner)
+		else
+			d = string.format("Inactive depositing machine (owned by %s)", owner)
+		end
+		return d
+	end
 	local iname = minetest.registered_items[itemstring].description
 	if iname == nil then iname = itemstring end
-	local d = ""
 	local printitem, printcost
 	if number == 1 then
 		printitem = iname

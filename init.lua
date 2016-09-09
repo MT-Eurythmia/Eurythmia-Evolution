@@ -106,6 +106,7 @@ if minetest.get_modpath("vendor") == nil then
 	minetest.register_lbm({
 		name = "easyvend:replace_vendor",
 		nodenames = { "vendor:vendor", "vendor:depositor" },
+		run_at_every_load = true,
 		action = function(pos, node)
 			local newnodename
 			if node.name == "vendor:vendor" then
@@ -150,6 +151,13 @@ if minetest.get_modpath("vendor") == nil then
 			end
 			if itemname ~= "" and itemname ~= nil and meta:get_int("gold") >= 1 or meta:get_int("number") >= 1 then
 				configmode = 0
+			end
+
+			local owner = meta:get_string("owner")
+			if easyvend.buysell(newnodename) == "sell" then
+				meta:set_string("infotext", string.format("Vending machine (owned by %s)", owner))
+			else
+				meta:set_string("infotext", string.format("Depositing machine (owned by %s)", owner))
 			end
 
 			meta:set_int("configmode", configmode)
