@@ -97,6 +97,67 @@ minetest.register_node("easyvend:vendor_on", vendor_on)
 minetest.register_node("easyvend:depositor", depositor_off)
 minetest.register_node("easyvend:depositor_on", depositor_on)
 
+-- Legacy support for vendor mod:
+-- Transform the world and items to use the easyvend nodes/items
+
+-- For safety reasons, vendor mod must be disabled before legacy mode goes on
+if minetest.get_modpath("vendor") == nil then
+	-- Replace vendor nodes
+	minetest.register_lbm({
+		name = "easyvend:replace_vendor",
+		nodenames = { "vendor:vendor", "vendor:depositor" },
+		action = function(pos, node)
+			local newnodename
+			if node.name == "vendor:vendor" then
+				newnodename = "easyvend:vendor"
+			elseif node.name == "vendor:depositor" then
+				newnodename = "easyvend:depositor"
+			end
+			minetest.swap_node(pos, { name = newnodename, param2 = node.param2 })
+			local meta = minetest.get_meta(pos)
+			meta:set_string("status", "Initializing …")
+			meta:set_string("message", "Upgrade successful.")
+			meta:set_int("stock", -1)
+			meta:set_int("joketimer", -1)
+			meta:set_int("joke_id", 1)
+			local inv = meta:get_inventory()
+			inv:set_size("item", 1)
+			inv:set_size("gold", 1)
+			inv:set_stack("gold", 1, easyvend.currency)
+
+			local itemname = meta:get_string("itemname")
+			local configmode = 1
+			if itemname == "" or itemname == nil then
+				-- If no itemname set, try to scan first item in chest below
+				local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
+				if chest.name == "default:chest_locked" then
+					local chest_meta = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z})
+					local chest_inv = chest_meta:get_inventory()
+					if ( chest_meta:get_string("owner") == machine_owner and chest_inv ~= nil ) then
+					end
+					for i=1,chest_inv:get_size("main") do
+						checkstack = chest_inv:get_stack("main", i)
+						if not checkstack:is_empty() then
+							itemname = checkstack:get_name()
+							break
+						end
+					end
+				end
+				if itemname ~= "" and itemname ~= nil then
+					inv:set_stack("item", 1, itemname)
+					meta:set_string("itemname", itemname)
+				end
+			end
+			if itemname ~= "" and itemname ~= nil and meta:get_int("gold") >= 1 or meta:get_int("number") >= 1 then
+				configmode = 0
+			end
+
+			meta:set_int("configmode", configmode)
+			easyvend.machine_check(pos, node)
+		end,
+	})
+end
+
 if minetest.get_modpath("default") ~= nil then
 	minetest.register_craft({
 		output = 'easyvend:vendor',
