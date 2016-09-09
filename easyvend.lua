@@ -1030,8 +1030,8 @@ minetest.register_abm({
 -- Legacy support for vendor mod:
 -- Transform the world and items to use the easyvend nodes/items
 
--- For safety reasons, vendor mod must be disabled before legacy mode goes on
-if minetest.get_modpath("vendor") == nil then
+-- For safety reasons, only do this when player requested so
+if minetest.setting_getbool("easyvend_convert_vendor") == true then
 	-- Replace vendor nodes
 	minetest.register_lbm({
 		name = "easyvend:replace_vendor",

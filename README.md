@@ -12,15 +12,18 @@ and turn them into the new machines from `easyvend`. This is useful if
 you want to switch a world from `vendor` to `easyvend`.
 
 **WARNING**: This feature is experimental! It is advised to backup your world
-before doing this. This feature is also incomplete;
+before doing this. This feature is also incomplete; items are currently
+**not** transformed in the process.
 
 ### Conversion process
-To transform all nodes from the `vendor` mod, enable the `easyvend` mod
-and disable the `vendor` mod, then load the world. Now all nodes from
-the vendor mod will be replaced by the new machines from `easyvend`.
+To transform all nodes from the `vendor` mod, disable the `vendor` mod (if
+it is not already disabled), enable the setting `easyvend_convert_vendor`
+and start or restart the game.
 
-If you run a server, inform players of the change after loading the world with
-the new nodes.
+Now all nodes from the `vendor` mod will be replaced  with `easyvend` ones.
+
+If you run a server, you should inform players of this change because a few
+machines might need a reconfiguration.
 
 ### Details
 The machine configuration will be kept in the process and the machines will
