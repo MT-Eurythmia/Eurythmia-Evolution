@@ -1026,13 +1026,13 @@ end
 
 easyvend.neighboring_nodes = function(pos)
 	local check = {
-		{x=pos.x, y=pos.y+1, z=pos.z},
 		{x=pos.x, y=pos.y-1, z=pos.z},
+		{x=pos.x, y=pos.y+1, z=pos.z},
 	}
 	local trav = {}
 	for i=1,#check do
 		if easyvend.is_traversable(check[i]) then
-			trav[#trav+1] = check[i]
+			table.insert(trav, check[i])
 		end
 	end
 	return trav
@@ -1057,28 +1057,20 @@ easyvend.find_connected_chest = function(owner, pos, nodename, amount, removing)
 	end
 
 	if (first ~= nil and second ~= nil) then
-		local dx = (first.x - second.x)/2
 		local dy = (first.y - second.y)/2
-		local dz = (first.z - second.z)/2
-		-- make sure they are in a column/row
-		if ( (dx * dx + dy * dy + dz * dz) ~= 1 ) then
-			return nil
-		end
-		local chest_pos = easyvend.find_chest(owner, pos, dx, dy, dz, nodename, amount, removing)
+		local chest_pos = easyvend.find_chest(owner, pos, dy, nodename, amount, removing)
 		if ( chest_pos == nil ) then
-			chest_pos = easyvend.find_chest(owner, pos, -dx, -dy, -dz, nodename, amount, removing)
+			chest_pos = easyvend.find_chest(owner, pos, -dy, nodename, amount, removing)
 		end
 		return chest_pos
 	else
-		local dx = first.x - pos.x
 		local dy = first.y - pos.y
-		local dz = first.z - pos.z
-		return easyvend.find_chest(owner, pos, dx, dy, dz, nodename, amount, removing)
+		return easyvend.find_chest(owner, pos, dy, nodename, amount, removing)
 	end
 end
 
-easyvend.find_chest = function(owner, pos, dx, dy, dz, nodename, amount, removing)
-	pos = {x=pos.x + dx, y=pos.y + dy, z=pos.z + dz}
+easyvend.find_chest = function(owner, pos, dy, nodename, amount, removing)
+	pos = {x=pos.x, y=pos.y + dy, z=pos.z}
 
 	local node = minetest.get_node_or_nil(pos)
 	if ( node == nil ) then
@@ -1106,7 +1098,7 @@ easyvend.find_chest = function(owner, pos, dx, dy, dz, nodename, amount, removin
 		return nil
 	end
 
-	return easyvend.find_chest(owner, pos, dx, dy, dz, nodename, amount, removing)
+	return easyvend.find_chest(owner, pos, dy, nodename, amount, removing)
 end
 
 -- Pseudo-inventory handling
