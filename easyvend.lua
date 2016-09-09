@@ -1039,6 +1039,7 @@ if minetest.setting_getbool("easyvend_convert_vendor") == true then
 		nodenames = { "vendor:vendor", "vendor:depositor" },
 		run_at_every_load = true,
 		action = function(pos, node)
+			-- Replace node
 			local newnodename
 			if node.name == "vendor:vendor" then
 				newnodename = "easyvend:vendor"
@@ -1046,9 +1047,9 @@ if minetest.setting_getbool("easyvend_convert_vendor") == true then
 				newnodename = "easyvend:depositor"
 			end
 			minetest.swap_node(pos, { name = newnodename, param2 = node.param2 })
-			local meta = minetest.get_meta(pos)
 
 			-- Initialize metadata
+			local meta = minetest.get_meta(pos)
 			meta:set_int("stock", -1)
 			meta:set_int("joketimer", -1)
 			meta:set_int("joke_id", 1)
@@ -1060,7 +1061,11 @@ if minetest.setting_getbool("easyvend_convert_vendor") == true then
 			-- In vendor, all machines accepted worn tools
 			meta:set_int("wear", 1)
 
+			-- Set item
 			local itemname = meta:get_string("itemname")
+			if itemname == "" or itemname == nil then
+				itemname = meta:get_string("itemtype")
+			end
 			local configmode = 1
 			if itemname == "" or itemname == nil then
 				-- If no itemname set, try to scan first item in chest below
@@ -1078,11 +1083,13 @@ if minetest.setting_getbool("easyvend_convert_vendor") == true then
 						end
 					end
 				end
-				if itemname ~= "" and itemname ~= nil then
-					inv:set_stack("item", 1, itemname)
-					meta:set_string("itemname", itemname)
-				end
 			end
+			if itemname ~= "" and itemname ~= nil then
+				inv:set_stack("item", 1, itemname)
+				meta:set_string("itemname", itemname)
+			end
+
+			-- Check for valid item, item count and price
 			if itemname ~= "" and itemname ~= nil then
 				local itemstack = inv:get_stack("item", 1)
 				local number_stack_max = itemstack:get_stack_max()
@@ -1093,6 +1100,8 @@ if minetest.setting_getbool("easyvend_convert_vendor") == true then
 					configmode = 0
 				end
 			end
+
+			-- Final initialization stuff
 			meta:set_int("configmode", configmode)
 
 			local owner = meta:get_string("owner")
