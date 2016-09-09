@@ -371,7 +371,7 @@ easyvend.machine_check = function(pos, node)
 	else
 		meta:set_int("stock", 0)
 		active = false
-                status = "No storage; machine needs a locked chest below it."
+                status = "No storage; machine needs to be connected with a locked chest."
         end
 	if meta:get_int("configmode") == 1 then
 		active = false
@@ -831,7 +831,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
         end
     else
         if sender and sender:is_player() then
-            meta:set_string("status", "No storage; machine needs a locked chest below it.")
+            meta:set_string("status", "No storage; machine needs to be connected with a locked chest.")
 	    easyvend.machine_disable(pos, node, sendername)
         end
     end
