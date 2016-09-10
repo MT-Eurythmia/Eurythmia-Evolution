@@ -20,8 +20,8 @@
 easyvend = {}
 easyvend.VERSION = {}
 easyvend.VERSION.MAJOR = 0
-easyvend.VERSION.MINOR = 1
-easyvend.VERSION.PATCH = 1
+easyvend.VERSION.MINOR = 2
+easyvend.VERSION.PATCH = 0
 easyvend.VERSION.STRING = easyvend.VERSION.MAJOR .. "." .. easyvend.VERSION.MINOR .. "." .. easyvend.VERSION.PATCH
 
 -- Set item which is used as payment for vending and depositing machines
