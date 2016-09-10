@@ -274,9 +274,9 @@ easyvend.machine_check = function(pos, node)
 		chestitem = itemname
 	else
 		chestnum = cost
-		chestitem = currency
+		chestitem = easyvend.currency
 	end
-        local chest_pos = easyvend.find_connected_chest(machine_owner, pos, chestitem, chestnum, buysell == "sell")
+        local chest_pos = easyvend.find_connected_chest(machine_owner, pos, chestitem, chestnum, true)
 	local chest, chestdef, chest_meta, chest_inv
 	if chest_pos ~= nil then
 		chest = minetest.get_node(chest_pos)
@@ -594,9 +594,9 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
 	chestitem = itemname
     else
         chestnum = cost
-	chestitem = currency
+	chestitem = easyvend.currency
     end
-    local chest_pos = easyvend.find_connected_chest(sendername, pos, chestitem, chestnum, buysell == "sell")
+    local chest_pos = easyvend.find_connected_chest(sendername, pos, chestitem, chestnum, true)
     local chest, chestdef
     if chest_pos ~= nil then
         chest = minetest.get_node(chest_pos)
