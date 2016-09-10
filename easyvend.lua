@@ -268,7 +268,15 @@ easyvend.machine_check = function(pos, node)
 	local itemstack = inv:get_stack("item",1)
 	local buysell = easyvend.buysell(node.name)
 
-        local chest_pos = easyvend.find_connected_chest(machine_owner, pos, itemname, number, buysell == "sell")
+	local chestnum, chestitem
+	if buysell == "sell" then
+		chestnum = number
+		chestitem = itemname
+	else
+		chestnum = cost
+		chestitem = currency
+	end
+        local chest_pos = easyvend.find_connected_chest(machine_owner, pos, chestitem, chestnum, buysell == "sell")
 	local chest, chestdef, chest_meta, chest_inv
 	if chest_pos ~= nil then
 		chest = minetest.get_node(chest_pos)
@@ -579,7 +587,16 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
 		return
 	end
 
-    local chest_pos = easyvend.find_connected_chest(sendername, pos, itemname, number, buysell == "sell")
+
+    local chestnum, chestitem
+    if buysell == "sell" then
+        chestnum = number
+	chestitem = itemname
+    else
+        chestnum = cost
+	chestitem = currency
+    end
+    local chest_pos = easyvend.find_connected_chest(sendername, pos, chestitem, chestnum, buysell == "sell")
     local chest, chestdef
     if chest_pos ~= nil then
         chest = minetest.get_node(chest_pos)
