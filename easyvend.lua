@@ -276,18 +276,14 @@ easyvend.machine_check = function(pos, node)
 		chestnum = cost
 		chestitem = easyvend.currency
 	end
-        local chest_pos = easyvend.find_connected_chest(machine_owner, pos, chestitem, chestnum, true)
+        local chest_pos, chest_error = easyvend.find_connected_chest(machine_owner, pos, chestitem, chestnum, true)
 	local chest, chestdef, chest_meta, chest_inv
 	if chest_pos ~= nil then
 		chest = minetest.get_node(chest_pos)
 		chestdef = registered_chests[chest.name]
-	end
-
-	if chestdef then
 		chest_meta = minetest.get_meta(chest_pos)
 		chest_inv = chest_meta:get_inventory()
 
-		if ( chest_meta:get_string(chestdef.meta_owner) == machine_owner and chest_inv ~= nil ) then
 
 			local checkstack, checkitem
 			if buysell == "buy" then
@@ -371,15 +367,24 @@ easyvend.machine_check = function(pos, node)
 				active = false
 				status = "Awaiting configuration by owner."
 			end
-		else
-			meta:set_int("stock", 0)
-			active = false
-                        status = "Storage can’t be accessed because it is owned by a different person!"
-		end
 	else
-		meta:set_int("stock", 0)
 		active = false
-                status = "No storage; machine needs to be connected with a locked chest."
+		meta:set_int("stock", 0)
+		if chest_error == "not_owned" then
+			status = "Storage can’t be accessed because it is owned by a different person!"
+		elseif chest_error == "no_chest" then
+			status = "No storage; machine needs to be connected with a locked chest."
+		elseif chest_error == "no_stock" then
+			if buysell == "sell" then
+				status = "The vending machine has insufficient materials!"
+			else
+				status = "The depositing machine is out of money!"
+			end
+		elseif chest_error == "no_space" then
+			status = "No room in the machine’s storage!"
+		else
+			status = "Unknown error!"
+		end
         end
 	if meta:get_int("configmode") == 1 then
 		active = false
@@ -596,7 +601,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
         chestnum = cost
 	chestitem = easyvend.currency
     end
-    local chest_pos = easyvend.find_connected_chest(sendername, pos, chestitem, chestnum, true)
+    local chest_pos, chest_error = easyvend.find_connected_chest(sendername, pos, chestitem, chestnum, true)
     local chest, chestdef
     if chest_pos ~= nil then
         chest = minetest.get_node(chest_pos)
@@ -1059,7 +1064,7 @@ easyvend.find_connected_chest = function(owner, pos, nodename, amount, removing)
 	local nodes = easyvend.neighboring_nodes(pos)
 
 	if (#nodes < 1 or  #nodes > 2) then
-		return nil
+		return nil, "no_chest"
 	end
 
 	-- Find the stack direction
@@ -1073,49 +1078,78 @@ easyvend.find_connected_chest = function(owner, pos, nodename, amount, removing)
 		end
 	end
 
+	local chest_pos, chest_internal
+
 	if (first ~= nil and second ~= nil) then
 		local dy = (first.y - second.y)/2
-		local chest_pos = easyvend.find_chest(owner, pos, dy, nodename, amount, removing)
+		chest_pos, chest_internal = easyvend.find_chest(owner, pos, dy, nodename, amount, removing)
 		if ( chest_pos == nil ) then
-			chest_pos = easyvend.find_chest(owner, pos, -dy, nodename, amount, removing)
+			chest_pos = easyvend.find_chest(owner, pos, -dy, nodename, amount, removing, chest_internal)
 		end
-		return chest_pos
 	else
 		local dy = first.y - pos.y
-		return easyvend.find_chest(owner, pos, dy, nodename, amount, removing)
+		chest_pos, chest_internal = easyvend.find_chest(owner, pos, dy, nodename, amount, removing)
+	end
+
+	if chest_pos == nil then
+		if chest_internal.chests == 0 then
+			return nil, "no_chest"
+		elseif chest_internal.chests == chest_internal.other_chests then
+			return nil, "not_owned"
+		elseif chest_internal.stock < 1 then
+			return nil, "no_stock"
+		elseif chest_internal.space < 1 then
+			return nil, "no_space"
+		else
+			return nil, "unknown"
+		end
+	else
+		return chest_pos
 	end
 end
 
-easyvend.find_chest = function(owner, pos, dy, nodename, amount, removing)
+easyvend.find_chest = function(owner, pos, dy, nodename, amount, removing, internal)
 	pos = {x=pos.x, y=pos.y + dy, z=pos.z}
+
+	if internal == nil then
+		internal = {}
+		internal.chests = 0
+		internal.other_chests = 0
+		internal.stock = 0
+		internal.space = 0
+	end
 
 	local node = minetest.get_node_or_nil(pos)
 	if ( node == nil ) then
-		return nil
+		return nil, internal
 	end
 	local chestdef = registered_chests[node.name]
 	if (chestdef ~= nil) then
+		internal.chests = internal.chests + 1
 		local meta = minetest.get_meta(pos)
-		if (chestdef ~= nil and owner ~= meta:get_string(chestdef.meta_owner)) then
-			return nil
+		if (owner ~= meta:get_string(chestdef.meta_owner)) then
+			internal.other_chests = internal.other_chests + 1
+			return nil, internal
 		end
 		local inv = meta:get_inventory()
 		if (inv ~= nil) then
 			if (nodename ~= nil and amount ~= nil and removing ~= nil) then
 				if (removing and inv:contains_item(chestdef.inv_list, nodename .. " " .. amount)) then
-					return pos
+					internal.stock = internal.stock + 1
+					return pos, internal
 				elseif ((not removing) and inv:room_for_item(chestdef.inv_list, nodename .. " " .. amount)) then
-					return pos
+					internal.space = internal.space + 1
+					return pos, internal
 				end
 			elseif (not inv:is_empty(chestdef.inv_list)) then
-				return pos
+				return pos, internal
 			end
 		end
 	elseif (node.name ~= "easyvend:vendor" and node.name~="easyvend:depositor" and node.name~="easyvend:vendor_on" and node.name~="easyvend:depositor_on") then
-		return nil
+		return nil, internal
 	end
 
-	return easyvend.find_chest(owner, pos, dy, nodename, amount, removing)
+	return easyvend.find_chest(owner, pos, dy, nodename, amount, removing, internal)
 end
 
 -- Pseudo-inventory handling
