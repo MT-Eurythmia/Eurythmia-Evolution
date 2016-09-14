@@ -276,7 +276,7 @@ easyvend.machine_check = function(pos, node)
 		chestnum = cost
 		chestitem = easyvend.currency
 	end
-        local chest_pos, chest_error = easyvend.find_connected_chest(machine_owner, pos, chestitem, chestnum, true)
+        local chest_pos, chest_error = easyvend.find_connected_chest(machine_owner, pos, chestitem, check_wear, chestnum, true)
 	local chest, chestdef, chest_meta, chest_inv
 	if chest_pos ~= nil then
 		chest = minetest.get_node(chest_pos)
@@ -551,7 +551,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
         chestnum = cost
 	chestitem = easyvend.currency
     end
-    local chest_pos, chest_error = easyvend.find_connected_chest(sendername, pos, chestitem, chestnum, true)
+    local chest_pos, chest_error = easyvend.find_connected_chest(sendername, pos, chestitem, check_wear, chestnum, true)
     local chest, chestdef
     if chest_pos ~= nil then
         chest = minetest.get_node(chest_pos)
@@ -1010,7 +1010,7 @@ easyvend.neighboring_nodes = function(pos)
 	return trav
 end
 
-easyvend.find_connected_chest = function(owner, pos, nodename, amount, removing)
+easyvend.find_connected_chest = function(owner, pos, nodename, check_wear, amount, removing)
 	local nodes = easyvend.neighboring_nodes(pos)
 
 	if (#nodes < 1 or  #nodes > 2) then
@@ -1032,13 +1032,13 @@ easyvend.find_connected_chest = function(owner, pos, nodename, amount, removing)
 
 	if (first ~= nil and second ~= nil) then
 		local dy = (first.y - second.y)/2
-		chest_pos, chest_internal = easyvend.find_chest(owner, pos, dy, nodename, amount, removing)
+		chest_pos, chest_internal = easyvend.find_chest(owner, pos, dy, nodename, check_wear, amount, removing)
 		if ( chest_pos == nil ) then
-			chest_pos, chest_internal = easyvend.find_chest(owner, pos, -dy, nodename, amount, removing, chest_internal)
+			chest_pos, chest_internal = easyvend.find_chest(owner, pos, -dy, nodename, check_wear, amount, removing, chest_internal)
 		end
 	else
 		local dy = first.y - pos.y
-		chest_pos, chest_internal = easyvend.find_chest(owner, pos, dy, nodename, amount, removing)
+		chest_pos, chest_internal = easyvend.find_chest(owner, pos, dy, nodename, check_wear, amount, removing)
 	end
 
 	if chest_internal.chests == 0 then
@@ -1056,7 +1056,7 @@ easyvend.find_connected_chest = function(owner, pos, nodename, amount, removing)
 	end
 end
 
-easyvend.find_chest = function(owner, pos, dy, itemname, amount, removing, internal)
+easyvend.find_chest = function(owner, pos, dy, itemname, check_wear, amount, removing, internal)
 	pos = {x=pos.x, y=pos.y + dy, z=pos.z}
 
 	if internal == nil then
@@ -1081,12 +1081,10 @@ easyvend.find_chest = function(owner, pos, dy, itemname, amount, removing, inter
 		end
 		local inv = meta:get_inventory()
 		if (inv ~= nil) then
-			if (itemname ~= nil and amount ~= nil and removing ~= nil) then
+			if (itemname ~= nil and amount ~= nil and removing ~= nil and check_wear ~= nil) then
 				local chest_has, chest_free
 				local stack = {name=itemname, count=amount, wear=0, metadata=""}
 				local stack_max = minetest.registered_items[itemname].stack_max
-				-- FIXME: Insert actual wear check
-				local check_wear = false
 
 				local stacks = math.modf(amount / stack_max)
 				local stacksremainder = math.fmod(amount, stack_max)
@@ -1109,7 +1107,7 @@ easyvend.find_chest = function(owner, pos, dy, itemname, amount, removing, inter
 		return nil, internal
 	end
 
-	return easyvend.find_chest(owner, pos, dy, itemname, amount, removing, internal)
+	return easyvend.find_chest(owner, pos, dy, itemname, check_wear, amount, removing, internal)
 end
 
 -- Pseudo-inventory handling
