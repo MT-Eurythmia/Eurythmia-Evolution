@@ -602,14 +602,14 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                        local costfree = coststacks
                        if numberremainder > 0 then numberfree = numberfree + 1 end
                        if costremainder > 0 then costfree = costfree + 1 end
-                       if easyvend.free_slots(player_inv, "main") < numberfree then
+                       if not player_free and easyvend.free_slots(player_inv, "main") < numberfree then
                            if numberfree > 1 then
                                msg = string.format("No room in your inventory (%d empty slots required)!", numberfree)
                            else
                                msg = "No room in your inventory!"
                            end
                            meta:set_string("message", msg)
-                       elseif easyvend.free_slots(achest_inv, achestdef.inv_list) < costfree then
+                       elseif not chest_free and easyvend.free_slots(achest_inv, achestdef.inv_list) < costfree then
                            meta:set_string("status", "No room in the machine’s storage!")
 	                   easyvend.machine_disable(pos, node, sendername)
                        else
@@ -717,7 +717,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                        local costfree = coststacks
                        if numberremainder > 0 then numberfree = numberfree + 1 end
                        if costremainder > 0 then costfree = costfree + 1 end
-                       if easyvend.free_slots(player_inv, "main") < costfree then
+                       if not player_free and easyvend.free_slots(player_inv, "main") < costfree then
                            if costfree > 1 then
                                msg = string.format("No room in your inventory (%d empty slots required)!", costfree)
                            else
@@ -725,7 +725,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            end
                            meta:set_string("message", msg)
                            easyvend.sound_error(sendername)
-                       elseif easyvend.free_slots(achest_inv, achestdef.inv_list) < numberfree then
+                       elseif not chest_free and easyvend.free_slots(achest_inv, achestdef.inv_list) < numberfree then
 	                   easyvend.machine_disable(pos, node, sendername)
                        else
                            easyvend.machine_enable(pos, node)
