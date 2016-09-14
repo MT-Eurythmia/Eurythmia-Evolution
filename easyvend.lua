@@ -21,6 +21,12 @@
 -- TODO: Improve mod compability
 local slots_max = 31
 
+local traversable_node_types = {
+	["easyvend:vendor"] = true,
+	["easyvend:depositor"] = true,
+	["easyvend:vendor_on"] = true,
+	["easyvend:depositor_on"] = true,
+}
 local registered_chests = {}
 local cost_stack_max = minetest.registered_items[easyvend.currency].stack_max
 local maxcost = cost_stack_max * slots_max
@@ -30,6 +36,7 @@ local joketimer_start = 3
 -- Allow for other mods to register custom chests
 easyvend.register_chest = function(node_name, inv_list, meta_owner)
 	registered_chests[node_name] = { inv_list = inv_list, meta_owner = meta_owner }
+	traversable_node_types[node_name] = true
 end
 
 -- Partly a wrapper around contains_item, but does special treatment if the item
@@ -250,24 +257,32 @@ easyvend.machine_check = function(pos, node)
 	local active = true
 	local status = "Ready."
 
-	local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
 	local meta = minetest.get_meta(pos)
+
+	local machine_owner = meta:get_string("owner")
 	local number = meta:get_int("number")
 	local cost = meta:get_int("cost")
+	local itemname = meta:get_string("itemname")
+	local check_wear = meta:get_int("wear") == 0
 	local inv = meta:get_inventory()
 	local itemstack = inv:get_stack("item",1)
-	local itemname=meta:get_string("itemname")
-	local machine_owner = meta:get_string("owner")
-	local check_wear = meta:get_int("wear") == 0
-	local chestdef = registered_chests[chest.name]
-	local chest_meta, chest_inv
+	local buysell = easyvend.buysell(node.name)
 
-	if chestdef then
-		chest_meta = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z})
-		chest_inv = chest_meta:get_inventory()
+	local chest_pos_remove, chest_error_remove, chest_pos_add, chest_error_add
+	if buysell == "sell" then
+		chest_pos_remove, chest_error_remove = easyvend.find_connected_chest(machine_owner, pos, itemname, check_wear, number, true)
+        	chest_pos_add, chest_error_add = easyvend.find_connected_chest(machine_owner, pos, easyvend.currency, check_wear, cost, false)
+	else
+		chest_pos_remove, chest_error_remove = easyvend.find_connected_chest(machine_owner, pos, easyvend.currency, check_wear, cost, true)
+        	chest_pos_add, chest_error_add = easyvend.find_connected_chest(machine_owner, pos, itemname, check_wear, number, false)
+	end
+	if chest_pos_remove and chest_pos_add then
+		local rchest, rchestdef, rchest_meta, rchest_inv
+		rchest = minetest.get_node(chest_pos_remove)
+		rchestdef = registered_chests[rchest.name]
+		rchest_meta = minetest.get_meta(chest_pos_remove)
+		rchest_inv = rchest_meta:get_inventory()
 
-		if ( chest_meta:get_string(chestdef.meta_owner) == machine_owner and chest_inv ~= nil ) then
-			local buysell = easyvend.buysell(node.name)
 
 			local checkstack, checkitem
 			if buysell == "buy" then
@@ -278,8 +293,8 @@ easyvend.machine_check = function(pos, node)
 			local stock = 0
 			-- Count stock
 			-- FIXME: Ignore tools with bad wear level
-			for i=1,chest_inv:get_size(chestdef.inv_list) do
-				checkstack = chest_inv:get_stack(chestdef.inv_list, i)
+			for i=1,rchest_inv:get_size(rchestdef.inv_list) do
+				checkstack = rchest_inv:get_stack(rchestdef.inv_list, i)
 				if checkstack:get_name() == checkitem then
 					stock = stock + checkstack:get_count()
 				end
@@ -289,57 +304,7 @@ easyvend.machine_check = function(pos, node)
 			if not itemstack:is_empty() then
 				local number_stack_max = itemstack:get_stack_max()
 				local maxnumber = number_stack_max * slots_max
-				if number >= 1 and number <= maxnumber and cost >= 1 and cost <= maxcost then
-					local stack = {name=itemname, count=number, wear=0, metadata=""}
-					local price = {name=easyvend.currency, count=cost, wear=0, metadata=""}
-
-					local chest_has, chest_free
-
-					local coststacks = math.modf(cost / cost_stack_max)
-					local costremainder = math.fmod(cost, cost_stack_max)
-					local numberstacks = math.modf(number / number_stack_max)
-					local numberremainder = math.fmod(number, number_stack_max)
-					local numberfree = numberstacks
-					local costfree = coststacks
-					if numberremainder > 0 then numberfree = numberfree + 1 end
-					if costremainder > 0 then costfree = costfree + 1 end
-
-					if buysell == "sell" then
-						chest_has = easyvend.check_and_get_items(chest_inv, chestdef.inv_list, stack, check_wear)
-						chest_free = chest_inv:room_for_item(chestdef.inv_list, price)
-				                if chest_has and chest_free then
-							if cost <= cost_stack_max and number <= number_stack_max then
-								active = true
-							elseif easyvend.free_slots(chest_inv, chestdef.inv_list) < costfree then
-								active = false
-								status = "No room in the machine’s storage!"
-							end
-						elseif not chest_has then
-							active = false
-							status = "The vending machine has insufficient materials!"
-						elseif not chest_free then
-							active = false
-							status = "No room in the machine’s storage!"
-						end
-					elseif buysell == "buy" then
-						chest_has = easyvend.check_and_get_items(chest_inv, chestdef.inv_list, price, check_wear)
-						chest_free = chest_inv:room_for_item(chestdef.inv_list, stack)
-				                if chest_has and chest_free then
-							if cost <= cost_stack_max and number <= number_stack_max then
-								active = true
-							elseif easyvend.free_slots(chest_inv, chestdef.inv_list) < numberfree then
-								active = false
-								status = "No room in the machine’s storage!"
-							end
-						elseif not chest_has then
-							active = false
-							status = "The depositing machine is out of money!"
-						elseif not chest_free then
-							active = false
-							status = "No room in the machine’s storage!"
-						end
-					end
-				else
+				if not(number >= 1 and number <= maxnumber and cost >= 1 and cost <= maxcost) then
 					active = false
 					if buysell == "sell" then
 						status = "Invalid item count or price."
@@ -351,15 +316,24 @@ easyvend.machine_check = function(pos, node)
 				active = false
 				status = "Awaiting configuration by owner."
 			end
-		else
-			meta:set_int("stock", 0)
-			active = false
-                        status = "Storage can’t be accessed because it is owned by a different person!"
-		end
 	else
-		meta:set_int("stock", 0)
 		active = false
-                status = "No storage; machine needs a locked chest below it."
+		meta:set_int("stock", 0)
+		if chest_error_remove == "no_chest" and chest_error_add == "no_chest" then
+			status = "No storage; machine needs to be connected with a locked chest."
+		elseif chest_error_remove == "not_owned" or chest_error_add == "not_owned" then
+			status = "Storage can’t be accessed because it is owned by a different person!"
+		elseif chest_error_remove == "no_stock" then
+			if buysell == "sell" then
+				status = "The vending machine has insufficient materials!"
+			else
+				status = "The depositing machine is out of money!"
+			end
+		elseif chest_error_add == "no_space" then
+			status = "No room in the machine’s storage!"
+		else
+			status = "Unknown error!"
+		end
         end
 	if meta:get_int("configmode") == 1 then
 		active = false
@@ -567,36 +541,49 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
 		return
 	end
 
-    
-    local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
-    local chestdef = registered_chests[chest.name]
-    if chestdef and sender and sender:is_player() then
-        local chest_meta = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z})
-        local chest_inv = chest_meta:get_inventory()
+
+    local chest_pos_remove, chest_error_remove, chest_pos_add, chest_error_add
+    if buysell == "sell" then
+        chest_pos_remove, chest_error_remove = easyvend.find_connected_chest(sendername, pos, itemname, check_wear, number, true)
+        chest_pos_add, chest_error_add = easyvend.find_connected_chest(sendername, pos, easyvend.currency, check_wear, cost, false)
+    else
+        chest_pos_remove, chest_error_remove = easyvend.find_connected_chest(sendername, pos, easyvend.currency, check_wear, cost, true)
+        chest_pos_add, chest_error_add = easyvend.find_connected_chest(sendername, pos, itemname, check_wear, number, false)
+    end
+
+    if chest_pos_remove ~= nil and chest_pos_add ~= nil and sender and sender:is_player() then
+        local rchest = minetest.get_node(chest_pos_remove)
+        local rchestdef = registered_chests[rchest.name]
+        local rchest_meta = minetest.get_meta(chest_pos_remove)
+        local rchest_inv = rchest_meta:get_inventory()
+        local achest = minetest.get_node(chest_pos_add)
+        local achestdef = registered_chests[achest.name]
+        local achest_meta = minetest.get_meta(chest_pos_add)
+        local achest_inv = achest_meta:get_inventory()
+
         local player_inv = sender:get_inventory()
-        if ( chest_meta:get_string(chestdef.meta_owner) == meta:get_string("owner") and chest_inv ~= nil and player_inv ~= nil ) then
             
             local stack = {name=itemname, count=number, wear=0, metadata=""} 
             local price = {name=easyvend.currency, count=cost, wear=0, metadata=""}
             local chest_has, player_has, chest_free, player_free, chest_out, player_out
             local msg = ""
             if buysell == "sell" then
-                chest_has, chest_out = easyvend.check_and_get_items(chest_inv, "main", stack, check_wear)
+                chest_has, chest_out = easyvend.check_and_get_items(rchest_inv, rchestdef.inv_list, stack, check_wear)
                 player_has, player_out = easyvend.check_and_get_items(player_inv, "main", price, check_wear)
-                chest_free = chest_inv:room_for_item("main", price)
+                chest_free = achest_inv:room_for_item(achestdef.inv_list, price)
                 player_free = player_inv:room_for_item("main", stack)
                 if chest_has and player_has and chest_free and player_free then
                    if cost <= cost_stack_max and number <= number_stack_max then
                        easyvend.machine_enable(pos, node)
                        player_inv:remove_item("main", price)
                        if check_wear then
-                           chest_inv:set_stack("main", chest_out[1].id, "")
+                           rchest_inv:set_stack(rchestdef.inv_list, chest_out[1].id, "")
                            player_inv:add_item("main", chest_out[1].item)
                        else
-                           stack = chest_inv:remove_item("main", stack)
+                           stack = rchest_inv:remove_item(rchestdef.inv_list, stack)
                            player_inv:add_item("main", stack)
                        end
-                       chest_inv:add_item("main", price)
+                       achest_inv:add_item(achestdef.inv_list, price)
                        if itemname == easyvend.currency and number == cost and cost <= cost_stack_max then
                            meta:set_string("message", easyvend.get_joke(buysell, meta:get_int("joke_id")))
                            meta:set_int("joketimer", joketimer_start)
@@ -615,14 +602,14 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                        local costfree = coststacks
                        if numberremainder > 0 then numberfree = numberfree + 1 end
                        if costremainder > 0 then costfree = costfree + 1 end
-                       if easyvend.free_slots(player_inv, "main") < numberfree then
+                       if not player_free and easyvend.free_slots(player_inv, "main") < numberfree then
                            if numberfree > 1 then
                                msg = string.format("No room in your inventory (%d empty slots required)!", numberfree)
                            else
                                msg = "No room in your inventory!"
                            end
                            meta:set_string("message", msg)
-                       elseif easyvend.free_slots(chest_inv, "main") < costfree then
+                       elseif not chest_free and easyvend.free_slots(achest_inv, achestdef.inv_list) < costfree then
                            meta:set_string("status", "No room in the machine’s storage!")
 	                   easyvend.machine_disable(pos, node, sendername)
                        else
@@ -639,25 +626,25 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            end
                            if check_wear then
                                for o=1,#chest_out do
-                                   chest_inv:set_stack("main", chest_out[o].id, "")
+                                   rchest_inv:set_stack(rchestdef.inv_list, chest_out[o].id, "")
                                end
                            else
                                for i=1, numberstacks do
                                    stack.count = number_stack_max
-                                   table.insert(cheststacks, chest_inv:remove_item("main", stack))
+                                   table.insert(cheststacks, rchest_inv:remove_item(rchestdef.inv_list, stack))
                                end
                            end
                            if numberremainder > 0 then
                                stack.count = numberremainder
-                               table.insert(cheststacks, chest_inv:remove_item("main", stack))
+                               table.insert(cheststacks, rchest_inv:remove_item(rchestdef.inv_list, stack))
                            end
                            for i=1, coststacks do
                                price.count = cost_stack_max
-                               chest_inv:add_item("main", price)
+                               achest_inv:add_item(achestdef.inv_list, price)
                            end
                            if costremainder > 0 then
                                price.count = costremainder
-                               chest_inv:add_item("main", price)
+                               achest_inv:add_item(achestdef.inv_list, price)
                            end
                            if check_wear then
                                for o=1,#chest_out do
@@ -695,21 +682,21 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                     end
                 end
             else
-                chest_has, chest_out = easyvend.check_and_get_items(chest_inv, "main", price, check_wear)
+                chest_has, chest_out = easyvend.check_and_get_items(rchest_inv, rchestdef.inv_list, price, check_wear)
                 player_has, player_out = easyvend.check_and_get_items(player_inv, "main", stack, check_wear)
-                chest_free = chest_inv:room_for_item("main", stack)
+                chest_free = achest_inv:room_for_item(achestdef.inv_list, stack)
                 player_free = player_inv:room_for_item("main", price)
                 if chest_has and player_has and chest_free and player_free then
                    if cost <= cost_stack_max and number <= number_stack_max then
                        easyvend.machine_enable(pos, node)
                        if check_wear then
                            player_inv:set_stack("main", player_out[1].id, "")
-                           chest_inv:add_item("main", player_out[1].item)
+                           achest_inv:add_item(achestdef.inv_list, player_out[1].item)
                        else
                            stack = player_inv:remove_item("main", stack)
-                           chest_inv:add_item("main", stack)
+                           achest_inv:add_item(achestdef.inv_list, stack)
                        end
-                       chest_inv:remove_item("main", price)
+                       rchest_inv:remove_item(rchestdef.inv_list, price)
                        player_inv:add_item("main", price)
                        meta:set_string("status", "Ready.")
                        if itemname == easyvend.currency and number == cost and cost <= cost_stack_max then
@@ -730,7 +717,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                        local costfree = coststacks
                        if numberremainder > 0 then numberfree = numberfree + 1 end
                        if costremainder > 0 then costfree = costfree + 1 end
-                       if easyvend.free_slots(player_inv, "main") < costfree then
+                       if not player_free and easyvend.free_slots(player_inv, "main") < costfree then
                            if costfree > 1 then
                                msg = string.format("No room in your inventory (%d empty slots required)!", costfree)
                            else
@@ -738,7 +725,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            end
                            meta:set_string("message", msg)
                            easyvend.sound_error(sendername)
-                       elseif easyvend.free_slots(chest_inv, "main") < numberfree then
+                       elseif not chest_free and easyvend.free_slots(achest_inv, achestdef.inv_list) < numberfree then
 	                   easyvend.machine_disable(pos, node, sendername)
                        else
                            easyvend.machine_enable(pos, node)
@@ -746,11 +733,11 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            local playerstacks = {}
                            for i=1, coststacks do
                                price.count = cost_stack_max
-                               chest_inv:remove_item("main", price)
+                               rchest_inv:remove_item(rchestdef.inv_list, price)
                            end
                            if costremainder > 0 then
                                price.count = costremainder
-                               chest_inv:remove_item("main", price)
+                               rchest_inv:remove_item(rchestdef.inv_list, price)
                            end
                            if check_wear then
                                for o=1,#player_out do
@@ -776,11 +763,11 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            end
                            if check_wear then
                                for o=1,#player_out do
-                                   chest_inv:add_item("main", player_out[o].item)
+                                   achest_inv:add_item(achestdef.inv_list, player_out[o].item)
                                end
                            else
                                for i=1,#playerstacks do
-                                   chest_inv:add_item("main", playerstacks[i])
+                                   achest_inv:add_item(achestdef.inv_list, playerstacks[i])
                                end
                            end
                            meta:set_string("message", "Item sold.")
@@ -810,15 +797,25 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                     end
                 end
             end
-        else
-            meta:set_string("status", "Storage can’t be accessed because it is owned by a different person!")
-	    easyvend.machine_disable(pos, node, sendername)
-        end
     else
-        if sender and sender:is_player() then
-            meta:set_string("status", "No storage; machine needs a locked chest below it.")
-	    easyvend.machine_disable(pos, node, sendername)
-        end
+	active = false
+	meta:set_int("stock", 0)
+	if chest_error_remove == "no_chest" and chest_error_add == "no_chest" then
+		status = "No storage; machine needs to be connected with a locked chest."
+	elseif chest_error_remove  == "not_owned" or chest_error_add == "not_owned" then
+		status = "Storage can’t be accessed because it is owned by a different person!"
+	elseif chest_error_remove  == "no_stock" then
+		if buysell == "sell" then
+			status = "The vending machine has insufficient materials!"
+		else
+			status = "The depositing machine is out of money!"
+		end
+	elseif chest_error_add  == "no_space" then
+		status = "No room in the machine’s storage!"
+	else
+		status = "Unknown error!"
+	end
+	easyvend.sound_error(sendername)
     end
 
     easyvend.set_formspec(pos, sender)
@@ -844,7 +841,6 @@ easyvend.after_place_node = function(pos, placer)
         meta:set_int("wear", 0)
     end
     meta:set_string("infotext", d)
-    local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
     meta:set_string("status", "Awaiting configuration by owner.")
     meta:set_string("message", "Welcome! Please prepare the machine.")
     meta:set_int("number", 1)
@@ -863,12 +859,17 @@ end
 easyvend.can_dig = function(pos, player)
     local meta = minetest.get_meta(pos)
     local name = player:get_player_name()
+    local owner = meta:get_string("owner")
     -- Owner can always dig shop
-    if meta:get_string("owner") == name then
+    if owner == name then
         return true
     end
-    local chest = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
-    local meta_chest = minetest.get_meta({x=pos.x,y=pos.y-1,z=pos.z});
+    local chest_pos = easyvend.get_connected_chest(owner, pos)
+    local chest, meta_chest
+    if chest_pos then
+        chest = minetest.get_node(chest_pos)
+        meta_chest = minetest.get_meta(chest_pos)
+    end
     if registered_chests[chest.name] then
          if player and player:is_player() then
             local owner_chest = meta_chest:get_string(registered_chests[chest.name].meta_owner)
@@ -987,7 +988,7 @@ easyvend.sound_disable = function(pos)
 	minetest.sound_play("easyvend_disable", {pos = pos, gain = 0.9, max_hear_distance = 12,})
 end
 
-easyvend.sound_vend = function(pos) 
+easyvend.sound_vend = function(pos)
 	minetest.sound_play("easyvend_vend", {pos = pos, gain = 0.4, max_hear_distance = 5,})
 end
 
@@ -995,6 +996,135 @@ easyvend.sound_deposit = function(pos)
 	minetest.sound_play("easyvend_deposit", {pos = pos, gain = 0.4, max_hear_distance = 5,})
 end
 
+--[[ Tower building ]]
+
+easyvend.is_traversable = function(pos)
+	local node = minetest.get_node_or_nil(pos)
+	if (node == nil) then
+		return false
+	end
+	return traversable_node_types[node.name] == true
+end
+
+easyvend.neighboring_nodes = function(pos)
+	local check = {
+		{x=pos.x, y=pos.y-1, z=pos.z},
+		{x=pos.x, y=pos.y+1, z=pos.z},
+	}
+	local trav = {}
+	for i=1,#check do
+		if easyvend.is_traversable(check[i]) then
+			table.insert(trav, check[i])
+		end
+	end
+	return trav
+end
+
+easyvend.find_connected_chest = function(owner, pos, nodename, check_wear, amount, removing)
+	local nodes = easyvend.neighboring_nodes(pos)
+
+	if (#nodes < 1 or  #nodes > 2) then
+		return nil, "no_chest"
+	end
+
+	-- Find the stack direction
+	local first = nil
+	local second = nil
+	for i=1,#nodes do
+		if ( first == nil ) then
+			first = nodes[i]
+		else
+			second = nodes[i]
+		end
+	end
+
+	local chest_pos, chest_internal
+
+	if (first ~= nil and second ~= nil) then
+		local dy = (first.y - second.y)/2
+		chest_pos, chest_internal = easyvend.find_chest(owner, pos, dy, nodename, check_wear, amount, removing)
+		if ( chest_pos == nil ) then
+			chest_pos, chest_internal = easyvend.find_chest(owner, pos, -dy, nodename, check_wear, amount, removing, chest_internal)
+		end
+	else
+		local dy = first.y - pos.y
+		chest_pos, chest_internal = easyvend.find_chest(owner, pos, dy, nodename, check_wear, amount, removing)
+	end
+
+	if chest_internal.chests == 0 then
+		return nil, "no_chest"
+	elseif chest_internal.chests == chest_internal.other_chests then
+		return nil, "not_owned"
+	elseif removing and chest_internal.stock < 1 then
+		return nil, "no_stock"
+	elseif not removing and chest_internal.space < 1 then
+		return nil, "no_space"
+	elseif chest_pos ~= nil then
+		return chest_pos
+	else
+		return nil, "unknown"
+	end
+end
+
+easyvend.find_chest = function(owner, pos, dy, itemname, check_wear, amount, removing, internal)
+	pos = {x=pos.x, y=pos.y + dy, z=pos.z}
+
+	if internal == nil then
+		internal = {}
+		internal.chests = 0
+		internal.other_chests = 0
+		internal.stock = 0
+		internal.space = 0
+	end
+
+	local node = minetest.get_node_or_nil(pos)
+	if ( node == nil ) then
+		return nil, internal
+	end
+	local chestdef = registered_chests[node.name]
+	if (chestdef ~= nil) then
+		internal.chests = internal.chests + 1
+		local meta = minetest.get_meta(pos)
+		if (owner ~= meta:get_string(chestdef.meta_owner)) then
+			internal.other_chests = internal.other_chests + 1
+			return nil, internal
+		end
+		local inv = meta:get_inventory()
+		if (inv ~= nil) then
+			if (itemname ~= nil and amount ~= nil and removing ~= nil and check_wear ~= nil) then
+				local chest_has, chest_free
+				local stack = {name=itemname, count=amount, wear=0, metadata=""}
+				local stack_max = minetest.registered_items[itemname].stack_max
+
+				local stacks = math.modf(amount / stack_max)
+				local stacksremainder = math.fmod(amount, stack_max)
+				local free = stacks
+				if stacksremainder > 0 then free = free + 1 end
+
+				chest_has = easyvend.check_and_get_items(inv, chestdef.inv_list, stack, check_wear)
+			        if chest_has then
+					internal.stock = internal.stock + 1
+				end
+				chest_free = inv:room_for_item(chestdef.inv_list, stack) or easyvend.free_slots(inv, chestdef.inv_list) < free
+			        if chest_free then
+					internal.space = internal.space + 1
+				end
+
+				if (removing and internal.stock == 0) or (not removing and internal.space == 0) then
+					return easyvend.find_chest(owner, pos, dy, itemname, check_wear, amount, removing, internal)
+				else
+					return pos, internal
+				end
+			end
+		end
+	elseif (node.name ~= "easyvend:vendor" and node.name~="easyvend:depositor" and node.name~="easyvend:vendor_on" and node.name~="easyvend:depositor_on") then
+		return nil, internal
+	end
+
+	return easyvend.find_chest(owner, pos, dy, itemname, check_wear, amount, removing, internal)
+end
+
+-- Pseudo-inventory handling
 easyvend.allow_metadata_inventory_put = function(pos, listname, index, stack, player)
     if listname=="item" then
         local meta = minetest.get_meta(pos);
