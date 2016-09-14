@@ -568,22 +568,22 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
             local chest_has, player_has, chest_free, player_free, chest_out, player_out
             local msg = ""
             if buysell == "sell" then
-                chest_has, chest_out = easyvend.check_and_get_items(chest_inv, "main", stack, check_wear)
+                chest_has, chest_out = easyvend.check_and_get_items(chest_inv, chestdef.inv_list, stack, check_wear)
                 player_has, player_out = easyvend.check_and_get_items(player_inv, "main", price, check_wear)
-                chest_free = chest_inv:room_for_item("main", price)
+                chest_free = chest_inv:room_for_item(chestdef.inv_list, price)
                 player_free = player_inv:room_for_item("main", stack)
                 if chest_has and player_has and chest_free and player_free then
                    if cost <= cost_stack_max and number <= number_stack_max then
                        easyvend.machine_enable(pos, node)
                        player_inv:remove_item("main", price)
                        if check_wear then
-                           chest_inv:set_stack("main", chest_out[1].id, "")
+                           chest_inv:set_stack(chestdef.inv_list, chest_out[1].id, "")
                            player_inv:add_item("main", chest_out[1].item)
                        else
-                           stack = chest_inv:remove_item("main", stack)
+                           stack = chest_inv:remove_item(chestdef.inv_list, stack)
                            player_inv:add_item("main", stack)
                        end
-                       chest_inv:add_item("main", price)
+                       chest_inv:add_item(chestdef.inv_list, price)
                        if itemname == easyvend.currency and number == cost and cost <= cost_stack_max then
                            meta:set_string("message", easyvend.get_joke(buysell, meta:get_int("joke_id")))
                            meta:set_int("joketimer", joketimer_start)
@@ -609,7 +609,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                                msg = "No room in your inventory!"
                            end
                            meta:set_string("message", msg)
-                       elseif easyvend.free_slots(chest_inv, "main") < costfree then
+                       elseif easyvend.free_slots(chest_inv, chestdef.inv_list) < costfree then
                            meta:set_string("status", "No room in the machine’s storage!")
 	                   easyvend.machine_disable(pos, node, sendername)
                        else
@@ -626,25 +626,25 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            end
                            if check_wear then
                                for o=1,#chest_out do
-                                   chest_inv:set_stack("main", chest_out[o].id, "")
+                                   chest_inv:set_stack(chestdef.inv_list, chest_out[o].id, "")
                                end
                            else
                                for i=1, numberstacks do
                                    stack.count = number_stack_max
-                                   table.insert(cheststacks, chest_inv:remove_item("main", stack))
+                                   table.insert(cheststacks, chest_inv:remove_item(chestdef.inv_list, stack))
                                end
                            end
                            if numberremainder > 0 then
                                stack.count = numberremainder
-                               table.insert(cheststacks, chest_inv:remove_item("main", stack))
+                               table.insert(cheststacks, chest_inv:remove_item(chestdef.inv_list, stack))
                            end
                            for i=1, coststacks do
                                price.count = cost_stack_max
-                               chest_inv:add_item("main", price)
+                               chest_inv:add_item(chestdef.inv_list, price)
                            end
                            if costremainder > 0 then
                                price.count = costremainder
-                               chest_inv:add_item("main", price)
+                               chest_inv:add_item(chestdef.inv_list, price)
                            end
                            if check_wear then
                                for o=1,#chest_out do
@@ -682,21 +682,21 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                     end
                 end
             else
-                chest_has, chest_out = easyvend.check_and_get_items(chest_inv, "main", price, check_wear)
+                chest_has, chest_out = easyvend.check_and_get_items(chest_inv, chestdef.inv_list, price, check_wear)
                 player_has, player_out = easyvend.check_and_get_items(player_inv, "main", stack, check_wear)
-                chest_free = chest_inv:room_for_item("main", stack)
+                chest_free = chest_inv:room_for_item(chestdef.inv_list, stack)
                 player_free = player_inv:room_for_item("main", price)
                 if chest_has and player_has and chest_free and player_free then
                    if cost <= cost_stack_max and number <= number_stack_max then
                        easyvend.machine_enable(pos, node)
                        if check_wear then
                            player_inv:set_stack("main", player_out[1].id, "")
-                           chest_inv:add_item("main", player_out[1].item)
+                           chest_inv:add_item(chestdef.inv_list, player_out[1].item)
                        else
                            stack = player_inv:remove_item("main", stack)
-                           chest_inv:add_item("main", stack)
+                           chest_inv:add_item(chestdef.inv_list, stack)
                        end
-                       chest_inv:remove_item("main", price)
+                       chest_inv:remove_item(chestdef.inv_list, price)
                        player_inv:add_item("main", price)
                        meta:set_string("status", "Ready.")
                        if itemname == easyvend.currency and number == cost and cost <= cost_stack_max then
@@ -725,7 +725,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            end
                            meta:set_string("message", msg)
                            easyvend.sound_error(sendername)
-                       elseif easyvend.free_slots(chest_inv, "main") < numberfree then
+                       elseif easyvend.free_slots(chest_inv, chestdef.inv_list) < numberfree then
 	                   easyvend.machine_disable(pos, node, sendername)
                        else
                            easyvend.machine_enable(pos, node)
@@ -733,11 +733,11 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            local playerstacks = {}
                            for i=1, coststacks do
                                price.count = cost_stack_max
-                               chest_inv:remove_item("main", price)
+                               chest_inv:remove_item(chestdef.inv_list, price)
                            end
                            if costremainder > 0 then
                                price.count = costremainder
-                               chest_inv:remove_item("main", price)
+                               chest_inv:remove_item(chestdef.inv_list, price)
                            end
                            if check_wear then
                                for o=1,#player_out do
@@ -763,11 +763,11 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                            end
                            if check_wear then
                                for o=1,#player_out do
-                                   chest_inv:add_item("main", player_out[o].item)
+                                   chest_inv:add_item(chestdef.inv_list, player_out[o].item)
                                end
                            else
                                for i=1,#playerstacks do
-                                   chest_inv:add_item("main", playerstacks[i])
+                                   chest_inv:add_item(chestdef.inv_list, playerstacks[i])
                                end
                            end
                            meta:set_string("message", "Item sold.")
