@@ -305,57 +305,7 @@ easyvend.machine_check = function(pos, node)
 			if not itemstack:is_empty() then
 				local number_stack_max = itemstack:get_stack_max()
 				local maxnumber = number_stack_max * slots_max
-				if number >= 1 and number <= maxnumber and cost >= 1 and cost <= maxcost then
-					local stack = {name=itemname, count=number, wear=0, metadata=""}
-					local price = {name=easyvend.currency, count=cost, wear=0, metadata=""}
-
-					local chest_has, chest_free
-
-					local coststacks = math.modf(cost / cost_stack_max)
-					local costremainder = math.fmod(cost, cost_stack_max)
-					local numberstacks = math.modf(number / number_stack_max)
-					local numberremainder = math.fmod(number, number_stack_max)
-					local numberfree = numberstacks
-					local costfree = coststacks
-					if numberremainder > 0 then numberfree = numberfree + 1 end
-					if costremainder > 0 then costfree = costfree + 1 end
-
-					if buysell == "sell" then
-						chest_has = easyvend.check_and_get_items(chest_inv, chestdef.inv_list, stack, check_wear)
-						chest_free = chest_inv:room_for_item(chestdef.inv_list, price)
-				                if chest_has and chest_free then
-							if cost <= cost_stack_max and number <= number_stack_max then
-								active = true
-							elseif easyvend.free_slots(chest_inv, chestdef.inv_list) < costfree then
-								active = false
-								status = "No room in the machine’s storage!"
-							end
-						elseif not chest_has then
-							active = false
-							status = "The vending machine has insufficient materials!"
-						elseif not chest_free then
-							active = false
-							status = "No room in the machine’s storage!"
-						end
-					elseif buysell == "buy" then
-						chest_has = easyvend.check_and_get_items(chest_inv, chestdef.inv_list, price, check_wear)
-						chest_free = chest_inv:room_for_item(chestdef.inv_list, stack)
-				                if chest_has and chest_free then
-							if cost <= cost_stack_max and number <= number_stack_max then
-								active = true
-							elseif easyvend.free_slots(chest_inv, chestdef.inv_list) < numberfree then
-								active = false
-								status = "No room in the machine’s storage!"
-							end
-						elseif not chest_has then
-							active = false
-							status = "The depositing machine is out of money!"
-						elseif not chest_free then
-							active = false
-							status = "No room in the machine’s storage!"
-						end
-					end
-				else
+				if not(number >= 1 and number <= maxnumber and cost >= 1 and cost <= maxcost) then
 					active = false
 					if buysell == "sell" then
 						status = "Invalid item count or price."
@@ -1084,27 +1034,25 @@ easyvend.find_connected_chest = function(owner, pos, nodename, amount, removing)
 		local dy = (first.y - second.y)/2
 		chest_pos, chest_internal = easyvend.find_chest(owner, pos, dy, nodename, amount, removing)
 		if ( chest_pos == nil ) then
-			chest_pos = easyvend.find_chest(owner, pos, -dy, nodename, amount, removing, chest_internal)
+			chest_pos, chest_internal = easyvend.find_chest(owner, pos, -dy, nodename, amount, removing, chest_internal)
 		end
 	else
 		local dy = first.y - pos.y
 		chest_pos, chest_internal = easyvend.find_chest(owner, pos, dy, nodename, amount, removing)
 	end
 
-	if chest_pos == nil then
-		if chest_internal.chests == 0 then
-			return nil, "no_chest"
-		elseif chest_internal.chests == chest_internal.other_chests then
-			return nil, "not_owned"
-		elseif chest_internal.stock < 1 then
-			return nil, "no_stock"
-		elseif chest_internal.space < 1 then
-			return nil, "no_space"
-		else
-			return nil, "unknown"
-		end
-	else
+	if chest_internal.chests == 0 then
+		return nil, "no_chest"
+	elseif chest_internal.chests == chest_internal.other_chests then
+		return nil, "not_owned"
+	elseif chest_internal.stock < 1 then
+		return nil, "no_stock"
+	elseif chest_internal.space < 1 then
+		return nil, "no_space"
+	elseif chest_pos ~= nil then
 		return chest_pos
+	else
+		return nil, "unknown"
 	end
 end
 
@@ -1137,22 +1085,21 @@ easyvend.find_chest = function(owner, pos, dy, itemname, amount, removing, inter
 				local chest_has, chest_free
 				local stack = {name=itemname, count=amount, wear=0, metadata=""}
 				local stack_max = minetest.registered_items[itemname].stack_max
+				-- FIXME: Insert actual wear check
+				local check_wear = false
 
 				local stacks = math.modf(amount / stack_max)
 				local stacksremainder = math.fmod(amount, stack_max)
 				local free = stacks
 				if stacksremainder > 0 then free = free + 1 end
 
-				if removing then
-					chest_has = easyvend.check_and_get_items(inv, chestdef.inv_list, stack, check_wear)
-			                if chest_has and stacks <= stack_max then
-						internal.stock = internal.stock + 1
-					end
-				else
-					chest_free = inv:room_for_item(chestdef.inv_list, stack)
-			                if chest_free and stacks <= stack_max then
-						internal.space = internal.space + 1
-					end
+				chest_has = easyvend.check_and_get_items(inv, chestdef.inv_list, stack, check_wear)
+			        if chest_has then
+					internal.stock = internal.stock + 1
+				end
+				chest_free = inv:room_for_item(chestdef.inv_list, stack) or easyvend.free_slots(inv, chestdef.inv_list) < free
+			        if chest_free then
+					internal.space = internal.space + 1
 				end
 
 				return pos, internal
