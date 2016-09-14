@@ -1105,7 +1105,11 @@ easyvend.find_chest = function(owner, pos, dy, itemname, check_wear, amount, rem
 					internal.space = internal.space + 1
 				end
 
-				return pos, internal
+				if internal.space == 0 or internal.stock == 0 then
+					return easyvend.find_chest(owner, pos, dy, itemname, check_wear, amount, removing, internal)
+				else
+					return pos, internal
+				end
 			end
 		end
 	elseif (node.name ~= "easyvend:vendor" and node.name~="easyvend:depositor" and node.name~="easyvend:vendor_on" and node.name~="easyvend:depositor_on") then
