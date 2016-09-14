@@ -552,16 +552,12 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
 	chestitem = easyvend.currency
     end
     local chest_pos, chest_error = easyvend.find_connected_chest(sendername, pos, chestitem, check_wear, chestnum, true)
-    local chest, chestdef
-    if chest_pos ~= nil then
-        chest = minetest.get_node(chest_pos)
-        chestdef = registered_chests[chest.name]
-    end
-    if chestdef and sender and sender:is_player() then
+    if chest_pos ~= nil and sender and sender:is_player() then
+        local chest = minetest.get_node(chest_pos)
+        local chestdef = registered_chests[chest.name]
         local chest_meta = minetest.get_meta(chest_pos)
         local chest_inv = chest_meta:get_inventory()
         local player_inv = sender:get_inventory()
-        if ( chest_meta:get_string(chestdef.meta_owner) == meta:get_string("owner") and chest_inv ~= nil and player_inv ~= nil ) then
             
             local stack = {name=itemname, count=number, wear=0, metadata=""} 
             local price = {name=easyvend.currency, count=cost, wear=0, metadata=""}
@@ -797,15 +793,24 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
                     end
                 end
             end
-        else
-            meta:set_string("status", "Storage can’t be accessed because it is owned by a different person!")
-	    easyvend.machine_disable(pos, node, sendername)
-        end
     else
-        if sender and sender:is_player() then
-            meta:set_string("status", "No storage; machine needs to be connected with a locked chest.")
-	    easyvend.machine_disable(pos, node, sendername)
-        end
+	active = false
+	meta:set_int("stock", 0)
+	if chest_error == "not_owned" then
+		status = "Storage can’t be accessed because it is owned by a different person!"
+	elseif chest_error == "no_chest" then
+		status = "No storage; machine needs to be connected with a locked chest."
+	elseif chest_error == "no_stock" then
+		if buysell == "sell" then
+			status = "The vending machine has insufficient materials!"
+		else
+			status = "The depositing machine is out of money!"
+		end
+	elseif chest_error == "no_space" then
+		status = "No room in the machine’s storage!"
+	else
+		status = "Unknown error!"
+	end
     end
 
     easyvend.set_formspec(pos, sender)
