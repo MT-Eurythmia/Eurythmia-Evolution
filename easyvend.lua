@@ -1108,7 +1108,7 @@ easyvend.find_connected_chest = function(owner, pos, nodename, amount, removing)
 	end
 end
 
-easyvend.find_chest = function(owner, pos, dy, nodename, amount, removing, internal)
+easyvend.find_chest = function(owner, pos, dy, itemname, amount, removing, internal)
 	pos = {x=pos.x, y=pos.y + dy, z=pos.z}
 
 	if internal == nil then
@@ -1133,15 +1133,28 @@ easyvend.find_chest = function(owner, pos, dy, nodename, amount, removing, inter
 		end
 		local inv = meta:get_inventory()
 		if (inv ~= nil) then
-			if (nodename ~= nil and amount ~= nil and removing ~= nil) then
-				if (removing and inv:contains_item(chestdef.inv_list, nodename .. " " .. amount)) then
-					internal.stock = internal.stock + 1
-					return pos, internal
-				elseif ((not removing) and inv:room_for_item(chestdef.inv_list, nodename .. " " .. amount)) then
-					internal.space = internal.space + 1
-					return pos, internal
+			if (itemname ~= nil and amount ~= nil and removing ~= nil) then
+				local chest_has, chest_free
+				local stack = {name=itemname, count=amount, wear=0, metadata=""}
+				local stack_max = minetest.registered_items[itemname].stack_max
+
+				local stacks = math.modf(amount / stack_max)
+				local stacksremainder = math.fmod(amount, stack_max)
+				local free = stacks
+				if stacksremainder > 0 then free = free + 1 end
+
+				if removing then
+					chest_has = easyvend.check_and_get_items(inv, chestdef.inv_list, stack, check_wear)
+			                if chest_has and stacks <= stack_max then
+						internal.stock = internal.stock + 1
+					end
+				else
+					chest_free = inv:room_for_item(chestdef.inv_list, stack)
+			                if chest_free and stacks <= stack_max then
+						internal.space = internal.space + 1
+					end
 				end
-			elseif (not inv:is_empty(chestdef.inv_list)) then
+
 				return pos, internal
 			end
 		end
@@ -1149,7 +1162,7 @@ easyvend.find_chest = function(owner, pos, dy, nodename, amount, removing, inter
 		return nil, internal
 	end
 
-	return easyvend.find_chest(owner, pos, dy, nodename, amount, removing, internal)
+	return easyvend.find_chest(owner, pos, dy, itemname, amount, removing, internal)
 end
 
 -- Pseudo-inventory handling
