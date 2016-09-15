@@ -1106,7 +1106,7 @@ easyvend.find_chest = function(owner, pos, dy, itemname, check_wear, amount, rem
 				if chest_has then
 					internal.stock = internal.stock + 1
 				end
-				chest_free = inv:room_for_item(chestdef.inv_list, stack) or easyvend.free_slots(inv, chestdef.inv_list) >= free
+				chest_free = inv:room_for_item(chestdef.inv_list, stack) and easyvend.free_slots(inv, chestdef.inv_list) >= free
 				if chest_free then
 					internal.space = internal.space + 1
 				end
