@@ -33,3 +33,7 @@ keep as many machines in operation as possible. Machines with very high values
 be reconfigured by their owners. Most machines which worked before will likely
 stay in operation afterwards.
 
+## Licenses
+- Code: LGPL 2.1. Forked from mod “Vending Machines” [vendor] by Bad_Command_.
+- Sounds: CC-BY 3.0/CC-BY-SA 3.0/GPL 3.0/GPL 2.0
+- Textures: MIT License 
