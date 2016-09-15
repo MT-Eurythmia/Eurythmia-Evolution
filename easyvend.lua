@@ -798,7 +798,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
 			end
 		end
 	else
-		active = false
+		local status
 		meta:set_int("stock", 0)
 		if chest_error_remove == "no_chest" and chest_error_add == "no_chest" then
 			status = "No storage; machine needs to be connected with a locked chest."
@@ -815,6 +815,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
 		else
 			status = "Unknown error!"
 		end
+		meta:set_string("status", status)
 		easyvend.sound_error(sendername)
 	end
 
