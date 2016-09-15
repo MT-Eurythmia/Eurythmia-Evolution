@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 easyvend = {}
 easyvend.VERSION = {}
 easyvend.VERSION.MAJOR = 0
-easyvend.VERSION.MINOR = 2
+easyvend.VERSION.MINOR = 3
 easyvend.VERSION.PATCH = 0
 easyvend.VERSION.STRING = easyvend.VERSION.MAJOR .. "." .. easyvend.VERSION.MINOR .. "." .. easyvend.VERSION.PATCH
 
