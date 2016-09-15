@@ -865,7 +865,7 @@ easyvend.can_dig = function(pos, player)
 	if owner == name then
 		return true
 	end
-	local chest_pos = easyvend.get_connected_chest(owner, pos)
+	local chest_pos = easyvend.find_connected_chest(owner, pos)
 	local chest, meta_chest
 	if chest_pos then
 		chest = minetest.get_node(chest_pos)
