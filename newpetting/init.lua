@@ -36,7 +36,7 @@ end
 local identification = function(self,clicker)
 	if self.owner and self.owner ~= clicker:get_player_name() then
 		minetest.chat_send_player(clicker:get_player_name(),
-			"This is a "..self.name..". It follows: "..getfollows(self.follow)
+			"This is a "..self.name..". It eats: "..getfollows(self.follow)
 		)
 	end
 	return true
@@ -105,16 +105,16 @@ processanimals("mobs_animal",{"cow","kitten","pumba","bunny","bee","rat","chicke
 processanimals("mobs_animal",{"sheep_black","sheep_blue","sheep_brown","sheep_cyan","sheep_dark_green","sheep_dark_grey","sheep_green","sheep_grey","sheep_magenta","sheep_orange","sheep_pink","sheep_red","sheep_violet","sheep_white","sheep_yellow"},fighttable)
 processanimals("mobs_turtles",{"turtle","seaturtle"},cattables({fighttable,{follow="farming:carrot"} }))
 processanimals("mobs_giraffe",{"jeraf"},fighttable)
-processanimals("mobs_wolf",{"wolf","dog"})
-processanimals("mobs_deer",{"deer"},fighttable)
+processanimals("mobs_wolf",{"wolf","dog"},{hp_max=20,armor=100})
+processanimals("mobs_deer",{"deer"},cattables({fighttable,{hp_max=20,armor=60,damage=4}}) )
 processanimals("mobs_",{"snowman"},{follow={value={"farming:carrot","default:snow"} }} )
-processanimals("mobs_bear",{"medved"})
+processanimals("mobs_bear",{"medved"},{hp_max=30,armor=90})
 processanimals("mobs_mr_goat",{"goat"},fighttable)
 processanimals("mobs_yeti",{"yeti"})
-processanimals("mobs_horse",{"horse"})
+processanimals("mobs_horse",{"horse"},{hp_max=40,armor=100})
 processanimals("mobs_slimes",{"green_small","green_medium","green_big","lava_small","lava_medium","lava_big"},{follow="mobs_slimes:slimeball"})
 processanimals("mobs_sandworm",{"sandworm"},{follow="default:sandstone"})
-processanimals("mobs_senderman",{"senderman"},{follow="default:nyan"})
+processanimals("mobs_senderman",{"senderman"},{follow="default:nyan"},{hp_max=50})
 processanimals("mobs_creeper",{"creeper"},{follow={value={"default:coal_lump","basic_machines:charcoal"}}})
 processanimals("mobs_zombie",{"zombie","zombie_mini"},{follow="mobs_zombie:rotten_flesh"})
 processanimals("mobs_monster",{"dirt_monster"},{follow="default:dirt"})
@@ -131,7 +131,7 @@ processanimals("dmobs",{"gnorm","pig"},cattables({fighttable,{follow="default:ap
 processanimals("dmobs",{"pig_evil"},{follow="mobs:pork_raw"})
 
 override.rewrite("dmobs:pig",{drops={value={ {name = "mobs:pork_raw", chance = 1, min = 1, max = 1}, }}})
-override.rewrite("dmobs:pig_evil",{drops={value={ {name = "mobs:pork_raw", chance = 1, min = 1, max = 1}, }}})
+override.rewrite("dmobs:pig_evil",{drops={value={ {name = "mobs:pork_raw", chance = 1, min = 2, max = 3}, }}})
 
 processanimals("dmobs",{"panda","elephant","hedgehog"},cattables({fighttable,{follow="farming:bread",type="animal"}}))
 processanimals("dmobs",{"fox","badger","owl"},cattables({fighttable,{follow="mobs:meat_raw",type="animal",walk_chance=2}}))
@@ -139,9 +139,9 @@ processanimals("dmobs",
 	{"dragon","dragon2","dragon3","dragon4","dragon_black","dragon_blue","dragon_great","dragon_great_tame","dragon_green","dragon_red"},
 	{follow={value={"mobs:lava_orb","bucket:bucket_lava"}} }
 	)
-processanimals("dmobs",{"orc","orc_redesign","ogre"},{follow="mobs_zombie:rotten_flesh"})
+processanimals("dmobs",{"orc","orc_redesign","ogre"},{follow="mobs_zombie:rotten_flesh",hp_max=50,armor=80})
 processanimals("f46_dragon",{"dragon"},{follow={value={"mobs:lava_orb","bucket:bucket_lava"}} })
-processanimals("banth",{"banth"},{follow="mobs:meat_raw"})
+processanimals("banth",{"banth"},{follow="mobs:meat_raw",hp_max=40,armor=80})
 processanimals("mobs_sharks",{"shark_lg","shark_md","shark_sm"},{follow="mobs_turtles:turtle"})
 
 processanimals("mobs_crocs",{"crocodile","crocodile_float","crocodile_swim"},{follow="mobs_jellyfish:jellyfish"})
