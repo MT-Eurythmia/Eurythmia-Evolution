@@ -170,11 +170,14 @@ processanimals("nssm",{"signosigno"},{follow="default:torch"})
 
 -- override nssm:larva and mobs_air and mobs_water with simple capturing
 
-for _,mob in pairs({"mobs_butterfly:butterfly","mobs_bat:bat","mobs_birds:gull","mobs_birds:bird_sm","mobs_birds:bird_lg","mobs_fish:clownfish","mobs_fish:tropical","mobs_jellyfish:jellyfish"}) do
+for _,mob in pairs({"nssm:larva","mobs_butterfly:butterfly","mobs_bat:bat","mobs_birds:gull","mobs_birds:bird_sm","mobs_birds:bird_lg","mobs_fish:clownfish","mobs_fish:tropical","mobs_jellyfish:jellyfish"}) do
 	local def = {}
 	local mymob = minetest.registered_entities[mob]
 	if mymob then
-		def.on_rightclick = capturedef(mymob.hp_max,{override=true})
+		def.on_rightclick = capturedef({hp=mymob.hp_max,override=true})
 		override.rewrite(mob,def)
 	end
 end
+
+-- TODO override nssm drops
+
