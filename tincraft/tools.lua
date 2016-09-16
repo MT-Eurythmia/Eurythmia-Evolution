@@ -1,9 +1,8 @@
--- Tin Dagger
+-- Tin ore is very commn and has very little use. Here's a tin dagger.
 -- Useful in that it's better than your bare hands or a wooden/stone sword
--- Pretty patheritc in that it breaks fairly quickly
+-- Pretty pathetic in that it breaks fairly quickly
 
-
-local tindagcap = {
+local tindaggercaps = {
                 full_punch_interval = 2.0,
                 max_drop_level = 0,
                 groupcaps = {
@@ -15,10 +14,10 @@ local tindagcap = {
 minetest.register_tool("tincraft:tin_dagger", {
         description = "Cheap Tin Dagger",
         inventory_image = "tincraft_tin_dagger.png",
-        tool_capabilities = tindagcap, -- overridden by use of on_use ....
+        tool_capabilities = tindaggercaps, -- overridden by use of on_use ....
 	on_use = function(itemstack,user,pointedthing)
 		if pointedthing.type == "object" then
-			pointedthing.ref:punch(user,1,tindagcap)
+			pointedthing.ref:punch(user,1,tindaggercaps)
 		        itemstack:add_wear(math.ceil(65536/25))
 		end
 	        return itemstack
