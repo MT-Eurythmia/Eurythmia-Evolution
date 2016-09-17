@@ -1,7 +1,8 @@
+-- Provide petting overrides on as many mobs as possible
+-- by Tai "DuCake" Kedzierski
+-- Provided under LGPLv3
 
-local chancer = function(hp,difficulty)
-        return math.floor(1000/hp * hp/(hp*0.4) * difficulty)
-end
+-- Capturing code
 
 local capturedef = function(def)
 	local handchance = chancer(def.hp,0.2)
@@ -19,6 +20,10 @@ local capturedef = function(def)
 		mobs:capture_mob(self, clicker, handchance, netchance, lassochance, override, replacement)
 	end
 	return capturing
+end
+
+local chancer = function(hp,difficulty)
+        return math.floor(1000/hp * hp/(hp*0.4) * difficulty)
 end
 
 local getfollows = function(followt)
@@ -58,14 +63,6 @@ local moborder = function(self,clicker)
 end
 
 -- table concatenation
-local cattable = function(oldtable,newtable)
-	local targettable = {}
-	for i,j in pairs(oldtable) do targettable[i] = j end
-	for i,j in pairs(newtable) do targettable[i] = j end
-	return targettable
-end
-
-
 local cattables = function(tablestable)
 	local targettable = {}
 	for i,thetable in pairs(tablestable) do
@@ -74,11 +71,10 @@ local cattables = function(tablestable)
 	return targettable
 end
 
+-- geenric check function to provide
 local nilcheck = function(oldval) return oldval ~= nil end
 
--- first assign capturing if necessary
--- then assign id and order
-
+-- A table of fighting info that can be provided generically to pubs
 local fighttable = {
 	attack_type={check=nilcheck,value="dogfight"},
 	damage={check=nilcheck,value=1}, -- small animals most likely
@@ -86,6 +82,7 @@ local fighttable = {
 	attacks_monsters = true,
 }
 
+-- general purpose processing function
 local function processanimals(modname,moblist,prop) -- just overrides the capturing
 	if prop == nil then prop = {} end
 
