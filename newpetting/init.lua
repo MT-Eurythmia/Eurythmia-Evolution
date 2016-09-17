@@ -101,7 +101,7 @@ local function processanimals(modname,moblist,prop) -- just overrides the captur
 	end
 end
 
-processanimals("mobs_animal",{"cow","kitten","pumba","bunny","bee","rat","chicken"},fighttable)
+processanimals("mobs_animal",{"cow","kitten","pumba","bunny","chicken"},fighttable)
 processanimals("mobs_animal",{"sheep_black","sheep_blue","sheep_brown","sheep_cyan","sheep_dark_green","sheep_dark_grey","sheep_green","sheep_grey","sheep_magenta","sheep_orange","sheep_pink","sheep_red","sheep_violet","sheep_white","sheep_yellow"},fighttable)
 processanimals("mobs_turtles",{"turtle","seaturtle"},cattables({fighttable,{follow="farming:carrot"} }))
 processanimals("mobs_giraffe",{"jeraf"},fighttable)
@@ -170,7 +170,7 @@ processanimals("nssm",{"signosigno"},{follow="default:torch"})
 
 -- override nssm:larva and mobs_air and mobs_water with simple capturing
 
-for _,mob in pairs({"nssm:larva","mobs_butterfly:butterfly","mobs_bat:bat","mobs_birds:gull","mobs_birds:bird_sm","mobs_birds:bird_lg","mobs_fish:clownfish","mobs_fish:tropical","mobs_jellyfish:jellyfish"}) do
+for _,mob in pairs({"mobs_animal:bee","mobs_animal:rat","nssm:larva","mobs_butterfly:butterfly","mobs_bat:bat","mobs_birds:gull","mobs_birds:bird_sm","mobs_birds:bird_lg","mobs_fish:clownfish","mobs_fish:tropical","mobs_jellyfish:jellyfish"}) do
 	local def = {}
 	local mymob = minetest.registered_entities[mob]
 	if mymob then
