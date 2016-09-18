@@ -25,7 +25,7 @@ staffmagic.forbidden_nodes = {
 	".+tin_block",
 	".+silver_block",
 	".+mithril_block",
-	"default:mese",
+	"default:mese$",
 	"protector:",
 	"basic_machines:",
 	"ethereal:crystal_spike",
