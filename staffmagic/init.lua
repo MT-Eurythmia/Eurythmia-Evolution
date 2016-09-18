@@ -387,8 +387,8 @@ minetest.register_tool("staffmagic:staff_melt", {
 
                 for _,fpos in pairs(frostarea) do
 			local oldmeta = minetest.get_meta(fpos)
-			if oldmeta and oldmeta:get_string("nssm") ~= nil then
-				minetest.swap_node(fpos, {name = oldmeta:get_string("nssm") }) -- thre meta data is otherwise already there
+			if oldmeta and oldmeta:get_string("nssm") ~= "" then
+				minetest.swap_node(fpos, {name = oldmeta:get_string("nssm") }) -- the meta data is otherwise already there
 			else -- node saving not enabled
 				local targetnode = minetest.get_node({x=fpos.x,y=fpos.y-1,z=fpos.z})
 				local replname = targetnode.name
