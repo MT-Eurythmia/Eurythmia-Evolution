@@ -1,5 +1,6 @@
 default
 vivarium
+entity_override
 nssm?
 dmobs?
 mobs_animal?
