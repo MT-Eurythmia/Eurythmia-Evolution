@@ -4,6 +4,10 @@
 
 -- Capturing code
 
+local chancer = function(hp,difficulty)
+        return math.floor(1000/hp * hp/(hp*0.4) * difficulty)
+end
+
 local capturedef = function(def)
 	local handchance = chancer(def.hp,0.2)
 	local netchance = chancer(def.hp,0.5)
@@ -20,10 +24,6 @@ local capturedef = function(def)
 		mobs:capture_mob(self, clicker, handchance, netchance, lassochance, override, replacement)
 	end
 	return capturing
-end
-
-local chancer = function(hp,difficulty)
-        return math.floor(1000/hp * hp/(hp*0.4) * difficulty)
 end
 
 local getfollows = function(followt)
