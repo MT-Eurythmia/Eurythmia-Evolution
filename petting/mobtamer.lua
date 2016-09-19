@@ -56,18 +56,18 @@ minetest.register_tool("petting:mobtamer", {
 			if luae.attack_type == nil then luae.attack_type = "dogfight" end
 			luae.runaway = false
 
-			luae.armor = math.ceil(luae.armor * 0.8)
+			luae.armor = math.ceil(luae.armor * 0.9)
 			local o_wv = luae.walk_velocity or 0
 			local o_rv = luae.run_velocity or 0
-			luae.walk_velocity = math.ceil(o_wv * 1.2)
-			luae.run_velocity = math.ceil(o_rv * 1.2)
+			luae.walk_velocity = math.ceil(o_wv * 1.1)
+			luae.run_velocity = math.ceil(o_rv * 1.1)
 			vivarium:bomf(pos,2 )
 		else
 			luaobj:remove()
 			minetest.chat_send_player(user:get_player_name(),"Not a mob!")
 		end
 
-		if not minetest.check_player_privs(user:get_player_name(), {creative=true}) then
+		if not minetest.check_player_privs(user:get_player_name(), {give=true}) then
 			itemstack:add_wear(math.ceil(65536/maxuses))
 		end
 		return itemstack
