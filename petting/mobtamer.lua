@@ -10,16 +10,17 @@ minetest.register_tool("petting:mobtamer", {
 		local pos = {}
 		if pointed_thing.type ~= "node" then
 			pos = user:getpos()
+			local airnodes = minetest.find_nodes_in_area(
+				{x = pos.x -1, y = pos.y - 1, z = pos.z -1},
+				{x = pos.x +1, y = pos.y + 1, z = pos.z +1},
+				{"air","default:water_source","default:river_water_source"}
+			)
+			pos = airnodes[math.random(1,#airnodes)]
+
 		else
 			pos = pointed_thing.under
+			pos = {x=pos.x,y=po.y+1,z=pos.z}
 		end
-		local airnodes = minetest.find_nodes_in_area(
-			{x = pos.x -1, y = pos.y - 1, z = pos.z -1},
-			{x = pos.x +1, y = pos.y + 1, z = pos.z +1},
-			{"air","default:water_source","default:lava_source","default:river_water_source"}
-		)
-		pos = airnodes[math.random(1,#airnodes)]
-
 
 		-- here get the mob to the left
 		local inventory = user:get_inventory()
@@ -52,6 +53,14 @@ minetest.register_tool("petting:mobtamer", {
 			luae.owner = user:get_player_name()
 			luae.tamed = true
 			luae.health = luae.hp_max
+			if luae.attack_type == nil then luae.attack_type = "dogfight" end
+			luae.runaway = false
+
+			luae.armor = math.ceil(luae.armor * 0.8)
+			local o_wv = luae.walk_velocity or 0
+			local o_rv = luae.run_velocity or 0
+			luae.walk_velocity = math.ceil(o_wv * 1.2)
+			luae.run_velocity = math.ceil(o_rv * 1.2)
 			vivarium:bomf(pos,2 )
 		else
 			luaobj:remove()
