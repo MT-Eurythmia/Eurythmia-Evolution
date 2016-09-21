@@ -850,6 +850,8 @@ easyvend.can_dig = function(pos, player)
 	if chest_pos then
 		chest = minetest.get_node(chest_pos)
 		meta_chest = minetest.get_meta(chest_pos)
+	else
+		return true --if no chest, enyone can dig this shop
 	end
 	if registered_chests[chest.name] then
 		 if player and player:is_player() then
