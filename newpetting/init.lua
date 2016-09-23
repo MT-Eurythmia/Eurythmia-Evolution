@@ -176,5 +176,27 @@ for _,mob in pairs({"mobs_animal:bee","mobs_animal:rat","nssm:larva","mobs_butte
 	end
 end
 
+override.rewrite("mobs_animal:bunny",{
+	on_rightclick = {
+		fchain_type = "after",
+		fchain_func = function(self,clicker)
+			local item = clicker:get_wielded_item()
+			if item:get_name() == "mobs:lava_orb" then -- these settings will make for a better battle
+				self.hp_max = 30
+				self.object:set_hp(30)
+				self.armor = 80
+				self.damage = 3
+				self.object:set_properties({textures = {"mobs_bunny_evil.png"}})
+				self.type = "monster"
+
+				if not minetest.setting_getbool("creative_mode") then
+					item:take_item()
+					clicker:set_wielded_item(item)
+				end
+			end
+		end
+	}
+})
+
 -- TODO override nssm drops
 
