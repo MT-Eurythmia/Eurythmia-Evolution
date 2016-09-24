@@ -85,5 +85,5 @@ doorcloser.autoclose = function(doorname)
 end
 
 doorcloser.autoclose("doors:door_obsidian_glass")
-doorcloser.autoclose("doors:door_wood")
+--doorcloser.autoclose("doors:door_wood") -- _a and _b states are inverted! d'oh!
 doorcloser.autoclose("doors:door_glass")
