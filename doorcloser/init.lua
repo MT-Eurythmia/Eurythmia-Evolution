@@ -75,7 +75,7 @@ doorcloser.autoclose = function(doorname)
 	doordef.on_rightclick = function(pos,clicker)
 		originalrc(pos,clicker)
 		if minetest.get_node(pos).name:sub(-2) == "_b" then
-			minetest.after(1.0, function()
+			minetest.after(5.0, function()
 				if minetest.get_node(pos).name:sub(-2) == "_b" then -- player might have closed it themselves
 					toggledoor(pos)
 				end
