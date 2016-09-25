@@ -31,9 +31,9 @@ function anycoin:register_coin(coinname,coindesc,cmaterial,overimg,cvalue)
 	core.register_craft( {
 		output = "anycoin:coin_"..coinname,
 		recipe = {
-			{metals,cmaterial,metals},
-			{cmaterial,cmaterial,cmaterial},
-			{metals,cmaterial,metals},
+			{metals,metals,metals},
+			{cmaterial,metals,cmaterial},
+			{metals,metals,metals},
 		}
 
 	})
@@ -49,10 +49,17 @@ minetest.register_craftitem("anycoin:anycoin", {
 	stack_max = 500,
 })
 
-minetest.register_craftitem("anycoin:nineycoin", {
-	description = "NineyCoin (9 ac-)",
-	inventory_image = "anycoin_coin.png^[colorize:blue:60",
-	coinvalue = 9,
+minetest.register_craftitem("anycoin:fivercoin", {
+	description = "FiverCoin (5 ac-)",
+	inventory_image = "anycoin_coin.png^[colorize:green:60",
+	coinvalue = 5,
+	stack_max = 500,
+})
+
+minetest.register_craftitem("anycoin:tennercoin", {
+	description = "TennerCoin (10 ac-)",
+	inventory_image = "anycoin_coin.png^[colorize:purple:60",
+	coinvalue = 10,
 	stack_max = 500,
 })
 
@@ -60,19 +67,35 @@ local basecoin = "anycoin:anycoin"
 
 core.register_craft( {
 
-	output = "anycoin:nineycoin",
+	output = "anycoin:fivercoin",
+	type = "shapeless",
 	recipe = {
-		{basecoin,basecoin,basecoin},
-		{basecoin,basecoin,basecoin},
-		{basecoin,basecoin,basecoin},
+		basecoin,basecoin,basecoin,basecoin,basecoin
+	}
+
+})
+
+core.register_craft( {
+
+	output = "anycoin:tennercoin",
+	type = "shapeless",
+	recipe = {
+		"anycoin:fivercoin","anycoin:fivercoin"
 	}
 
 })
 
 core.register_craft( {
 	type = "shapeless",
-	output = "anycoin:anycoin 9",
-	recipe = {"anycoin:nineycoin"}
+	output = "anycoin:anycoin 10",
+	recipe = {"anycoin:tennercoin"}
+
+})
+
+core.register_craft( {
+	type = "shapeless",
+	output = "anycoin:anycoin 5",
+	recipe = {"anycoin:fivercoin"}
 
 })
 
