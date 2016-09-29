@@ -19,7 +19,7 @@ minetest.register_tool("petting:mobtamer", {
 
 		else
 			pos = pointed_thing.under
-			pos = {x=pos.x,y=po.y+1,z=pos.z}
+			pos = {x=pos.x,y=pos.y+1,z=pos.z}
 		end
 
 		-- here get the mob to the left
