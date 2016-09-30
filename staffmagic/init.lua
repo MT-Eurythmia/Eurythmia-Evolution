@@ -300,7 +300,7 @@ minetest.register_tool("staffmagic:staff_boom", {
 	on_use = function(itemstack, user, pointed_thing)
 		if not staffmagic:staffcheck(user,"staffer") then return end
 
-		local radius = 5
+		local radius = 1
 		radius = radius + staffmagic:countpower(user,"boom")
 
 		if pointed_thing.type ~= "node" then
