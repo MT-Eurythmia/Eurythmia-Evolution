@@ -57,7 +57,7 @@ mobs:register_mob("mobs_monster:oerkki", {
 	},
 })
 
-mobs:register_spawn("mobs_monster:oerkki", {"default:stone"}, 7, 0, 7000, 1, -10)
+mobs:register_spawn("mobs_monster:oerkki", {"default:stone"}, 7, 0, 7000, 2, -10)
 
 mobs:register_egg("mobs_monster:oerkki", S("Oerkki"), "default_obsidian.png", 1)
 

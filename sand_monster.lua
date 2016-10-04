@@ -55,7 +55,7 @@ mobs:register_mob("mobs_monster:sand_monster", {
 ]]
 })
 
-mobs:register_spawn("mobs_monster:sand_monster", {"default:desert_sand"}, 20, 0, 7000, 1, 31000)
+mobs:register_spawn("mobs_monster:sand_monster", {"default:desert_sand"}, 20, 0, 7000, 2, 31000)
 
 mobs:register_egg("mobs_monster:sand_monster", S("Sand Monster"), "default_desert_sand.png", 1)
 
