@@ -5,7 +5,7 @@ local fh,err = io.open(filepath,'rb') -- use binary in case of UTF ?
 
 if not err then
 	an_data = fh:read("*a")
-	fh.close()
+	fh:close()
 else
 	an_data = minetest.setting_get("motd") or ""
 end
