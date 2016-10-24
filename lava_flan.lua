@@ -56,7 +56,7 @@ mobs:register_mob("mobs_monster:lava_flan", {
 	end,
 })
 
-mobs:register_spawn("mobs_monster:lava_flan", {"default:lava_source"}, 15, 0, 1000, 3, 0)
+mobs:register_spawn("mobs_monster:lava_flan", {"default:lava_source"}, 15, 0, 1000, 2, 0)
 
 mobs:register_egg("mobs_monster:lava_flan", S("Lava Flan"), "default_lava.png", 1)
 

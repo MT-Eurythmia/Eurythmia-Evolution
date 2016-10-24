@@ -53,7 +53,7 @@ mobs:register_mob("mobs_monster:spider", {
 })
 
 mobs:register_spawn("mobs_monster:spider",
-	{"default:desert_stone", "ethereal:crystal_dirt"}, 13, 0, 7000, 3, 71)
+	{"default:desert_stone", "ethereal:crystal_dirt"}, 13, 0, 7000, 1, 71)
 
 mobs:register_egg("mobs_monster:spider", S("Spider"), "mobs_cobweb.png", 1)
 
