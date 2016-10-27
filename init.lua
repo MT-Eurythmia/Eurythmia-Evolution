@@ -30,9 +30,15 @@ if easyvend.currency == nil or minetest.registered_items[easyvend.currency] == n
 	-- Default currency
 	easyvend.currency = "default:gold_ingot"
 end
-easyvend.currency_desc = minetest.registered_items[easyvend.currency].description
-if easyvend.currency_desc == nil or easyvend.currency_desc == "" then
-	easyvend.currency_desc = easyvend.currency
+if minetest.registered_items[easyvend.currency] == nil then
+	minetest.log("error", "[easyvend] Unknown currency item “"..tostring(easyvend.currency).."”!")
+	easyvend.currency = "unknown"
+	easyvend.currency_desc = "unknown"
+else
+	easyvend.currency_desc = minetest.registered_items[easyvend.currency].description
+	if easyvend.currency_desc == nil or easyvend.currency_desc == "" then
+		easyvend.currency_desc = easyvend.currency
+	end
 end
 
 dofile(minetest.get_modpath("easyvend") .. "/easyvend.lua")
