@@ -8,6 +8,13 @@ local chancer = function(hp,difficulty)
         return math.floor(1000/hp * hp/(hp*0.4) * difficulty)
 end
 
+local sethas = function(needle,haystack)
+	if type(haystack) == "table" then
+		return haystack[needle] ~= nil
+	end
+	return haystack == needle
+end
+
 local capturedef = function(def)
 	local handchance = chancer(def.hp,0.2)
 	local netchance = chancer(def.hp,0.5)
@@ -40,9 +47,13 @@ end
 
 local identification = function(self,clicker)
 	if self.owner and self.owner ~= clicker:get_player_name() then
-		minetest.chat_send_player(clicker:get_player_name(),
-			"This is a "..self.name..". It eats: "..getfollows(self.follow)
-		)
+		if not sethas(clicker:get_wielded_item():get_name(),self.follow) then
+			minetest.chat_send_player(clicker:get_player_name(),
+				"This is a "..self.name..". It eats: "..getfollows(self.follow)
+			)
+		else
+			minetest.chat_send_player(clicker:get_player_name(),"Feeding "..self.name.." ...")
+		end
 	end
 	return true
 end

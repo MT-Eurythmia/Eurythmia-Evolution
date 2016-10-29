@@ -285,7 +285,7 @@ minetest.register_tool("staffmagic:staff_sending",{
 	range = 5,
 	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
-		if not staffmagic:staffcheck(user,"staffer") then return end
+		--if not staffmagic:staffcheck(user,"staffer") then return end
 		if pointed_thing.type ~= "node" then
 			if pointed_thing.ref and pointed_thing.ref:is_player() then return end
 			if pointed_thing.type == "object" then
@@ -495,7 +495,6 @@ minetest.register_tool("staffmagic:staff_melt", {
 	end,
 })
 
-if false then
 
 minetest.register_craft(
 {
@@ -510,27 +509,6 @@ minetest.register_craft(
 
 minetest.register_craft(
 {
-	output = "staffmagic:staff_stack",
-	recipe = {
-		{"bucket:bucket_lava","default:diamond","bucket:bucket_lava"},
-		{"","default:mese_crystal",""},
-		{"","default:mese_crystal",""},
-	}
-}
-)
-
-minetest.register_craft(
-{
-	output = "staffmagic:staff_clone",
-	recipe = {
-		{"default:mese_crystal","default:diamondblock","default:mese_crystal"},
-		{"","default:obsidian_shard",""},
-		{"","default:obsidian_shard",""},
-	}
-}
-)
-minetest.register_craft(
-{
 	output = "staffmagic:staff_sending",
 	recipe = {
 		{"default:mese_crystal_fragment","default:apple","default:mese_crystal_fragment"},
@@ -539,14 +517,3 @@ minetest.register_craft(
 	}
 }
 )
-minetest.register_craft(
-{
-	output = "staffmagic:staff_boom",
-	recipe = {
-		{"default:mese","bucket:bucket_lava","default:mese"},
-		{"tnt:gunpowder","default:obsidian","tnt:gunpowder"},
-		{"tnt:gunpowder","default:obsidian","tnt:gunpowder"},
-	}
-}
-)
-end
