@@ -5,9 +5,10 @@ minetest.register_privilege("staff_master","Full trust.")
 staffmagic = {}
 
 staffmagic.staff_power = {
-	boom = "anycoin:coin_bronze",
-	stack = "anycoin:anycoin",
-	clone = "anycoin:coin_iron"
+	boom = "default:mese",
+	expand = "default:obsidian",
+	stack = "default:mese_crystal",
+	clone = "default:diamond"
 }
 
 staffmagic.forbidden_nodes = {
@@ -65,6 +66,37 @@ function staffmagic:isforbidden(nodename)
 		end
 	end
 	return false
+end
+
+local getarea = function (pos,radius)
+	-- get nodes in an area around origin pos
+	-- nearer the centre, greater chance of capturing a node
+	-- at the edges, minimal chance
+	-- for y, y-1 and y+1
+	
+	local nodeset = {}
+	for dy=-1,1 do
+	  for dx=-radius,radius do
+	    for dz=-radius,radius do
+		local tpos = {
+		  x=pos.x+dx,
+		  y=pos.y+dy,
+		  z=pos.z+dz,
+		  }
+		local tnode = minetest.get_node(tpos).name
+		if minetest.get_node_group(tnode,"cracky") ~= 0
+		  or minetest.get_node_group(tnode,"crumbly") > 0
+		  --or tnode == "air"
+		  then
+			local amp = vector.distance(pos,tpos)
+			if (1-amp/radius)*math.random(1,radius) > amp then
+				nodeset[#nodeset+1] = tpos
+			end
+		end
+	    end -- dz
+	  end -- dx
+	end
+	return nodeset
 end
 
 function staffmagic:max(x,y)
@@ -291,6 +323,51 @@ minetest.register_tool("staffmagic:staff_sending",{
 	end
 })
 
+minetest.register_tool("staffmagic:staff_expand", {
+	description = "Expansion Staff (spread nodes)",
+	inventory_image = "staffmagic_staff.png^[colorize:pink:140",
+	wield_image = "staffmagic_staff.png^[colorize:pink:140",
+	range = 12,
+	stack_max = 1,
+	on_use = function(itemstack, user, pointed_thing)
+		if not staffmagic:staffcheck(user,"staffer") then return end
+
+		local radius = 3
+		radius = radius + staffmagic:countpower(user,"expand")
+
+		if pointed_thing.type ~= "node" then
+			return
+		end
+
+		if not staffmagic:staffcheck(user,"super_staffer") then return end
+
+		local pos = pointed_thing.under
+		local pname = user:get_player_name()
+
+		if minetest.is_protected(pos, pname) then
+			minetest.record_protection_violation(pos, pname)
+			return
+		end
+
+
+		local targetnode = minetest.get_node(pos).name
+		local userpos = user:getpos()
+                local targetnodes = getarea(pos,radius)
+
+		vivarium:bomf(pos,radius)
+
+                for _,fpos in pairs(targetnodes) do
+			if string.match("fire:",targetnode) then
+				--minetest.dig_node(fpos)
+			else
+				minetest.swap_node(fpos, {name = targetnode })
+			end
+		end
+		return itemstack
+
+	end,
+})
+
 minetest.register_tool("staffmagic:staff_boom", {
 	description = "Boom Staff (delete nodes)",
 	inventory_image = "staffmagic_staff.png^[colorize:black:140",
@@ -418,6 +495,8 @@ minetest.register_tool("staffmagic:staff_melt", {
 	end,
 })
 
+if false then
+
 minetest.register_craft(
 {
 	output = "staffmagic:staff_melt",
@@ -470,3 +549,4 @@ minetest.register_craft(
 	}
 }
 )
+end
