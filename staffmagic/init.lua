@@ -333,7 +333,7 @@ minetest.register_tool("staffmagic:staff_expand", {
 		if not staffmagic:staffcheck(user,"staffer") then return end
 
 		local radius = 3
-		radius = radius + staffmagic:countpower(user,"expand")
+		radius = radius + 2*staffmagic:countpower(user,"expand")
 
 		if pointed_thing.type ~= "node" then
 			return
