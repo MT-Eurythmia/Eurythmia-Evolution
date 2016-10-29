@@ -1,6 +1,7 @@
 local filepath = minetest.get_worldpath() .. "/announcement.txt"
 local an_data = nil
 local fsn = "announcement:billboard"
+local mdisplay = true -- whether to display the message
 
 local reload = function()
 	local fh,err = io.open(filepath,'rb') -- use binary in case of UTF ?
@@ -11,7 +12,12 @@ local reload = function()
 	else
 		an_data = minetest.setting_get("motd") or ""
 	end
-	if an_data == "" then an_data = "<no message>" end
+	if an_data == "" then
+		an_data = "<no message>"
+		mdisplay = false
+	else
+		mdisplay = true
+	end
 
 	formspeccer:clear(fsn)
 	formspeccer:newform(fsn,"20,10")
@@ -46,7 +52,9 @@ minetest.register_chatcommand("announcement",{
 })
 
 minetest.register_on_joinplayer(function(player)
+	if mdisplay then
 	minetest.after(0.5,function(...)
 		formspeccer:show(player,fsn )
 	end)
+	end
 end)
