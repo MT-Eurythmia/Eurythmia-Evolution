@@ -423,7 +423,10 @@ minetest.register_tool("staffmagic:staff_boom", {
 			if string.match("fire:",targetnode) then -- stop fire sound at same time.
 				minetest.dig_node(fpos)
 			else
-				minetest.swap_node(fpos, {name = "air" })
+				local amp = vector.distance(pos,fpos) -- make the hole more "organic" :-P
+				if (1-amp/radius)*math.random(1,radius) > amp then
+					minetest.swap_node(fpos, {name = "air" })
+				end
 			end
 		end
 		return itemstack
