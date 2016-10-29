@@ -53,8 +53,14 @@ mobs:register_mob("mobs_monster:tree_monster", {
 	},
 })
 
-mobs:register_spawn("mobs_monster:tree_monster",
-	{"default:leaves", "default:jungleleaves"}, 7, 0, 7000, 1, 31000, false)
+mobs:spawn({
+	name = "mobs_monster:tree_monster",
+	nodes = {"default:leaves", "default:jungleleaves"},
+	max_light = 7,
+	chance = 7000,
+	min_height = 0,
+	day_toggle = false,
+})
 
 mobs:register_egg("mobs_monster:tree_monster", S("Tree Monster"), "default_tree_top.png", 1)
 
