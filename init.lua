@@ -56,6 +56,7 @@ end
 local machine_template = {
 	paramtype2 = "facedir",
 	groups = {choppy=2,oddly_breakable_by_hand=2},
+	is_ground_content = false,
 
 	after_place_node = easyvend.after_place_node,
 	can_dig = easyvend.can_dig,
