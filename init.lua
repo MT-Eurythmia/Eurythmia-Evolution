@@ -30,6 +30,10 @@ if easyvend.currency == nil or minetest.registered_items[easyvend.currency] == n
 	-- Default currency
 	easyvend.currency = "default:gold_ingot"
 end
+
+-- Number of currency items required to earn for awarding “Pro Seller” award
+easyvend.powerseller = 1000
+
 if minetest.registered_items[easyvend.currency] == nil then
 	minetest.log("error", "[easyvend] Unknown currency item “"..tostring(easyvend.currency).."”!")
 	easyvend.currency = "unknown"

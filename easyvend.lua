@@ -340,6 +340,18 @@ easyvend.machine_check = function(pos, node)
 	itemname=itemstack:get_name()
 	meta:set_string("itemname", itemname)
 
+	if minetest.get_modpath("awards") and buysell == "sell" then
+		if minetest.get_player_by_name(machine_owner) then
+			local earnings = meta:get_int("earnings")
+			if earnings >= 1 then
+				awards.unlock(machine_owner, "easyvend_seller")
+			end
+			if earnings >= easyvend.powerseller then
+				awards.unlock(machine_owner, "easyvend_powerseller")
+			end
+		end
+	end
+
 	local change
 	if node.name == "easyvend:vendor" or node.name == "easyvend:depositor" then
 		if active then change = easyvend.machine_enable(pos, node) end
@@ -493,6 +505,46 @@ easyvend.make_infotext = function(nodename, owner, cost, number, itemstring)
 	return d
 end
 
+if minetest.get_modpath("awards") then
+	awards.register_achievement("easyvend_seller",{
+		title = "First Sale",
+		description = "Sell something with a vending machine.",
+		icon = "easyvend_vendor_front_on.png^awards_level1.png",
+	})
+	local desc_powerseller
+	if easyvend.currency == "default:gold_ingot" then
+		desc_powerseller = string.format("Earn %d gold ingots by selling goods with a single vending machine.", easyvend.powerseller)
+	else
+		desc_powerseller = string.format("Earn %d currency items by selling goods with a single vending machine.", easyvend.powerseller)
+	end
+	awards.register_achievement("easyvend_powerseller",{
+		title = "Power Seller",
+		description = desc_powerseller,
+		icon = "easyvend_vendor_front_on.png^awards_level2.png",
+	})
+end
+
+easyvend.check_earnings = function(buyername, nodemeta)
+	local owner = nodemeta:get_string("owner")
+	if buyername ~= owner then
+		local cost = nodemeta:get_int("cost")
+		local itemname = nodemeta:get_string("itemname")
+		-- First sell
+		if minetest.get_player_by_name(owner) ~= nil then
+			awards.unlock(owner, "easyvend_seller")
+		end
+		if itemname ~= easyvend.currency then
+			local newearnings = nodemeta:get_int("earnings") + cost
+			if newearnings >= easyvend.powerseller and minetest.get_modpath("awards") then
+				if minetest.get_player_by_name(owner) ~= nil then
+					awards.unlock(owner, "easyvend_powerseller")
+				end
+			end
+			nodemeta:set_int("earnings", newearnings)
+		end
+	end
+end
+
 easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
 	local sendername = sender:get_player_name()
 	local meta = minetest.get_meta(pos)
@@ -507,6 +559,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
 	local itemname=meta:get_string("itemname")
 	local item=meta:get_inventory():get_stack("item", 1)
 	local check_wear = meta:get_int("wear") == 0 and minetest.registered_tools[itemname] ~= nil
+	local machine_owner = meta:get_string("owner")
 
 	local buysell = easyvend.buysell(node.name)
 	
@@ -523,11 +576,11 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
 
 	local chest_pos_remove, chest_error_remove, chest_pos_add, chest_error_add
 	if buysell == "sell" then
-		chest_pos_remove, chest_error_remove = easyvend.find_connected_chest(sendername, pos, itemname, check_wear, number, true)
-		chest_pos_add, chest_error_add = easyvend.find_connected_chest(sendername, pos, easyvend.currency, check_wear, cost, false)
+		chest_pos_remove, chest_error_remove = easyvend.find_connected_chest(machine_owner, pos, itemname, check_wear, number, true)
+		chest_pos_add, chest_error_add = easyvend.find_connected_chest(machine_owner, pos, easyvend.currency, check_wear, cost, false)
 	else
-		chest_pos_remove, chest_error_remove = easyvend.find_connected_chest(sendername, pos, easyvend.currency, check_wear, cost, true)
-		chest_pos_add, chest_error_add = easyvend.find_connected_chest(sendername, pos, itemname, check_wear, number, false)
+		chest_pos_remove, chest_error_remove = easyvend.find_connected_chest(machine_owner, pos, easyvend.currency, check_wear, cost, true)
+		chest_pos_add, chest_error_add = easyvend.find_connected_chest(machine_owner, pos, itemname, check_wear, number, false)
 	end
 
 	if chest_pos_remove ~= nil and chest_pos_add ~= nil and sender and sender:is_player() then
@@ -569,6 +622,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
 					else
 						meta:set_string("message", "Item bought.")
 					end
+					easyvend.check_earnings(sendername, meta)
 					easyvend.sound_vend(pos)
 					easyvend.machine_check(pos, node)
 				else
@@ -635,6 +689,7 @@ easyvend.on_receive_fields_buysell = function(pos, formname, fields, sender)
 							end
 						end
 						meta:set_string("message", "Item bought.")
+						easyvend.check_earnings(sendername, meta)
 						easyvend.sound_vend(pos)
 						easyvend.machine_check(pos, node)
 					end
@@ -817,6 +872,8 @@ easyvend.after_place_node = function(pos, placer)
 	if node.name == "easyvend:vendor" then
 		d = string.format("Inactive vending machine (owned by %s)", player_name)
 		meta:set_int("wear", 1)
+		-- Total number of currency items earned for the machine's life time (excluding currency-currency trading)
+		meta:set_int("earnings", 0)
 	elseif node.name == "easyvend:depositor" then
 		d = string.format("Inactive depositing machine (owned by %s)", player_name)
 		meta:set_int("wear", 0)
@@ -1169,6 +1226,9 @@ if minetest.setting_getbool("easyvend_convert_vendor") == true then
 
 			-- Initialize metadata
 			local meta = minetest.get_meta(pos)
+			if node.name == "vendor:vendor" then
+				meta:set_int("earnings", 0)
+			end
 			meta:set_int("stock", -1)
 			meta:set_int("joketimer", -1)
 			meta:set_int("joke_id", 1)
