@@ -1,5 +1,5 @@
 minetest.register_tool("petting:mobtamer", {
-	description = "Mob Tamer",
+	description = "Mob Converter (place mob egg to the left of this item)",
 	inventory_image = "petting_mobtamer.png",
 	wield_image = "petting_mobtamer.png",
 	range = 10,
