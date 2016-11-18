@@ -138,6 +138,10 @@ easyvend.set_formspec = function(pos, player)
 		.."label[0,-0.15;"..numbertext.."]"
 		.."label[0,1.2;"..costtext.."]"
 		.."list[current_player;main;0,3.5;8,4;]"
+	if minetest.get_modpath("doc") and minetest.get_modpath("doc_items") then
+		formspec = formspec .. "image_button[7.25,2;0.75,0.75;doc_button_icon_lores.png;doc;]" ..
+		"tooltip[doc;Help]"
+	end
 
 	if configmode then
 		local wear = "false"
@@ -927,9 +931,17 @@ easyvend.on_receive_fields = function(pos, formname, fields, sender)
 	local meta = minetest.get_meta(pos)
 	local node = minetest.get_node(pos)
 	local owner = meta:get_string("owner")
-	local sendername = sender:get_player_name(sender)
+	local sendername = sender:get_player_name()
 
-	if fields.config or fields.save or fields.usermode then
+	if fields.doc then
+		if minetest.get_modpath("doc") and minetest.get_modpath("doc_items") then
+			if easyvend.buysell(node.name) == "buy" then
+				doc.show_entry(sendername, "nodes", "easyvend:depositor", true)
+			else
+				doc.show_entry(sendername, "nodes", "easyvend:vendor", true)
+			end
+		end
+	elseif fields.config or fields.save or fields.usermode then
 		if sender:get_player_name() == owner then
 			easyvend.on_receive_fields_config(pos, formname, fields, sender)
 		else
