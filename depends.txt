@@ -2,5 +2,4 @@ default
 screwdriver?
 doc?
 doc_items?
-doc?
 awards?
