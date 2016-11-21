@@ -139,8 +139,10 @@ easyvend.set_formspec = function(pos, player)
 		.."label[0,1.2;"..costtext.."]"
 		.."list[current_player;main;0,3.5;8,4;]"
 	if minetest.get_modpath("doc") and minetest.get_modpath("doc_items") then
-		formspec = formspec .. "image_button[7.25,2;0.75,0.75;doc_button_icon_lores.png;doc;]" ..
-		"tooltip[doc;Help]"
+		if (doc.VERSION.MAJOR >= 1) or (doc.VERSION.MAJOR == 0 and doc.VERSION.MINOR >= 8) then
+			formspec = formspec .. "image_button[7.25,2;0.75,0.75;doc_button_icon_lores.png;doc;]" ..
+			"tooltip[doc;Help]"
+		end
 	end
 
 	if configmode then
