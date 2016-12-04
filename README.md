@@ -47,5 +47,6 @@ stay in operation afterwards.
         - [CC-BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)
         - [GPL 3.0](https://www.gnu.org/licenses/gpl-3.0.html)
         - [GPL 2.0](https://www.gnu.org/licenses/old-licenses/gpl-2.0)
+    - Original title of the work: “Inventory Sound Effects”
     - Source: [OpenGameArt](http://opengameart.org/content/inventory-sound-effects)
     - Authors: [OpenGameArt](http://opengameart.org/) user artisticdude, edited by Bad\_Command\_
