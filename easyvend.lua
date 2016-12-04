@@ -536,7 +536,7 @@ easyvend.check_earnings = function(buyername, nodemeta)
 		local cost = nodemeta:get_int("cost")
 		local itemname = nodemeta:get_string("itemname")
 		-- First sell
-		if minetest.get_player_by_name(owner) ~= nil then
+		if minetest.get_modpath("awards") and minetest.get_player_by_name(owner) ~= nil then
 			awards.unlock(owner, "easyvend_seller")
 		end
 		if itemname ~= easyvend.currency then
