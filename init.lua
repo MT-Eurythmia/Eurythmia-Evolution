@@ -132,7 +132,7 @@ if minetest.get_modpath("default") ~= nil then
 	})
 end
 
-if minetest.get_modpath("doc") ~= nil then
+if minetest.get_modpath("doc") ~= nil and minetest.get_modpath("doc_items") ~= nil then
 	doc.add_entry_alias("nodes", "easyvend:vendor", "easyvend:vendor_on")
 	doc.add_entry_alias("nodes", "easyvend:depositor", "easyvend:depositor_on")
 end
