@@ -486,7 +486,12 @@ easyvend.make_infotext = function(nodename, owner, cost, number, itemstring)
 		end
 		return d
 	end
-	local iname = minetest.registered_items[itemstring].description
+	local iname
+	if minetest.registered_items[itemstring] then
+		iname = minetest.registered_items[itemstring].description
+	else
+		iname = string.format("Unknown Item (%s)", itemstring)
+	end
 	if iname == nil then iname = itemstring end
 	local printitem, printcost
 	if number == 1 then
@@ -1145,7 +1150,7 @@ easyvend.find_chest = function(owner, pos, dy, itemname, check_wear, amount, rem
 		end
 		local inv = meta:get_inventory()
 		if (inv ~= nil) then
-			if (itemname ~= nil and amount ~= nil and removing ~= nil and check_wear ~= nil) then
+			if (itemname ~= nil and minetest.registered_items[itemname] and amount ~= nil and removing ~= nil and check_wear ~= nil) then
 				local chest_has, chest_free
 				local stack = {name=itemname, count=amount, wear=0, metadata=""}
 				local stack_max = minetest.registered_items[itemname].stack_max
@@ -1169,7 +1174,11 @@ easyvend.find_chest = function(owner, pos, dy, itemname, check_wear, amount, rem
 				else
 					return pos, internal
 				end
+			else
+				return nil, internal
 			end
+		else
+			return nil, internal
 		end
 	elseif (node.name ~= "easyvend:vendor" and node.name~="easyvend:depositor" and node.name~="easyvend:vendor_on" and node.name~="easyvend:depositor_on") then
 		return nil, internal
