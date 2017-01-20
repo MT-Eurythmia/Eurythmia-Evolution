@@ -8,6 +8,7 @@ mobs:register_mob("mobs_monster:sand_monster", {
 	passive = false,
 	attack_type = "dogfight",
 	pathfinding = true,
+	--specific_attack = {"player", "mobs_npc:npc"},
 	reach = 2,
 	damage = 1,
 	hp_min = 4,
