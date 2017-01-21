@@ -71,9 +71,12 @@ mobs:alias_mob("mobs:mese_monster", "mobs_monster:mese_monster")
 -- mese arrow (weapon)
 mobs:register_arrow("mobs_monster:mese_arrow", {
 	visual = "sprite",
+--	visual = "wielditem",
 	visual_size = {x = 0.5, y = 0.5},
 	textures = {"default_mese_crystal_fragment.png"},
+	--textures = {"default:mese_crystal_fragment"},
 	velocity = 6,
+--	rotate = 180,
 
 	hit_player = function(self, player)
 		player:punch(self.object, 1.0, {
