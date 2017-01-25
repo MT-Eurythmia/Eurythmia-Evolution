@@ -516,8 +516,13 @@ for i = 1, 12 do
 	minetest.register_alias("unifieddyes:pigment_"..hue, "dye:"..hue)
 end
 
-minetest.register_alias("unifieddyes:light_red", "dye:pink")
+minetest.register_alias("unifieddyes:light_red",  "dye:pink")
 minetest.register_alias("unifieddyes:dark_green", "dye:dark_green")
+minetest.register_alias("unifieddyes:black",      "dye:black")
+minetest.register_alias("unifieddyes:darkgrey",   "dye:dark_grey")
+minetest.register_alias("unifieddyes:grey",       "dye:grey")
+minetest.register_alias("unifieddyes:lightgrey",  "dye:light_grey")
+minetest.register_alias("unifieddyes:white",      "dye:white")
 
 minetest.register_alias("unifieddyes:white_paint", "dye:white")
 minetest.register_alias("unifieddyes:titanium_dioxide", "dye:white")
