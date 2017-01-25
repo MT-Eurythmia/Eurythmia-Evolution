@@ -39,6 +39,23 @@ else
 	S = function(s) return s end
 end
 
+unifieddyes.hue_to_idx = {
+	red = 2,
+	orange = 3,
+	yellow = 4,
+	lime = 5,
+	green = 6,
+	aqua = 7,
+	cyan = 8,
+	skyblue = 9,
+	blue = 10,
+	violet = 11,
+	magenta = 12,
+	redviolet = 13,
+
+	grey = 1
+}
+
 -- helper functions for other mods that use this one
 
 -- code borrowed from homedecor
