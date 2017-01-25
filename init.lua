@@ -183,7 +183,8 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 		end
 	else
 		local pos2 = unifieddyes.select_node(pointed_thing)
-		if unifieddyes.is_buildable_to(player:get_player_name(), pos2) then
+		if unifieddyes.is_buildable_to(player:get_player_name(), pos2) and
+		  minetest.registered_nodes[name] then
 			local oldnode = minetest.registered_nodes[stack:get_name()]
 			minetest.set_node(pos2, oldnode)
 			stack:take_item()
