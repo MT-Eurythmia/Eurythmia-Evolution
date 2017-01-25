@@ -29,12 +29,167 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 --=====================================================================
 
+unifieddyes = {}
+
 -- Boilerplate to support localized strings if intllib mod is installed.
 local S
 if minetest.get_modpath("intllib") then
 	S = intllib.Getter()
 else
 	S = function(s) return s end
+end
+
+-- helper functions for other mods that use this one
+
+-- code borrowed from homedecor
+
+function unifieddyes.select_node(pointed_thing)
+	local pos = pointed_thing.under
+	local node = minetest.get_node_or_nil(pos)
+	local def = node and minetest.registered_nodes[node.name]
+
+	if not def or not def.buildable_to then
+		pos = pointed_thing.above
+		node = minetest.get_node_or_nil(pos)
+		def = node and minetest.registered_nodes[node.name]
+	end
+	return def and pos, def
+end
+
+function unifieddyes.is_buildable_to(placer_name, ...)
+	for _, pos in ipairs({...}) do
+		local node = minetest.get_node_or_nil(pos)
+		local def = node and minetest.registered_nodes[node.name]
+		if not (def and def.buildable_to) or minetest.is_protected(pos, placer_name) then
+			return false
+		end
+	end
+	return true
+end
+
+-- code borrowed from cheapie's plasticbox mod
+
+function unifieddyes.getpaletteidx(color)
+	local aliases = {
+		["pink"] = "light_red",
+		["brown"] = "dark_orange",
+	}
+
+	local grayscale = {
+		["white"] = 1,
+		["light_grey"] = 2,
+		["grey"] = 3,
+		["dark_grey"] = 4,
+		["black"] = 5,
+	}
+
+	local hues = {
+		["red"] = 1,
+		["orange"] = 2,
+		["yellow"] = 3,
+		["lime"] = 4,
+		["green"] = 5,
+		["aqua"] = 6,
+		["cyan"] = 7,
+		["skyblue"] = 8,
+		["blue"] = 9,
+		["violet"] = 10,
+		["magenta"] = 11,
+		["redviolet"] = 12,
+	}
+
+	local shades = {
+		[""] = 1,
+		["s50"] = 2,
+		["light"] = 3,
+		["medium"] = 4,
+		["mediums50"] = 5,
+		["dark"] = 6,
+		["darks50"] = 7,
+	}
+
+	if string.sub(color,1,4) == "dye:" then
+		color = string.sub(color,5,-1)
+	elseif string.sub(color,1,12) == "unifieddyes:" then
+		color = string.sub(color,13,-1)
+	else
+		return
+	end
+
+	color = aliases[color] or color
+
+	if grayscale[color] then
+		return(grayscale[color])
+	end
+
+	local shade = ""
+	if string.sub(color,1,6) == "light_" then
+		shade = "light"
+		color = string.sub(color,7,-1)
+	elseif string.sub(color,1,7) == "medium_" then
+		shade = "medium"
+		color = string.sub(color,8,-1)
+	elseif string.sub(color,1,5) == "dark_" then
+		shade = "dark"
+		color = string.sub(color,6,-1)
+	end
+	if string.sub(color,-4,-1) == "_s50" then
+		shade = shade.."s50"
+		color = string.sub(color,1,-5)
+	end
+
+	if hues[color] and shades[shade] then
+		return(hues[color] * 8 + shades[shade])
+	end
+end
+
+function unifieddyes.on_destruct(pos)
+	local meta = minetest.get_meta(pos)
+	local prevdye = meta:get_string("dye")
+	if minetest.registered_items[prevdye] then
+		minetest.add_item(pos,prevdye)
+	end
+end
+
+function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newnode)
+	local name = player:get_player_name()
+	if minetest.is_protected(pos,name) and not minetest.check_player_privs(name,{protection_bypass=true}) then
+		minetest.record_protection_violation(pos,name)
+		return stack
+	end
+	local name = stack:get_name()
+
+	local paletteidx = unifieddyes.getpaletteidx(name)
+	if paletteidx then
+
+		local meta = minetest.get_meta(pos)
+		local prevdye = meta:get_string("dye")
+		if minetest.registered_items[prevdye] then
+			local inv = player:get_inventory()
+			if inv:room_for_item("main",prevdye) then
+				inv:add_item("main",prevdye)
+			else
+				minetest.add_item(pos,prevdye)
+			end
+		end
+		meta:set_string("dye",name)
+		stack:take_item()
+		node.param2 = paletteidx
+		if newnode then
+			node.name = newnode
+			minetest.swap_node(pos, node)
+		else
+			minetest.swap_node(pos, node)
+		end
+	else
+		local pos2 = unifieddyes.select_node(pointed_thing)
+		if unifieddyes.is_buildable_to(player:get_player_name(), pos2) then
+			local oldnode = minetest.registered_nodes[stack:get_name()]
+			minetest.set_node(pos2, oldnode)
+			stack:take_item()
+			return stack
+		end
+	end
 end
 
 -- Items/recipes needed to generate the few base colors that are not
