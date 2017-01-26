@@ -97,7 +97,7 @@ function unifieddyes.is_buildable_to(placer_name, ...)
 	return true
 end
 
-function unifieddyes.get_hsv(name)
+function unifieddyes.get_hsv(name) -- expects a node/item name
 	local hue = ""
 	local a,b
 	for _, i in ipairs(HUES) do
@@ -108,9 +108,13 @@ function unifieddyes.get_hsv(name)
 		end
 	end
 
-	if string.find(name, "grey")           then hue = "grey" 
-	elseif string.find(name, "white")      then hue = "white"
-	elseif string.find(name, "black")      then hue = "black"
+	if string.find(name, "_light_grey")     then hue = "light_grey"
+	elseif string.find(name, "_lightgrey")  then hue = "light_grey"
+	elseif string.find(name, "_dark_grey")  then hue = "dark_grey"
+	elseif string.find(name, "_darkgrey")   then hue = "dark_grey"
+	elseif string.find(name, "_grey")       then hue = "grey"
+	elseif string.find(name, "_white")      then hue = "white"
+	elseif string.find(name, "_black")      then hue = "black"
 	end
 
 	local sat = ""
