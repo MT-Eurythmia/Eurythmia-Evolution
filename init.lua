@@ -191,8 +191,7 @@ function unifieddyes.on_destruct(pos)
 	end
 end
 
-function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newnode)
-	local colorfdir = (minetest.registered_nodes[minetest.get_node(pos).name].paramtype2 == "colorfacedir")
+function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newnode, colorfdir)
 	local name = player:get_player_name()
 	if minetest.is_protected(pos,name) and not minetest.check_player_privs(name,{protection_bypass=true}) then
 		minetest.record_protection_violation(pos,name)
@@ -222,13 +221,31 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 
 		if newnode then
 			node.name = newnode
-			if colorfdir then  -- we probably need to change the color of the node too
+			if colorfdir then  -- we probably need to change the hue of the node too
 				if oldhue ~=0 then -- it's colored, not grey
-					node.name = string.gsub(node.name, "_"..HUES[oldhue], "_"..HUES[hue])
+					print("at line 226")
+					print("prevdye = "..dump(prevdye))
+					print("oldhue = "..dump(oldhue).." "..dump(HUES[oldhue]))
+					print("hue = "..dump(hue).." "..dump(HUES[hue]))
+					print("node.name = "..dump(node.name))
+					if oldhue ~= nil then -- it's been painted before
+						if hue ~= 0 then -- the player's wielding a colored dye
+							node.name = string.gsub(node.name, "_"..HUES[oldhue], "_"..HUES[hue])
+						else -- it's a greyscale dye
+							node.name = string.gsub(node.name, "_"..HUES[oldhue], "_grey")
+						end
+					else -- it's never had a color at all
+						if hue ~= 0 then -- and if the wield is greyscale, don't change the node name
+							node.name = string.gsub(node.name, "_grey", "_"..HUES[hue])
+						end
+					end
 				else
-					node.name = string.gsub(node.name, "_grey", "_"..HUES[hue])
+					if hue ~= 0 then  -- greyscale dye on greyscale node = no hue change
+						node.name = string.gsub(node.name, "_grey", "_"..HUES[hue])
+					end
 				end
 			end
+
 			minetest.swap_node(pos, node)
 		else
 			if colorfdir then  -- we probably need to change the color of the node too
