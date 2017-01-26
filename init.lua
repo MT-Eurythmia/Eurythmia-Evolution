@@ -97,6 +97,33 @@ function unifieddyes.is_buildable_to(placer_name, ...)
 	return true
 end
 
+function unifieddyes.get_hsv(name)
+	local hue = ""
+	local a,b
+	for _, i in ipairs(HUES) do
+		a,b = string.find(name, "_"..i)
+		if a and not ( string.find(name, "_redviolet") and i == "red" ) then
+			hue = i
+			break
+		end
+	end
+
+	if string.find(name, "grey")           then hue = "grey" 
+	elseif string.find(name, "white")      then hue = "white"
+	elseif string.find(name, "black")      then hue = "black"
+	end
+
+	local sat = ""
+	if string.find(name, "_s50")    then sat = "_s50" end
+
+	local val = ""
+	if string.find(name, "dark_")   then val = "dark_"   end
+	if string.find(name, "medium_") then val = "medium_" end
+	if string.find(name, "light_")  then val = "light_"  end
+
+	return hue, sat, val
+end
+
 -- code borrowed from cheapie's plasticbox mod
 
 function unifieddyes.getpaletteidx(color, colorfdir)
