@@ -230,7 +230,7 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 			end
 		end
 
-		if newnode then
+		if newnode then -- this path is used when the calling mod want to supply a replacement node
 			if colorfdir then  -- we probably need to change the hue of the node too
 				if oldhue ~=0 then -- it's colored, not grey
 					if oldhue ~= nil then -- it's been painted before
@@ -252,20 +252,26 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 			end
 			node.name = newnode
 			minetest.swap_node(pos, node)
-		else
+		else -- this path is used when you're just painting an existing node, rather than replacing one.
 			newnode = oldnode  -- note that here, newnode/oldnode are a full node, not just the name.
 			if colorfdir then
 				print("prevdye = "..dump(prevdye))
 				print("hue = "..dump(hue).." "..dump(HUES[hue]))
 				print("newnode.name = "..newnode.name)
 				if oldhue then
-					newnode.name = string.gsub(newnode.name, "_"..oldhue, "_"..HUES[hue])
+					if hue ~= 0 then
+						newnode.name = string.gsub(newnode.name, "_"..oldhue, "_"..HUES[hue])
+					else
+						newnode.name = string.gsub(newnode.name, "_"..oldhue, "_grey")
+					end
+				elseif string.find(minetest.get_node(pos).name, "_grey") and hue ~= 0 then
+					newnode.name = string.gsub(newnode.name, "_grey", "_"..HUES[hue])
 				end
 			end
 			newnode.param2 = paletteidx + (minetest.get_node(pos).param2 % 32)
 			minetest.set_node(pos, newnode)
 		end
-	else
+	else  -- here is where a node is just being placed, not something being colored
 		if unifieddyes.is_buildable_to(player:get_player_name(), pos2) and
 		  minetest.registered_nodes[name] then
 			local placeable_node = minetest.registered_nodes[stack:get_name()]
