@@ -217,47 +217,60 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 		stack:take_item()
 		node.param2 = paletteidx
 
-		local oldpaletteidx, oldhue = unifieddyes.getpaletteidx(prevdye, colorfdir)
+		local oldpaletteidx, oldhuenum = unifieddyes.getpaletteidx(prevdye, colorfdir)
+
+		local oldnode = minetest.get_node(pos)
+
+		local oldhue = nil
+		for _, i in ipairs(HUES) do
+			if string.find(oldnode.name, "_"..i) and not
+				( string.find(oldnode.name, "_redviolet") and i == "red" ) then
+				oldhue = i
+				break
+			end
+		end
 
 		if newnode then
-			node.name = newnode
 			if colorfdir then  -- we probably need to change the hue of the node too
 				if oldhue ~=0 then -- it's colored, not grey
-					print("at line 226")
-					print("prevdye = "..dump(prevdye))
-					print("oldhue = "..dump(oldhue).." "..dump(HUES[oldhue]))
-					print("hue = "..dump(hue).." "..dump(HUES[hue]))
-					print("node.name = "..dump(node.name))
 					if oldhue ~= nil then -- it's been painted before
 						if hue ~= 0 then -- the player's wielding a colored dye
-							node.name = string.gsub(node.name, "_"..HUES[oldhue], "_"..HUES[hue])
+							newnode = string.gsub(newnode, "_"..oldhue, "_"..HUES[hue])
 						else -- it's a greyscale dye
-							node.name = string.gsub(node.name, "_"..HUES[oldhue], "_grey")
+							newnode = string.gsub(newnode, "_"..oldhue, "_grey")
 						end
 					else -- it's never had a color at all
 						if hue ~= 0 then -- and if the wield is greyscale, don't change the node name
-							node.name = string.gsub(node.name, "_grey", "_"..HUES[hue])
+							newnode = string.gsub(newnode, "_grey", "_"..HUES[hue])
 						end
 					end
 				else
 					if hue ~= 0 then  -- greyscale dye on greyscale node = no hue change
-						node.name = string.gsub(node.name, "_grey", "_"..HUES[hue])
+						newnode = string.gsub(newnode, "_grey", "_"..HUES[hue])
 					end
 				end
 			end
-
+			node.name = newnode
 			minetest.swap_node(pos, node)
 		else
-			if colorfdir then  -- we probably need to change the color of the node too
-				node.name = string.gsub(node.name, HUES[oldhue], HUES[hue])
+			newnode = oldnode  -- note that here, newnode/oldnode are a full node, not just the name.
+			if colorfdir then
+				print("prevdye = "..dump(prevdye))
+				print("hue = "..dump(hue).." "..dump(HUES[hue]))
+				print("newnode.name = "..newnode.name)
+				if oldhue then
+					newnode.name = string.gsub(newnode.name, "_"..oldhue, "_"..HUES[hue])
+				end
 			end
-			minetest.swap_node(pos, node)
+			newnode.param2 = paletteidx + (minetest.get_node(pos).param2 % 32)
+			minetest.set_node(pos, newnode)
 		end
 	else
 		if unifieddyes.is_buildable_to(player:get_player_name(), pos2) and
 		  minetest.registered_nodes[name] then
 			local placeable_node = minetest.registered_nodes[stack:get_name()]
 			minetest.set_node(pos2, placeable_node)
+			print(minetest.get_node(pos).name)
 			stack:take_item()
 			return stack
 		end
