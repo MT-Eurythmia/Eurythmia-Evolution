@@ -39,24 +39,37 @@ else
 	S = function(s) return s end
 end
 
-unifieddyes.hue_to_idx = {
-	red = 2,
-	orange = 3,
-	yellow = 4,
-	lime = 5,
-	green = 6,
-	aqua = 7,
-	cyan = 8,
-	skyblue = 9,
-	blue = 10,
-	violet = 11,
-	magenta = 12,
-	redviolet = 13,
+-- helper functions for other mods that use this one
 
-	grey = 1
+local HUES = {
+	"red",
+	"orange",
+	"yellow",
+	"lime",
+	"green",
+	"aqua",
+	"cyan",
+	"skyblue",
+	"blue",
+	"violet",
+	"magenta",
+	"redviolet"
 }
 
--- helper functions for other mods that use this one
+local HUES2 = {
+	"Red",
+	"Orange",
+	"Yellow",
+	"Lime",
+	"Green",
+	"Aqua",
+	"Cyan",
+	"Sky-blue",
+	"Blue",
+	"Violet",
+	"Magenta",
+	"Red-violet"
+}
 
 -- code borrowed from homedecor
 
@@ -86,7 +99,8 @@ end
 
 -- code borrowed from cheapie's plasticbox mod
 
-function unifieddyes.getpaletteidx(color)
+function unifieddyes.getpaletteidx(color, colorfdir)
+	local origcolor = color
 	local aliases = {
 		["pink"] = "light_red",
 		["brown"] = "dark_orange",
@@ -134,9 +148,14 @@ function unifieddyes.getpaletteidx(color)
 	end
 
 	color = aliases[color] or color
+	local idx
 
 	if grayscale[color] then
-		return(grayscale[color])
+		if colorfdir then
+			return (grayscale[color] * 32), 0
+		else
+			return grayscale[color], 0
+		end
 	end
 
 	local shade = ""
@@ -156,7 +175,11 @@ function unifieddyes.getpaletteidx(color)
 	end
 
 	if hues[color] and shades[shade] then
-		return(hues[color] * 8 + shades[shade])
+		if not colorfdir then
+			return (hues[color] * 8 + shades[shade]), hues[color]
+		else
+			return (shades[shade] * 32), hues[color]
+		end
 	end
 end
 
@@ -169,14 +192,16 @@ function unifieddyes.on_destruct(pos)
 end
 
 function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newnode)
+	local colorfdir = (minetest.registered_nodes[minetest.get_node(pos).name].paramtype2 == "colorfacedir")
 	local name = player:get_player_name()
 	if minetest.is_protected(pos,name) and not minetest.check_player_privs(name,{protection_bypass=true}) then
 		minetest.record_protection_violation(pos,name)
 		return stack
 	end
 	local name = stack:get_name()
+	local pos2 = unifieddyes.select_node(pointed_thing)
+	local paletteidx, hue = unifieddyes.getpaletteidx(name, colorfdir)
 
-	local paletteidx = unifieddyes.getpaletteidx(name)
 	if paletteidx then
 
 		local meta = minetest.get_meta(pos)
@@ -192,18 +217,30 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 		meta:set_string("dye",name)
 		stack:take_item()
 		node.param2 = paletteidx
+
+		local oldpaletteidx, oldhue = unifieddyes.getpaletteidx(prevdye, colorfdir)
+
 		if newnode then
 			node.name = newnode
+			if colorfdir then  -- we probably need to change the color of the node too
+				if oldhue ~=0 then -- it's colored, not grey
+					node.name = string.gsub(node.name, "_"..HUES[oldhue], "_"..HUES[hue])
+				else
+					node.name = string.gsub(node.name, "_grey", "_"..HUES[hue])
+				end
+			end
 			minetest.swap_node(pos, node)
 		else
+			if colorfdir then  -- we probably need to change the color of the node too
+				node.name = string.gsub(node.name, HUES[oldhue], HUES[hue])
+			end
 			minetest.swap_node(pos, node)
 		end
 	else
-		local pos2 = unifieddyes.select_node(pointed_thing)
 		if unifieddyes.is_buildable_to(player:get_player_name(), pos2) and
 		  minetest.registered_nodes[name] then
-			local oldnode = minetest.registered_nodes[stack:get_name()]
-			minetest.set_node(pos2, oldnode)
+			local placeable_node = minetest.registered_nodes[stack:get_name()]
+			minetest.set_node(pos2, placeable_node)
 			stack:take_item()
 			return stack
 		end
@@ -351,36 +388,6 @@ minetest.register_craft( {
 -- "s50" in a file/item name means "saturation: 50%".
 -- Brightness levels in the textures are 33% ("dark"), 66% ("medium"),
 -- 100% ("full", but not so-named), and 150% ("light").
-
-local HUES = {
-	"red",
-	"orange",
-	"yellow",
-	"lime",
-	"green",
-	"aqua",
-	"cyan",
-	"skyblue",
-	"blue",
-	"violet",
-	"magenta",
-	"redviolet"
-}
-
-local HUES2 = {
-	"Red",
-	"Orange",
-	"Yellow",
-	"Lime",
-	"Green",
-	"Aqua",
-	"Cyan",
-	"Sky-blue",
-	"Blue",
-	"Violet",
-	"Magenta",
-	"Red-violet"
-}
 
 
 for i = 1, 12 do
