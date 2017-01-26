@@ -286,9 +286,6 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 		else -- this path is used when you're just painting an existing node, rather than replacing one.
 			newnode = oldnode  -- note that here, newnode/oldnode are a full node, not just the name.
 			if colorfdir then
-				print("prevdye = "..dump(prevdye))
-				print("hue = "..dump(hue).." "..dump(HUES[hue]))
-				print("newnode.name = "..newnode.name)
 				if oldhue then
 					if hue ~= 0 then
 						newnode.name = string.gsub(newnode.name, "_"..oldhue, "_"..HUES[hue])
@@ -307,7 +304,6 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 		  minetest.registered_nodes[name] then
 			local placeable_node = minetest.registered_nodes[stack:get_name()]
 			minetest.set_node(pos2, placeable_node)
-			print(minetest.get_node(pos).name)
 			stack:take_item()
 			return stack
 		end
