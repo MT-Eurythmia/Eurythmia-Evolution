@@ -280,9 +280,9 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 						newnode = string.gsub(newnode, "_grey", "_"..HUES[hue])
 					end
 				end
+			node.param2 = paletteidx + (minetest.get_node(pos).param2 % 32)
 			end
 			node.name = newnode
-			node.param2 = paletteidx + (minetest.get_node(pos).param2 % 32)
 			minetest.swap_node(pos, node)
 		else -- this path is used when you're just painting an existing node, rather than replacing one.
 			newnode = oldnode  -- note that here, newnode/oldnode are a full node, not just the name.
