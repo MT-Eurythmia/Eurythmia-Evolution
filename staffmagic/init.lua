@@ -423,8 +423,9 @@ minetest.register_tool("staffmagic:staff_boom", {
 			if string.match("fire:",targetnode) then -- stop fire sound at same time.
 				minetest.dig_node(fpos)
 			else
-				local amp = vector.distance(pos,fpos) -- make the hole more "organic" :-P
-				if (1-amp/radius)*math.random(1,radius) > amp then
+				local dist = vector.distance(pos,fpos) -- make the hole more "organic"
+				--if (1-dist/radius)*math.random(1,radius-dist) > dist/2 then
+				if dist < radius then
 					minetest.swap_node(fpos, {name = "air" })
 				end
 			end
@@ -479,7 +480,7 @@ minetest.register_tool("staffmagic:staff_melt", {
 						replname = newreplname
 					end
 				end
-				local sealevel = 0 -- TODO get the custom setting for sealevel
+				local sealevel = tonumber(minetest.setting_get("water_level") ) or 0
 				if fpos.y > 0 and replname == "default:water_source" then -- don't bother with water above sea level
 					replname = "air"
 				end
