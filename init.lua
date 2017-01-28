@@ -132,7 +132,7 @@ end
 
 -- code borrowed from cheapie's plasticbox mod
 
-function unifieddyes.getpaletteidx(color, colorfdir)
+function unifieddyes.getpaletteidx(color, is_color_fdir)
 	local origcolor = color
 	local aliases = {
 		["pink"] = "light_red",
@@ -184,7 +184,7 @@ function unifieddyes.getpaletteidx(color, colorfdir)
 	local idx
 
 	if grayscale[color] then
-		if colorfdir then
+		if is_color_fdir then
 			return (grayscale[color] * 32), 0
 		else
 			return grayscale[color], 0
@@ -208,7 +208,7 @@ function unifieddyes.getpaletteidx(color, colorfdir)
 	end
 
 	if hues[color] and shades[shade] then
-		if not colorfdir then
+		if not is_color_fdir then
 			return (hues[color] * 8 + shades[shade]), hues[color]
 		else
 			return (shades[shade] * 32), hues[color]
@@ -218,11 +218,16 @@ end
 
 function unifieddyes.after_dig_node(pos, oldnode, oldmetadata, digger)
 	local prevdye
+
+	print(dump(oldmetadata))
+
 	if oldmetadata and oldmetadata.fields then
 		prevdye = oldmetadata.fields.dye
 	end
 
 	local inv = digger:get_inventory()
+
+	print(dump(prevdye))
 
 	if prevdye and not (inv:contains_item("main", prevdye) and creative_mode) and minetest.registered_items[prevdye] then
 		if inv:room_for_item("main", prevdye) then
@@ -233,7 +238,7 @@ function unifieddyes.after_dig_node(pos, oldnode, oldmetadata, digger)
 	end
 end
 
-function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newnode, colorfdir)
+function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newnode, is_color_fdir)
 	local name = player:get_player_name()
 	if minetest.is_protected(pos,name) and not minetest.check_player_privs(name,{protection_bypass=true}) then
 		minetest.record_protection_violation(pos,name)
@@ -241,7 +246,7 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 	end
 	local name = stack:get_name()
 	local pos2 = unifieddyes.select_node(pointed_thing)
-	local paletteidx, hue = unifieddyes.getpaletteidx(name, colorfdir)
+	local paletteidx, hue = unifieddyes.getpaletteidx(name, is_color_fdir)
 
 	if paletteidx then
 
@@ -263,7 +268,7 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 		end
 		node.param2 = paletteidx
 
-		local oldpaletteidx, oldhuenum = unifieddyes.getpaletteidx(prevdye, colorfdir)
+		local oldpaletteidx, oldhuenum = unifieddyes.getpaletteidx(prevdye, is_color_fdir)
 
 		local oldnode = minetest.get_node(pos)
 
@@ -277,7 +282,7 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 		end
 
 		if newnode then -- this path is used when the calling mod want to supply a replacement node
-			if colorfdir then  -- we probably need to change the hue of the node too
+			if is_color_fdir then  -- we probably need to change the hue of the node too
 				if oldhue ~=0 then -- it's colored, not grey
 					if oldhue ~= nil then -- it's been painted before
 						if hue ~= 0 then -- the player's wielding a colored dye
@@ -301,7 +306,7 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 			minetest.swap_node(pos, node)
 		else -- this path is used when you're just painting an existing node, rather than replacing one.
 			newnode = oldnode  -- note that here, newnode/oldnode are a full node, not just the name.
-			if colorfdir then
+			if is_color_fdir then
 				if oldhue then
 					if hue ~= 0 then
 						newnode.name = string.gsub(newnode.name, "_"..oldhue, "_"..HUES[hue])
