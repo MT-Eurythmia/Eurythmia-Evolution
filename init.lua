@@ -247,8 +247,9 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 
 		local meta = minetest.get_meta(pos)
 		local prevdye = meta:get_string("dye")
-		if not creative_mode and minetest.registered_items[prevdye] then
-			local inv = player:get_inventory()
+		local inv = player:get_inventory()
+
+		if not (inv:contains_item("main", prevdye) and creative_mode) and minetest.registered_items[prevdye] then
 			if inv:room_for_item("main", prevdye) then
 				inv:add_item("main", prevdye)
 			else
@@ -256,7 +257,7 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 			end
 		end
 
-		meta:set_string("dye",name)
+		meta:set_string("dye", name)
 		if not creative_mode and prevdye ~= name then
 			stack:take_item()
 		end
@@ -312,7 +313,7 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 				end
 			end
 			newnode.param2 = paletteidx + (minetest.get_node(pos).param2 % 32)
-			minetest.set_node(pos, newnode)
+			minetest.swap_node(pos, newnode)
 		end
 	else  -- here is where a node is just being placed, not something being colored
 		if unifieddyes.is_buildable_to(player:get_player_name(), pos2) and
@@ -630,8 +631,10 @@ minetest.register_alias("unifieddyes:light_red",  "dye:pink")
 minetest.register_alias("unifieddyes:dark_green", "dye:dark_green")
 minetest.register_alias("unifieddyes:black",      "dye:black")
 minetest.register_alias("unifieddyes:darkgrey",   "dye:dark_grey")
+minetest.register_alias("unifieddyes:dark_grey",   "dye:dark_grey")
 minetest.register_alias("unifieddyes:grey",       "dye:grey")
 minetest.register_alias("unifieddyes:lightgrey",  "dye:light_grey")
+minetest.register_alias("unifieddyes:light_grey",  "dye:light_grey")
 minetest.register_alias("unifieddyes:white",      "dye:white")
 
 minetest.register_alias("unifieddyes:white_paint", "dye:white")
