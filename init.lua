@@ -31,6 +31,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 unifieddyes = {}
 
+local creative_mode = minetest.setting_getbool("creative_mode")
+
 -- Boilerplate to support localized strings if intllib mod is installed.
 local S
 if minetest.get_modpath("intllib") then
@@ -214,11 +216,18 @@ function unifieddyes.getpaletteidx(color, colorfdir)
 	end
 end
 
-function unifieddyes.on_destruct(pos)
-	local meta = minetest.get_meta(pos)
-	local prevdye = meta:get_string("dye")
-	if minetest.registered_items[prevdye] then
-		minetest.add_item(pos,prevdye)
+function unifieddyes.after_dig_node(pos, oldnode, oldmetadata, digger)
+	local prevdye
+	if oldmetadata and oldmetadata.fields then
+		prevdye = oldmetadata.fields.dye
+	end
+	if not creative_mode and prevdye and minetest.registered_items[prevdye] then
+		local inv = digger:get_inventory()
+		if inv:room_for_item("main", prevdye) then
+			inv:add_item("main", prevdye)
+		else
+			minetest.add_item(pos, prevdye)
+		end
 	end
 end
 
@@ -236,16 +245,19 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 
 		local meta = minetest.get_meta(pos)
 		local prevdye = meta:get_string("dye")
-		if minetest.registered_items[prevdye] then
+		if not creative_mode and minetest.registered_items[prevdye] then
 			local inv = player:get_inventory()
-			if inv:room_for_item("main",prevdye) then
-				inv:add_item("main",prevdye)
+			if inv:room_for_item("main", prevdye) then
+				inv:add_item("main", prevdye)
 			else
-				minetest.add_item(pos,prevdye)
+				minetest.add_item(pos, prevdye)
 			end
 		end
+
 		meta:set_string("dye",name)
-		stack:take_item()
+		if not creative_mode and prevdye ~= name then
+			stack:take_item()
+		end
 		node.param2 = paletteidx
 
 		local oldpaletteidx, oldhuenum = unifieddyes.getpaletteidx(prevdye, colorfdir)
@@ -310,7 +322,9 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 			local fdir = minetest.dir_to_facedir(dir)
 
 			minetest.set_node(pos2, { name = placeable_node.name, param2 = fdir })
-			stack:take_item()
+			if not creative_mode then
+				stack:take_item()
+			end
 			return stack
 		end
 	end
