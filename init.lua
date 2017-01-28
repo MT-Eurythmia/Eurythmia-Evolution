@@ -300,7 +300,9 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 						newnode = string.gsub(newnode, "_grey", "_"..HUES[hue])
 					end
 				end
-			node.param2 = paletteidx + (minetest.get_node(pos).param2 % 32)
+				node.param2 = paletteidx + (minetest.get_node(pos).param2 % 32)
+			else
+				node.param2 = paletteidx
 			end
 			node.name = newnode
 			minetest.swap_node(pos, node)
@@ -316,8 +318,10 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 				elseif string.find(minetest.get_node(pos).name, "_grey") and hue ~= 0 then
 					newnode.name = string.gsub(newnode.name, "_grey", "_"..HUES[hue])
 				end
+				newnode.param2 = paletteidx + (minetest.get_node(pos).param2 % 32)
+			else
+				newnode.param2 = paletteidx
 			end
-			newnode.param2 = paletteidx + (minetest.get_node(pos).param2 % 32)
 			minetest.swap_node(pos, newnode)
 		end
 	else  -- here is where a node is just being placed, not something being colored
