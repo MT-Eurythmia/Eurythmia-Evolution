@@ -304,7 +304,12 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 		if unifieddyes.is_buildable_to(player:get_player_name(), pos2) and
 		  minetest.registered_nodes[name] then
 			local placeable_node = minetest.registered_nodes[stack:get_name()]
-			minetest.set_node(pos2, placeable_node)
+
+			local yaw = player:get_look_yaw()
+			local dir = minetest.yaw_to_dir(yaw-1.5)
+			local fdir = minetest.dir_to_facedir(dir)
+
+			minetest.set_node(pos2, { name = placeable_node.name, param2 = fdir })
 			stack:take_item()
 			return stack
 		end
