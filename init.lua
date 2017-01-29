@@ -147,6 +147,14 @@ function unifieddyes.getpaletteidx(color, is_color_fdir)
 		["black"] = 5,
 	}
 
+	local grayscale_wallmounted = {
+		["white"] = 0,
+		["light_grey"] = 1,
+		["grey"] = 2,
+		["dark_grey"] = 3,
+		["black"] = 4,
+	}
+
 	local hues = {
 		["red"] = 1,
 		["orange"] = 2,
@@ -162,6 +170,17 @@ function unifieddyes.getpaletteidx(color, is_color_fdir)
 		["redviolet"] = 12,
 	}
 
+	local hues_wallmounted = {
+		["red"] = 0,
+		["orange"] = 1,
+		["yellow"] = 2,
+		["green"] = 3,
+		["cyan"] = 4,
+		["blue"] = 5,
+		["violet"] = 6,
+		["magenta"] = 7
+	}
+
 	local shades = {
 		[""] = 1,
 		["s50"] = 2,
@@ -170,6 +189,12 @@ function unifieddyes.getpaletteidx(color, is_color_fdir)
 		["mediums50"] = 5,
 		["dark"] = 6,
 		["darks50"] = 7,
+	}
+
+	local shades_wallmounted = {
+		[""] = 1,
+		["medium"] = 2,
+		["dark"] = 3
 	}
 
 	if string.sub(color,1,4) == "dye:" then
@@ -183,8 +208,12 @@ function unifieddyes.getpaletteidx(color, is_color_fdir)
 	color = aliases[color] or color
 	local idx
 
-	if grayscale[color] then
-		if is_color_fdir then
+	if is_color_fdir == "wallmounted" then
+		if grayscale_wallmounted[color] then
+			return (grayscale_wallmounted[color] * 64), 0
+		end
+	elseif is_color_fdir then
+		if grayscale[color] then
 			return (grayscale[color] * 32), 0
 		else
 			return grayscale[color], 0
@@ -207,11 +236,17 @@ function unifieddyes.getpaletteidx(color, is_color_fdir)
 		color = string.sub(color,1,-5)
 	end
 
-	if hues[color] and shades[shade] then
-		if not is_color_fdir then
-			return (hues[color] * 8 + shades[shade]), hues[color]
-		else
+	if is_color_fdir == "wallmounted" then
+		if shade == "dark" and color == "orange" then return 48,1 -- brown
+		elseif shade == "light" and color == "red" then return 56,7 -- pink
+		elseif hues_wallmounted[color] and shades_wallmounted[shade] then
+			return (shades_wallmounted[shade] * 64 + hues_wallmounted[color] * 8), hues_wallmounted[color]
+		end
+	elseif hues[color] and shades[shade] then
+		if is_color_fdir then
 			return (shades[shade] * 32), hues[color]
+		else
+			return (hues[color] * 8 + shades[shade]), hues[color]
 		end
 	end
 end
@@ -282,7 +317,9 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 		end
 
 		if newnode then -- this path is used when the calling mod want to supply a replacement node
-			if is_color_fdir then  -- we probably need to change the hue of the node too
+			if is_color_fdir == "wallmounted" then
+				node.param2 = paletteidx + (minetest.get_node(pos).param2 % 8)
+			elseif is_color_fdir then  -- we probably need to change the hue of the node too
 				if oldhue ~=0 then -- it's colored, not grey
 					if oldhue ~= nil then -- it's been painted before
 						if hue ~= 0 then -- the player's wielding a colored dye
@@ -308,7 +345,9 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 			minetest.swap_node(pos, node)
 		else -- this path is used when you're just painting an existing node, rather than replacing one.
 			newnode = oldnode  -- note that here, newnode/oldnode are a full node, not just the name.
-			if is_color_fdir then
+			if is_color_fdir == "wallmounted" then
+				newnode.param2 = paletteidx + (minetest.get_node(pos).param2 % 8)
+			elseif is_color_fdir then
 				if oldhue then
 					if hue ~= 0 then
 						newnode.name = string.gsub(newnode.name, "_"..oldhue, "_"..HUES[hue])
@@ -332,6 +371,10 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 			local yaw = player:get_look_yaw()
 			local dir = minetest.yaw_to_dir(yaw-1.5)
 			local fdir = minetest.dir_to_facedir(dir)
+
+			if is_color_fdir == "wallmounted" then
+				fdir = minetest.dir_to_wallmounted(dir)
+			end
 
 			minetest.set_node(pos2, { name = placeable_node.name, param2 = fdir })
 			if not creative_mode then
