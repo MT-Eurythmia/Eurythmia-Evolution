@@ -254,15 +254,11 @@ end
 function unifieddyes.after_dig_node(pos, oldnode, oldmetadata, digger)
 	local prevdye
 
-	print(dump(oldmetadata))
-
 	if oldmetadata and oldmetadata.fields then
 		prevdye = oldmetadata.fields.dye
 	end
 
 	local inv = digger:get_inventory()
-
-	print(dump(prevdye))
 
 	if prevdye and not (inv:contains_item("main", prevdye) and creative_mode) and minetest.registered_items[prevdye] then
 		if inv:room_for_item("main", prevdye) then
