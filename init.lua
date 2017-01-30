@@ -208,24 +208,16 @@ function unifieddyes.getpaletteidx(color, is_color_fdir)
 	color = aliases[color] or color
 	local idx
 
-	print("unified dyes says color = "..color)
-
 	if is_color_fdir == "wallmounted" then
-		print("is wallmounted")
 		if grayscale_wallmounted[color] then
-			print("is in grayscale_wallmounted[]")
-			return (grayscale_wallmounted[color] * 64), 0
+			return (grayscale_wallmounted[color] * 8), 0
 		end
 	elseif is_color_fdir then
-		print("is_color_fdir")
 		if grayscale[color] then
-			print("is in grayscale[]")
 			return (grayscale[color] * 32), 0
 		end
 	else
-		print("is not color fdir")
 		if grayscale[color] then
-			print("is in grayscale[]")
 			return grayscale[color], 0
 		end
 	end
