@@ -281,6 +281,8 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 	local pos2 = unifieddyes.select_node(pointed_thing)
 	local paletteidx, hue = unifieddyes.getpaletteidx(name, is_color_fdir)
 
+	print(dump(paletteidx))
+
 	if paletteidx then
 
 		local meta = minetest.get_meta(pos)
@@ -366,12 +368,16 @@ function unifieddyes.on_rightclick(pos, node, player, stack, pointed_thing, newn
 		  minetest.registered_nodes[name] then
 			local placeable_node = minetest.registered_nodes[stack:get_name()]
 
-			local yaw = player:get_look_yaw()
-			local dir = minetest.yaw_to_dir(yaw-1.5)
-			local fdir = minetest.dir_to_facedir(dir)
+			local fdir = 0
 
 			if is_color_fdir == "wallmounted" then
+				local yaw = player:get_look_yaw()
+				local dir = minetest.yaw_to_dir(yaw-1.5)
 				fdir = minetest.dir_to_wallmounted(dir)
+			elseif is_color_fdir then
+				local yaw = player:get_look_yaw()
+				local dir = minetest.yaw_to_dir(yaw-1.5)
+				fdir = minetest.dir_to_facedir(dir)
 			end
 
 			minetest.set_node(pos2, { name = placeable_node.name, param2 = fdir })
