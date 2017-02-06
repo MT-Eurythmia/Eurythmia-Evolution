@@ -256,6 +256,7 @@ function unifieddyes.getpaletteidx(color, is_color_fdir)
 	if is_color_fdir == "wallmounted" then
 		if color == "brown" then return 48,1
 		elseif color == "pink" then return 56,7
+		elseif color == "blue" and shade == "light" then return 40,5
 		elseif hues_wallmounted[color] and shades_wallmounted[shade] then
 			return (shades_wallmounted[shade] * 64 + hues_wallmounted[color] * 8), hues_wallmounted[color]
 		end
