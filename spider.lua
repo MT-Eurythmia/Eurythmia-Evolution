@@ -77,7 +77,7 @@ end
 minetest.register_node(":mobs:cobweb", {
 	description = S("Cobweb"),
 	drawtype = "plantlike",
-	visual_scale = 1.1,
+	visual_scale = 1.2,
 	tiles = {"mobs_cobweb.png"},
 	inventory_image = "mobs_cobweb.png",
 	paramtype = "light",
