@@ -103,9 +103,9 @@ function unifieddyes.fix_rotation(pos, placer, itemstack, pointed_thing)
 
 	local fdir = minetest.dir_to_wallmounted(dir)
 
-	if pitch < -(math.pi/4) then
+	if pitch < -(math.pi/8) then
 		fdir = 0
-	elseif pitch > math.pi/4 then
+	elseif pitch > math.pi/8 then
 		fdir = 1
 	end
 	minetest.swap_node(pos, { name = node.name, param2 = fdir })
