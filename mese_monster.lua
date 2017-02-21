@@ -1,6 +1,7 @@
 
 local S = mobs.intllib
 
+
 -- Mese Monster by Zeg9
 
 mobs:register_mob("mobs_monster:mese_monster", {
@@ -54,6 +55,7 @@ mobs:register_mob("mobs_monster:mese_monster", {
 	},
 })
 
+
 mobs:spawn({
 	name = "mobs_monster:mese_monster",
 	nodes = {"default:stone"},
@@ -63,10 +65,12 @@ mobs:spawn({
 	max_height = -20,
 })
 
+
 mobs:register_egg("mobs_monster:mese_monster", S("Mese Monster"), "default_mese_block.png", 1)
 
--- compatibility
-mobs:alias_mob("mobs:mese_monster", "mobs_monster:mese_monster")
+
+mobs:alias_mob("mobs:mese_monster", "mobs_monster:mese_monster") -- compatiblity
+
 
 -- mese arrow (weapon)
 mobs:register_arrow("mobs_monster:mese_arrow", {

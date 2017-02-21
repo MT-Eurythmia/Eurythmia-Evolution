@@ -1,6 +1,7 @@
 
 local S = mobs.intllib
 
+
 -- Dungeon Master by PilzAdam
 
 mobs:register_mob("mobs_monster:dungeon_master", {
@@ -58,6 +59,7 @@ mobs:register_mob("mobs_monster:dungeon_master", {
 	},
 })
 
+
 mobs:spawn({
 	name = "mobs_monster:dungeon_master",
 	nodes = {"default:stone"},
@@ -67,10 +69,12 @@ mobs:spawn({
 	max_height = -70,
 })
 
+
 mobs:register_egg("mobs_monster:dungeon_master", S("Dungeon Master"), "fire_basic_flame.png", 1, true)
 
--- compatibility
-mobs:alias_mob("mobs:dungeon_master", "mobs_monster:dungeon_master")
+
+mobs:alias_mob("mobs:dungeon_master", "mobs_monster:dungeon_master") -- compatibility
+
 
 -- fireball (weapon)
 mobs:register_arrow("mobs_monster:fireball", {

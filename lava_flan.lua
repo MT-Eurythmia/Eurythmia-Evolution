@@ -1,6 +1,7 @@
 
 local S = mobs.intllib
 
+
 -- Lava Flan by Zeg9 (additional textures by JurajVajda)
 
 mobs:register_mob("mobs_monster:lava_flan", {
@@ -56,6 +57,7 @@ mobs:register_mob("mobs_monster:lava_flan", {
 	end,
 })
 
+
 mobs:spawn({
 	name = "mobs_monster:lava_flan",
 	nodes = {"default:lava_source"},
@@ -64,10 +66,12 @@ mobs:spawn({
 	max_height = 0,
 })
 
+
 mobs:register_egg("mobs_monster:lava_flan", S("Lava Flan"), "default_lava.png", 1)
 
--- compatibility
-mobs:alias_mob("mobs:lava_flan", "mobs_monster:lava_flan")
+
+mobs:alias_mob("mobs:lava_flan", "mobs_monster:lava_flan") -- compatibility
+
 
 -- lava orb
 minetest.register_craftitem(":mobs:lava_orb", {
@@ -82,6 +86,7 @@ minetest.register_craft({
 	recipe = "mobs:lava_orb",
 	burntime = 80,
 })
+
 
 -- Lava Pick (digs and smelts at same time)
 

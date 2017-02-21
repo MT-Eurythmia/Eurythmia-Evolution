@@ -1,6 +1,7 @@
 
 local S = mobs.intllib
 
+
 -- Spider by AspireMint (fishyWET (CC-BY-SA 3.0 license for texture)
 
 mobs:register_mob("mobs_monster:spider", {
@@ -52,9 +53,18 @@ mobs:register_mob("mobs_monster:spider", {
 	},
 })
 
+
+local spawn_on = "default:desert_stone"
+
+if minetest.get_modpath("ethereal") then
+	spawn_on = "ethereal:crystal_dirt"
+else
+	minetest.register_alias("ethereal:crystal_spike", "default:sandstone")
+end
+
 mobs:spawn({
 	name = "mobs_monster:spider",
-	nodes = {"default:desert_stone", "ethereal:crystal_dirt"},
+	nodes = {spawn_on},
 	min_light = 0,
 	max_light = 12,
 	chance = 7000,
@@ -63,15 +73,12 @@ mobs:spawn({
 	max_height = 31000,
 })
 
+
 mobs:register_egg("mobs_monster:spider", S("Spider"), "mobs_cobweb.png", 1)
 
--- compatibility
-mobs:alias_mob("mobs:spider", "mobs_monster:spider")
 
--- ethereal crystal spike compatibility
-if not minetest.get_modpath("ethereal") then
-	minetest.register_alias("ethereal:crystal_spike", "default:sandstone")
-end
+mobs:alias_mob("mobs:spider", "mobs_monster:spider") -- compatibility
+
 
 -- cobweb
 minetest.register_node(":mobs:cobweb", {
