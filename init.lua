@@ -58,12 +58,51 @@ local HUES = {
 	"redviolet"
 }
 
+-- the names of the various colors here came from http://www.procato.com/rgb+index/
+
+local HUES_EXTENDED = {
+	{ "red",        0xff, 0x00, 0x00 },
+	{ "vermilion",  0xff, 0x40, 0x00 },
+	{ "orange",     0xff, 0x80, 0x00 },
+	{ "amber",      0xff, 0xbf, 0x00 },
+	{ "yellow",     0xff, 0xff, 0x00 },
+	{ "lime",       0xbf, 0xff, 0x00 },
+	{ "chartreuse", 0x80, 0xff, 0x00 },
+	{ "harlequin",  0x40, 0xff, 0x00 },
+	{ "green",      0x00, 0xff, 0x00 },
+	{ "malachite",  0x00, 0xff, 0x40 },
+	{ "spring",     0x00, 0xff, 0x80 },
+	{ "turquoise",  0x00, 0xff, 0xbf },
+	{ "cyan",       0x00, 0xff, 0xff },
+	{ "cerulean",   0x00, 0xbf, 0xff },
+	{ "azure",      0x00, 0x80, 0xff },
+	{ "sapphire",   0x00, 0x40, 0xff },
+	{ "blue",       0x00, 0x00, 0xff },
+	{ "indigo",     0x40, 0x00, 0xff },
+	{ "violet",     0x80, 0x00, 0xff },
+	{ "mulberry",   0xbf, 0x00, 0xff },
+	{ "magenta",    0xff, 0x00, 0xff },
+	{ "fuchsia",    0xff, 0x00, 0xbf },
+	{ "rose",       0xff, 0x00, 0x80 },
+	{ "crimson",    0xff, 0x00, 0x40 }
+}
+
 local SATS = {
 	"",
 	"_s50"
 }
 
 local VALS = {
+	"",
+	"medium_",
+	"dark_"
+}
+
+local VALS_EXTENDED = {
+	"faint_",
+	"pastel_",
+	"light_",
+	"bright_",
 	"",
 	"medium_",
 	"dark_"
@@ -542,17 +581,90 @@ for grey = 0, 4 do
 	unifieddyes.convert_classic_palette[paletteidx] = grey
 end
 
--- Items/recipes needed to generate the few base colors that are not
--- provided by the standard dyes mod.
+-- Generate all dyes that are not part of the default minetest_game dyes mod
+
+for _, h in ipairs(HUES_EXTENDED) do
+	local hue = h[1]
+	local r = h[2]
+	local g = h[3]
+	local b = h[4]
+
+	for v = 0, 6 do
+		local val = VALS_EXTENDED[v+1]
+
+		local factor = 40
+		if v > 4 then factor = 75 end
+
+		local r2 = math.max(math.min(r + (4-v)*factor, 255), 0)
+		local g2 = math.max(math.min(g + (4-v)*factor, 255), 0)
+		local b2 = math.max(math.min(b + (4-v)*factor, 255), 0)
+
+		-- full-sat color
+
+		local desc = hue:gsub("%a", string.upper, 1).." Dye"
+
+		if val ~= "" then
+			desc = val:sub(1, -2):gsub("%a", string.upper, 1) .." "..desc
+		end
+
+		if not minetest.registered_items["dye:"..val..hue] then
+
+			local color = string.format("%02x", r2)..string.format("%02x", g2)..string.format("%02x", b2)
+
+			minetest.register_craftitem(":dye:"..val..hue, {
+				description = S(desc),
+				inventory_image = "unifieddyes_dye.png^[colorize:#"..color..":200",
+--				groups = { dye=1, not_in_creative_inventory=1 },
+				on_use = unifieddyes.on_use
+			})
+			minetest.register_alias("unifieddyes:"..val..hue, "dye:"..val..hue)
+		end
+
+		if v > 4 then -- also register the low-sat version
+
+			local pr = 0.299
+			local pg = 0.587
+			local pb = 0.114
+
+			local p = math.sqrt(r2*r2*pr + g2*g2*pg + b2*b2*pb)
+			local r3 = math.floor(p+(r2-p)*0.5)
+			local g3 = math.floor(p+(g2-p)*0.5)
+			local b3 = math.floor(p+(b2-p)*0.5)
+
+			local color = string.format("%02x", r3)..string.format("%02x", g3)..string.format("%02x", b3)
+
+			minetest.register_craftitem(":dye:"..val..hue.."_s50", {
+				description = S(desc.." (low saturation)"),
+				inventory_image = "unifieddyes_dye.png^[colorize:#"..color..":200",
+--				groups = { dye=1, not_in_creative_inventory=1 },
+				on_use = unifieddyes.on_use
+			})
+			minetest.register_alias("unifieddyes:"..val..hue.."_s50", "dye:"..val..hue.."_s50")
+		end
+	end
+end
+
+-- register the greyscales too :P
+
+for y = 1, 14 do -- colors 0 and 15 are black and white, default dyes
+
+	if y ~= 4 and y ~= 7 then -- dark grey and regular grey, default dyes
+
+		local rgb = string.format("%02x", y*17)..string.format("%02x", y*17)..string.format("%02x", y*17)
+		local name = "grey_"..y
+		local desc = "Grey Dye #"..y
+
+		minetest.register_craftitem(":dye:"..name, {
+			description = S(desc),
+			inventory_image = "unifieddyes_dye.png^[colorize:#"..rgb..":200",
+		--	groups = { dye=1, not_in_creative_inventory=1 },
+			on_use = unifieddyes.on_use
+		})
+		minetest.register_alias("unifieddyes:"..name, "dye:"..name)
+	end
+end
 
 -- Lime
-
-minetest.register_craftitem(":dye:lime", {
-	description = S("Lime Dye"),
-	inventory_image = "unifieddyes_lime.png",
-	groups = { dye=1, excolor_lime=1, unicolor_lime=1, not_in_creative_inventory=1 },
-	on_use = unifieddyes.on_use
-})
 
 minetest.register_craft( {
        type = "shapeless",
@@ -565,16 +677,9 @@ minetest.register_craft( {
 
 -- Aqua
 
-minetest.register_craftitem(":dye:aqua", {
-	description = S("Aqua Dye"),
-	inventory_image = "unifieddyes_aqua.png",
-	groups = { dye=1, excolor_aqua=1, unicolor_aqua=1, not_in_creative_inventory=1 },
-	on_use = unifieddyes.on_use
-})
-
 minetest.register_craft( {
        type = "shapeless",
-       output = "dye:aqua 2",
+       output = "dye:spring 2",
        recipe = {
                "dye:cyan",
                "dye:green",
@@ -583,16 +688,9 @@ minetest.register_craft( {
 
 -- Sky blue
 
-minetest.register_craftitem(":dye:skyblue", {
-	description = S("Sky-blue Dye"),
-	inventory_image = "unifieddyes_skyblue.png",
-	groups = { dye=1, excolor_sky_blue=1, unicolor_sky_blue=1, not_in_creative_inventory=1 },
-	on_use = unifieddyes.on_use
-})
-
 minetest.register_craft( {
        type = "shapeless",
-       output = "dye:skyblue 2",
+       output = "dye:azure 2",
        recipe = {
                "dye:cyan",
                "dye:blue",
@@ -601,16 +699,9 @@ minetest.register_craft( {
 
 -- Red-violet
 
-minetest.register_craftitem(":dye:redviolet", {
-	description = S("Red-violet Dye"),
-	inventory_image = "unifieddyes_redviolet.png",
-	groups = { dye=1, excolor_red_violet=1, unicolor_red_violet=1, not_in_creative_inventory=1 },
-	on_use = unifieddyes.on_use
-})
-
 minetest.register_craft( {
        type = "shapeless",
-       output = "dye:redviolet 2",
+       output = "dye:rose 2",
        recipe = {
                "dye:red",
                "dye:magenta",
@@ -619,13 +710,6 @@ minetest.register_craft( {
 
 
 -- Light grey
-
-minetest.register_craftitem(":dye:light_grey", {
-	description = S("Light Grey Dye"),
-	inventory_image = "unifieddyes_lightgrey.png",
-	groups = { dye=1, excolor_lightgrey=1, unicolor_light_grey=1, not_in_creative_inventory=1 },
-	on_use = unifieddyes.on_use
-})
 
 minetest.register_craft( {
        type = "shapeless",
@@ -681,14 +765,7 @@ minetest.register_craft( {
 })
 
 -- =================================================================
-
--- Generate all of additional variants of hue, saturation, and
--- brightness.
-
--- "s50" in a file/item name means "saturation: 50%".
--- Brightness levels in the textures are 33% ("dark"), 66% ("medium"),
--- 100% ("full", but not so-named), and 150% ("light").
-
+-- generate recipes
 
 for i = 1, 12 do
 
@@ -803,65 +880,22 @@ for i = 1, 12 do
 			},
 		})
 	end
-
-	minetest.register_craftitem("unifieddyes:dark_" .. hue .. "_s50", {
-		description = S("Dark " .. hue2 .. " Dye (low saturation)"),
-		inventory_image = "unifieddyes_dark_" .. hue .. "_s50.png",
-		groups = { dye=1, ["unicolor_dark_"..hue.."_s50"]=1, not_in_creative_inventory=1 },
-		on_use = unifieddyes.on_use
-	})
-
-	if hue ~= "green" then
-		minetest.register_craftitem("unifieddyes:dark_" .. hue, {
-			description = S("Dark " .. hue2 .. " Dye"),
-			inventory_image = "unifieddyes_dark_" .. hue .. ".png",
-			groups = { dye=1, ["unicolor_dark_"..hue]=1, not_in_creative_inventory=1 },
-			on_use = unifieddyes.on_use
-		})
-	end
-
-	minetest.register_craftitem("unifieddyes:medium_" .. hue .. "_s50", {
-		description = S("Medium " .. hue2 .. " Dye (low saturation)"),
-		inventory_image = "unifieddyes_medium_" .. hue .. "_s50.png",
-		groups = { dye=1, ["unicolor_medium_"..hue.."_s50"]=1, not_in_creative_inventory=1 },
-		on_use = unifieddyes.on_use
-	})
-
-	minetest.register_craftitem("unifieddyes:medium_" .. hue, {
-		description = S("Medium " .. hue2 .. " Dye"),
-		inventory_image = "unifieddyes_medium_" .. hue .. ".png",
-		groups = { dye=1, ["unicolor_medium_"..hue]=1, not_in_creative_inventory=1 },
-		on_use = unifieddyes.on_use
-	})
-
-	minetest.register_craftitem("unifieddyes:" .. hue .. "_s50", {
-		description = S(hue2 .. " Dye (low saturation)"),
-		inventory_image = "unifieddyes_" .. hue .. "_s50.png",
-		groups = { dye=1, ["unicolor_"..hue.."_s50"]=1, not_in_creative_inventory=1 },
-		on_use = unifieddyes.on_use
-	})
-
-	if hue ~= "red" then
-		minetest.register_craftitem("unifieddyes:light_" .. hue, {
-			description = S("Light " .. hue2 .. " Dye"),
-			inventory_image = "unifieddyes_light_" .. hue .. ".png",
-			groups = { dye=1, ["unicolor_light_"..hue]=1, not_in_creative_inventory=1 },
-			on_use = unifieddyes.on_use
-		})
-	end
-	minetest.register_alias("unifieddyes:"..hue, "dye:"..hue)
-	minetest.register_alias("unifieddyes:pigment_"..hue, "dye:"..hue)
 end
 
 minetest.register_alias("unifieddyes:light_red",  "dye:pink")
 minetest.register_alias("unifieddyes:dark_green", "dye:dark_green")
 minetest.register_alias("unifieddyes:black",      "dye:black")
 minetest.register_alias("unifieddyes:darkgrey",   "dye:dark_grey")
-minetest.register_alias("unifieddyes:dark_grey",   "dye:dark_grey")
+minetest.register_alias("unifieddyes:dark_grey",  "dye:dark_grey")
 minetest.register_alias("unifieddyes:grey",       "dye:grey")
 minetest.register_alias("unifieddyes:lightgrey",  "dye:light_grey")
-minetest.register_alias("unifieddyes:light_grey",  "dye:light_grey")
+minetest.register_alias("unifieddyes:light_grey", "dye:light_grey")
 minetest.register_alias("unifieddyes:white",      "dye:white")
+
+minetest.register_alias("unifieddyes:grey_0",     "dye:black")
+minetest.register_alias("unifieddyes:grey_4",     "dye:dark_grey")
+minetest.register_alias("unifieddyes:grey_7",     "dye:grey")
+minetest.register_alias("unifieddyes:grey_15",    "dye:white")
 
 minetest.register_alias("unifieddyes:white_paint", "dye:white")
 minetest.register_alias("unifieddyes:titanium_dioxide", "dye:white")
@@ -869,6 +903,14 @@ minetest.register_alias("unifieddyes:lightgrey_paint", "dye:light_grey")
 minetest.register_alias("unifieddyes:grey_paint", "dye:grey")
 minetest.register_alias("unifieddyes:darkgrey_paint", "dye:dark_grey")
 minetest.register_alias("unifieddyes:carbon_black", "dye:black")
+
+-- aqua -> spring, skyblue -> azure, and redviolet -> rose aliases
+-- note that technically, lime should be aliased, but can't be (there IS
+-- lime in the new color table, it's just shifted up a bit)
+
+minetest.register_alias("unifieddyes:aqua", "unifieddyes:spring")
+minetest.register_alias("unifieddyes:skyblue", "unifieddyes:azure")
+minetest.register_alias("unifieddyes:redviolet", "unifieddyes:rose")
 
 print(S("[UnifiedDyes] Loaded!"))
 
