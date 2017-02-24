@@ -472,6 +472,18 @@ function unifieddyes.getpaletteidx(color, palette_type)
 				return (hues_extended[color] + shades_extended[shade]*24), hues_extended[color]
 			end
 		else -- it's the 89-color palette
+
+			-- If using this palette, translate new color names back to old.
+
+			if shade == "" then
+				if color == "spring" then
+					color = "aqua"
+				elseif color == "azure" then
+					color = "skyblue"
+				elseif color == "rose" then
+					color = "redviolet"
+				end
+			end
 			if hues[color] and shades[shade] then
 				return (hues[color] * 8 + shades[shade]), hues[color]
 			end
