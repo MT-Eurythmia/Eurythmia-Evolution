@@ -77,21 +77,6 @@ local GREYS = {
 	"black"
 }
 
-local HUES2 = {
-	"Red",
-	"Orange",
-	"Yellow",
-	"Lime",
-	"Green",
-	"Aqua",
-	"Cyan",
-	"Sky-blue",
-	"Blue",
-	"Violet",
-	"Magenta",
-	"Red-violet"
-}
-
 local default_dyes = {
 	"black",
 	"blue",
@@ -708,7 +693,13 @@ minetest.register_craft( {
 for i = 1, 12 do
 
 	local hue = HUES[i]
-	local hue2 = HUES2[i]
+	local hue2 = HUES[i]:gsub("%a", string.upper, 1)
+
+	if hue == "skyblue" then
+		hue2 = "Sky Blue"
+	elseif hue == "redviolet" then
+		hue2 = "Red-violet"
+	end
 
 	minetest.register_craft( {
         type = "shapeless",
