@@ -58,6 +58,25 @@ local HUES = {
 	"redviolet"
 }
 
+local SATS = {
+	"",
+	"_s50"
+}
+
+local VALS = {
+	"",
+	"medium_",
+	"dark_"
+}
+
+local GREYS = {
+	"white",
+	"light_grey",
+	"grey",
+	"dark_grey",
+	"black"
+}
+
 local HUES2 = {
 	"Red",
 	"Orange",
@@ -90,6 +109,27 @@ local default_dyes = {
 	"white",
 	"yellow"
 }
+
+-- this tiles the "extended" palette sideways and then crops it to 256x1
+-- to convert it from human readable to something the engine can use as a palette.
+--
+-- in machine-readable form, the selected color is:
+-- 16 + [hue] - [shade]*24 for the light colors, or
+-- 16 + [hue] + [saturation]*24 + [shade]*48 for the dark colors, or
+-- [shade] (no math) for the greys, 0 = white.
+
+unifieddyes.extended_palette = "[combine:256x1"
+	..":0,0=unifieddyes_palette_extended.png"
+	..":16,-1=unifieddyes_palette_extended.png"
+	..":40,-2=unifieddyes_palette_extended.png"
+	..":64,-3=unifieddyes_palette_extended.png"
+	..":88,-4=unifieddyes_palette_extended.png"
+	..":112,-5=unifieddyes_palette_extended.png"
+	..":136,-6=unifieddyes_palette_extended.png"
+	..":160,-7=unifieddyes_palette_extended.png"
+	..":184,-8=unifieddyes_palette_extended.png"
+	..":208,-9=unifieddyes_palette_extended.png"
+	..":232,-10=unifieddyes_palette_extended.png"
 
 -- code borrowed from homedecor
 
@@ -493,6 +533,28 @@ for _, color in ipairs(default_dyes) do
 	minetest.override_item("dye:"..color, {
 		on_use = unifieddyes.on_use
 	})
+end
+
+-- build a table to convert from classic/89-color palette to extended palette
+
+unifieddyes.convert_classic_palette = {}
+
+for hue = 0, 11 do
+	-- light
+	local paletteidx = unifieddyes.getpaletteidx("dye:light_"..HUES[hue+1], false)
+	unifieddyes.convert_classic_palette[paletteidx] = 16 + hue*2 + 48
+	for sat = 0, 1 do
+		for val = 0, 2 do
+			-- full
+			local paletteidx = unifieddyes.getpaletteidx("dye:"..VALS[val+1]..HUES[hue+1]..SATS[sat+1], false)
+			unifieddyes.convert_classic_palette[paletteidx] = 16 + hue*2 + sat*24 + (val+4)*48
+		end
+	end
+end
+
+for grey = 0, 4 do
+	local paletteidx = unifieddyes.getpaletteidx("dye:"..GREYS[grey+1], false)
+	unifieddyes.convert_classic_palette[paletteidx] = grey
 end
 
 -- Items/recipes needed to generate the few base colors that are not
