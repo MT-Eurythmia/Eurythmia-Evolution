@@ -87,6 +87,9 @@ local HUES_EXTENDED = {
 	{ "crimson",    0xff, 0x00, 0x40 }
 }
 
+for _, i in ipairs(HUES_EXTENDED) do
+	print("[\""..i[1].."\"] =,")
+end
 local SATS = {
 	"",
 	"_s50"
@@ -256,9 +259,18 @@ function unifieddyes.get_hsv(name) -- expects a node/item name
 	return hue, sat, val
 end
 
--- code borrowed from cheapie's plasticbox mod
+-- code partially borrowed from cheapie's plasticbox mod
 
-function unifieddyes.getpaletteidx(color, is_color_fdir)
+-- in the function below, color is just a color string, while
+-- palette_type can be:
+--
+-- false/nil = standard 89 color palette
+-- true = 89 color palette split into pieces for colorfacedir
+-- "wallmounted" = 32-color abridged palette
+-- "extended" = 256 color palette
+
+function unifieddyes.getpaletteidx(color, palette_type)
+
 	local origcolor = color
 	local aliases = {
 		["pink"] = "light_red",
@@ -271,6 +283,28 @@ function unifieddyes.getpaletteidx(color, is_color_fdir)
 		["grey"] = 3,
 		["dark_grey"] = 4,
 		["black"] = 5,
+	}
+
+	local grayscale_extended = {
+		["white"] = 0,
+		["grey_14"] = 1,
+		["grey_13"] = 2,
+		["grey_12"] = 3,
+		["light_grey"] = 3,
+		["grey_11"] = 4,
+		["grey_10"] = 5,
+		["grey_9"] = 6,
+		["grey_8"] = 7,
+		["grey"] = 7,
+		["grey_7"] = 8,
+		["grey_6"] = 9,
+		["grey_5"] = 10,
+		["grey_4"] = 11,
+		["dark_grey"] = 11,
+		["grey_3"] = 12,
+		["grey_2"] = 13,
+		["grey_1"] = 14,
+		["black"] = 15,
 	}
 
 	local grayscale_wallmounted = {
@@ -296,6 +330,33 @@ function unifieddyes.getpaletteidx(color, is_color_fdir)
 		["redviolet"] = 12,
 	}
 
+	local hues_extended = {
+		["red"] = 0,
+		["vermilion"] = 1,
+		["orange"] = 2,
+		["amber"] = 3,
+		["yellow"] = 4,
+		["lime"] = 5,
+		["chartreuse"] = 6,
+		["harlequin"] = 7,
+		["green"] = 8,
+		["malachite"] = 9,
+		["spring"] = 10,
+		["turquoise"] = 11,
+		["cyan"] = 12,
+		["cerulean"] = 13,
+		["azure"] = 14,
+		["sapphire"] = 15,
+		["blue"] = 16,
+		["indigo"] = 17,
+		["violet"] = 18,
+		["mulberry"] = 19,
+		["magenta"] = 20,
+		["fuchsia"] = 21,
+		["rose"] = 22,
+		["crimson"] = 23,
+	}
+
 	local hues_wallmounted = {
 		["red"] = 0,
 		["orange"] = 1,
@@ -317,6 +378,19 @@ function unifieddyes.getpaletteidx(color, is_color_fdir)
 		["darks50"] = 7,
 	}
 
+	local shades_extended = {
+		["faint"] = 1,
+		["pastel"] = 2,
+		["light"] = 3,
+		["bright"] = 4,
+		[""] = 5,
+		["s50"] = 6,
+		["medium"] = 7,
+		["mediums50"] = 8,
+		["dark"] = 9,
+		["darks50"] = 10,
+	}
+
 	local shades_wallmounted = {
 		[""] = 1,
 		["medium"] = 2,
@@ -331,13 +405,17 @@ function unifieddyes.getpaletteidx(color, is_color_fdir)
 		return
 	end
 
-	if is_color_fdir == "wallmounted" then
+	if palette_type == "wallmounted" then
 		if grayscale_wallmounted[color] then
 			return (grayscale_wallmounted[color] * 8), 0
 		end
-	elseif is_color_fdir then
+	elseif palette_type == true then
 		if grayscale[color] then
 			return (grayscale[color] * 32), 0
+		end
+	elseif palette_type == "extended" then
+		if grayscale_extended[color] then
+			return grayscale_extended[color], 0
 		end
 	else
 		if grayscale[color] then
@@ -345,10 +423,19 @@ function unifieddyes.getpaletteidx(color, is_color_fdir)
 		end
 	end
 
-	local shade = ""
-	if string.sub(color,1,6) == "light_" then
+	local shade = "" -- assume full
+	if string.sub(color,1,6) == "faint_" then
+		shade = "faint"
+		color = string.sub(color,7,-1)
+	elseif string.sub(color,1,7) == "pastel_" then
+		shade = "pastel"
+		color = string.sub(color,8,-1)
+	elseif string.sub(color,1,6) == "light_" then
 		shade = "light"
 		color = string.sub(color,7,-1)
+	elseif string.sub(color,1,7) == "bright_" then
+		shade = "bright"
+		color = string.sub(color,8,-1)
 	elseif string.sub(color,1,7) == "medium_" then
 		shade = "medium"
 		color = string.sub(color,8,-1)
@@ -361,7 +448,7 @@ function unifieddyes.getpaletteidx(color, is_color_fdir)
 		color = string.sub(color,1,-5)
 	end
 
-	if is_color_fdir == "wallmounted" then
+	if palette_type == "wallmounted" then
 		if color == "brown" then return 48,1
 		elseif color == "pink" then return 56,7
 		elseif color == "blue" and shade == "light" then return 40,5
@@ -376,10 +463,16 @@ function unifieddyes.getpaletteidx(color, is_color_fdir)
 			color = "red"
 			shade = "light"
 		end
-		if hues[color] and shades[shade] then
-			if is_color_fdir then
+		if palette_type == true then -- it's colorfacedir
+			if hues[color] and shades[shade] then
 				return (shades[shade] * 32), hues[color]
-			else
+			end
+		elseif palette_type == "extended" then
+			if hues_extended[color] and shades_extended[shade] then
+				return (hues_extended[color] + shades_extended[shade]*24), hues_extended[color]
+			end
+		else -- it's the 89-color palette
+			if hues[color] and shades[shade] then
 				return (hues[color] * 8 + shades[shade]), hues[color]
 			end
 		end
@@ -433,14 +526,18 @@ function unifieddyes.on_use(itemstack, player, pointed_thing)
 	end
 
 	local newnode = nodedef.ud_replacement_node
-	local is_color_fdir
+	local palette_type
 
 	if nodedef.paramtype2 == "color" then
-		is_color_fdir = false
-	elseif nodedef.paramtype2 == "colorfacedir"
-		then is_color_fdir = true
-	elseif nodedef.paramtype2 == "colorwallmounted"
-		then is_color_fdir = "wallmounted"
+		if nodedef.palette == "unifieddyes_palette_extended.png" then
+			palette_type = "extended"
+		else
+			palette_type = false
+		end
+	elseif nodedef.paramtype2 == "colorfacedir" then
+		palette_type = true
+	elseif nodedef.paramtype2 == "colorwallmounted" then
+		palette_type = "wallmounted"
 	end
 
 	if minetest.is_protected(pos, playername) and not minetest.check_player_privs(playername, {protection_bypass=true}) then
@@ -450,7 +547,7 @@ function unifieddyes.on_use(itemstack, player, pointed_thing)
 
 	local stackname = itemstack:get_name()
 	local pos2 = unifieddyes.select_node(pointed_thing)
-	local paletteidx, hue = unifieddyes.getpaletteidx(stackname, is_color_fdir)
+	local paletteidx, hue = unifieddyes.getpaletteidx(stackname, palette_type)
 
 	if paletteidx then
 
@@ -478,7 +575,7 @@ function unifieddyes.on_use(itemstack, player, pointed_thing)
 
 		node.param2 = paletteidx
 
-		local oldpaletteidx, oldhuenum = unifieddyes.getpaletteidx(prevdye, is_color_fdir)
+		local oldpaletteidx, oldhuenum = unifieddyes.getpaletteidx(prevdye, palette_type)
 		local oldnode = minetest.get_node(pos)
 
 		local oldhue = nil
@@ -491,9 +588,9 @@ function unifieddyes.on_use(itemstack, player, pointed_thing)
 		end
 
 		if newnode then -- this path is used when the calling mod want to supply a replacement node
-			if is_color_fdir == "wallmounted" then
+			if palette_type == "wallmounted" then
 				node.param2 = paletteidx + (minetest.get_node(pos).param2 % 8)
-			elseif is_color_fdir then  -- we probably need to change the hue of the node too
+			elseif palette_type == true then  -- it's colorfacedir
 				if oldhue ~=0 then -- it's colored, not grey
 					if oldhue ~= nil then -- it's been painted before
 						if hue ~= 0 then -- the player's wielding a colored dye
@@ -512,7 +609,7 @@ function unifieddyes.on_use(itemstack, player, pointed_thing)
 					end
 				end
 				node.param2 = paletteidx + (minetest.get_node(pos).param2 % 32)
-			else
+			else -- it's the 89-color palette, or the extended palette
 				node.param2 = paletteidx
 			end
 			node.name = newnode
@@ -522,9 +619,9 @@ function unifieddyes.on_use(itemstack, player, pointed_thing)
 			end
 		else -- this path is used when you're just painting an existing node, rather than replacing one.
 			newnode = oldnode  -- note that here, newnode/oldnode are a full node, not just the name.
-			if is_color_fdir == "wallmounted" then
+			if palette_type == "wallmounted" then
 				newnode.param2 = paletteidx + (minetest.get_node(pos).param2 % 8)
-			elseif is_color_fdir then
+			elseif palette_type == true then -- it's colorfacedir
 				if oldhue then
 					if hue ~= 0 then
 						newnode.name = string.gsub(newnode.name, "_"..oldhue, "_"..HUES[hue])
@@ -535,7 +632,7 @@ function unifieddyes.on_use(itemstack, player, pointed_thing)
 					newnode.name = string.gsub(newnode.name, "_grey", "_"..HUES[hue])
 				end
 				newnode.param2 = paletteidx + (minetest.get_node(pos).param2 % 32)
-			else
+			else -- it's the 89-color palette, or the extended palette
 				newnode.param2 = paletteidx
 			end
 			minetest.swap_node(pos, newnode)
