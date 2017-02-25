@@ -43,7 +43,7 @@ end
 
 -- helper functions for other mods that use this one
 
-local HUES = {
+unifieddyes.HUES = {
 	"red",
 	"orange",
 	"yellow",
@@ -60,7 +60,7 @@ local HUES = {
 
 -- the names of the various colors here came from http://www.procato.com/rgb+index/
 
-local HUES_EXTENDED = {
+unifieddyes.HUES_EXTENDED = {
 	{ "red",        0xff, 0x00, 0x00 },
 	{ "vermilion",  0xff, 0x40, 0x00 },
 	{ "orange",     0xff, 0x80, 0x00 },
@@ -87,18 +87,18 @@ local HUES_EXTENDED = {
 	{ "crimson",    0xff, 0x00, 0x40 }
 }
 
-local SATS = {
+unifieddyes.SATS = {
 	"",
 	"_s50"
 }
 
-local VALS = {
+unifieddyes.VALS = {
 	"",
 	"medium_",
 	"dark_"
 }
 
-local VALS_EXTENDED = {
+unifieddyes.VALS_EXTENDED = {
 	"faint_",
 	"pastel_",
 	"light_",
@@ -108,7 +108,7 @@ local VALS_EXTENDED = {
 	"dark_"
 }
 
-local GREYS = {
+unifieddyes.GREYS = {
 	"white",
 	"light_grey",
 	"grey",
@@ -213,7 +213,7 @@ end
 function unifieddyes.get_hsv(name) -- expects a node/item name
 	local hue = ""
 	local a,b
-	for _, i in ipairs(HUES) do
+	for _, i in ipairs(unifieddyes.HUES) do
 		a,b = string.find(name, "_"..i)
 		if a and not ( string.find(name, "_redviolet") and i == "red" ) then
 			hue = i
@@ -573,7 +573,7 @@ function unifieddyes.on_use(itemstack, player, pointed_thing)
 		local oldnode = minetest.get_node(pos)
 
 		local oldhue = nil
-		for _, i in ipairs(HUES) do
+		for _, i in ipairs(unifieddyes.HUES) do
 			if string.find(oldnode.name, "_"..i) and not
 				( string.find(oldnode.name, "_redviolet") and i == "red" ) then
 				oldhue = i
@@ -588,18 +588,18 @@ function unifieddyes.on_use(itemstack, player, pointed_thing)
 				if oldhue ~=0 then -- it's colored, not grey
 					if oldhue ~= nil then -- it's been painted before
 						if hue ~= 0 then -- the player's wielding a colored dye
-							newnode = string.gsub(newnode, "_"..oldhue, "_"..HUES[hue])
+							newnode = string.gsub(newnode, "_"..oldhue, "_"..unifieddyes.HUES[hue])
 						else -- it's a greyscale dye
 							newnode = string.gsub(newnode, "_"..oldhue, "_grey")
 						end
 					else -- it's never had a color at all
 						if hue ~= 0 then -- and if the wield is greyscale, don't change the node name
-							newnode = string.gsub(newnode, "_grey", "_"..HUES[hue])
+							newnode = string.gsub(newnode, "_grey", "_"..unifieddyes.HUES[hue])
 						end
 					end
 				else
 					if hue ~= 0 then  -- greyscale dye on greyscale node = no hue change
-						newnode = string.gsub(newnode, "_grey", "_"..HUES[hue])
+						newnode = string.gsub(newnode, "_grey", "_"..unifieddyes.HUES[hue])
 					end
 				end
 				node.param2 = paletteidx + (minetest.get_node(pos).param2 % 32)
@@ -621,12 +621,12 @@ function unifieddyes.on_use(itemstack, player, pointed_thing)
 			elseif palette_type == true then -- it's colorfacedir
 				if oldhue then
 					if hue ~= 0 then
-						newnode.name = string.gsub(newnode.name, "_"..oldhue, "_"..HUES[hue])
+						newnode.name = string.gsub(newnode.name, "_"..oldhue, "_"..unifieddyes.HUES[hue])
 					else
 						newnode.name = string.gsub(newnode.name, "_"..oldhue, "_grey")
 					end
 				elseif string.find(minetest.get_node(pos).name, "_grey") and hue ~= 0 then
-					newnode.name = string.gsub(newnode.name, "_grey", "_"..HUES[hue])
+					newnode.name = string.gsub(newnode.name, "_grey", "_"..unifieddyes.HUES[hue])
 				end
 				newnode.param2 = paletteidx + (minetest.get_node(pos).param2 % 32)
 			else -- it's the 89-color palette, or the extended palette
@@ -669,12 +669,12 @@ unifieddyes.convert_classic_palette = {
 
 for hue = 0, 11 do
 	-- light
-	local paletteidx = unifieddyes.getpaletteidx("dye:light_"..HUES[hue+1], false)
+	local paletteidx = unifieddyes.getpaletteidx("dye:light_"..unifieddyes.HUES[hue+1], false)
 	unifieddyes.convert_classic_palette[paletteidx] = hue*2 + 48
 	for sat = 0, 1 do
 		for val = 0, 2 do
 			-- all other shades
-			local paletteidx = unifieddyes.getpaletteidx("dye:"..VALS[val+1]..HUES[hue+1]..SATS[sat+1], false)
+			local paletteidx = unifieddyes.getpaletteidx("dye:"..unifieddyes.VALS[val+1]..unifieddyes.HUES[hue+1]..unifieddyes.SATS[sat+1], false)
 			unifieddyes.convert_classic_palette[paletteidx] = hue*2 + sat*24 + (val*48+96)
 		end
 	end
@@ -682,14 +682,14 @@ end
 
 -- Generate all dyes that are not part of the default minetest_game dyes mod
 
-for _, h in ipairs(HUES_EXTENDED) do
+for _, h in ipairs(unifieddyes.HUES_EXTENDED) do
 	local hue = h[1]
 	local r = h[2]
 	local g = h[3]
 	local b = h[4]
 
 	for v = 0, 6 do
-		local val = VALS_EXTENDED[v+1]
+		local val = unifieddyes.VALS_EXTENDED[v+1]
 
 		local factor = 40
 		if v > 4 then factor = 75 end
@@ -868,8 +868,8 @@ minetest.register_craft( {
 
 for i = 1, 12 do
 
-	local hue = HUES[i]
-	local hue2 = HUES[i]:gsub("%a", string.upper, 1)
+	local hue = unifieddyes.HUES[i]
+	local hue2 = unifieddyes.HUES[i]:gsub("%a", string.upper, 1)
 
 	if hue == "skyblue" then
 		hue2 = "Sky Blue"
