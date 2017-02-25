@@ -141,22 +141,9 @@ local default_dyes = {
 -- to convert it from human readable to something the engine can use as a palette.
 --
 -- in machine-readable form, the selected color is:
--- 16 + [hue] - [shade]*24 for the light colors, or
--- 16 + [hue] + [saturation]*24 + [shade]*48 for the dark colors, or
--- [shade] (no math) for the greys, 0 = white.
-
-unifieddyes.extended_palette = "[combine:256x1"
-	..":0,0=unifieddyes_palette_extended.png"
-	..":16,-1=unifieddyes_palette_extended.png"
-	..":40,-2=unifieddyes_palette_extended.png"
-	..":64,-3=unifieddyes_palette_extended.png"
-	..":88,-4=unifieddyes_palette_extended.png"
-	..":112,-5=unifieddyes_palette_extended.png"
-	..":136,-6=unifieddyes_palette_extended.png"
-	..":160,-7=unifieddyes_palette_extended.png"
-	..":184,-8=unifieddyes_palette_extended.png"
-	..":208,-9=unifieddyes_palette_extended.png"
-	..":232,-10=unifieddyes_palette_extended.png"
+-- [hue] - [shade]*24 for the light colors, or
+-- [hue] + [saturation]*24 + [shade]*48 for the dark colors, or
+-- 240 + [shade] for the greys, 0 = white.
 
 -- code borrowed from homedecor
 
@@ -379,16 +366,16 @@ function unifieddyes.getpaletteidx(color, palette_type)
 	}
 
 	local shades_extended = {
-		["faint"] = 1,
-		["pastel"] = 2,
-		["light"] = 3,
-		["bright"] = 4,
-		[""] = 5,
-		["s50"] = 6,
-		["medium"] = 7,
-		["mediums50"] = 8,
-		["dark"] = 9,
-		["darks50"] = 10,
+		["faint"] = 0,
+		["pastel"] = 1,
+		["light"] = 2,
+		["bright"] = 3,
+		[""] = 4,
+		["s50"] = 5,
+		["medium"] = 6,
+		["mediums50"] = 7,
+		["dark"] = 8,
+		["darks50"] = 9
 	}
 
 	local shades_wallmounted = {
@@ -415,7 +402,7 @@ function unifieddyes.getpaletteidx(color, palette_type)
 		end
 	elseif palette_type == "extended" then
 		if grayscale_extended[color] then
-			return grayscale_extended[color], 0
+			return grayscale_extended[color]+240, 0
 		end
 	else
 		if grayscale[color] then
@@ -681,19 +668,19 @@ unifieddyes.convert_classic_palette = {}
 for hue = 0, 11 do
 	-- light
 	local paletteidx = unifieddyes.getpaletteidx("dye:light_"..HUES[hue+1], false)
-	unifieddyes.convert_classic_palette[paletteidx] = 16 + hue*2 + 48
+	unifieddyes.convert_classic_palette[paletteidx] = hue*2 + 48
 	for sat = 0, 1 do
 		for val = 0, 2 do
-			-- full
+			-- all other shades
 			local paletteidx = unifieddyes.getpaletteidx("dye:"..VALS[val+1]..HUES[hue+1]..SATS[sat+1], false)
-			unifieddyes.convert_classic_palette[paletteidx] = 16 + hue*2 + sat*24 + (val+4)*48
+			unifieddyes.convert_classic_palette[paletteidx] = hue*2 + sat*24 + (val*48+96)
 		end
 	end
 end
 
 for grey = 0, 4 do
 	local paletteidx = unifieddyes.getpaletteidx("dye:"..GREYS[grey+1], false)
-	unifieddyes.convert_classic_palette[paletteidx] = grey
+	unifieddyes.convert_classic_palette[paletteidx] = 240 + grey
 end
 
 -- Generate all dyes that are not part of the default minetest_game dyes mod
