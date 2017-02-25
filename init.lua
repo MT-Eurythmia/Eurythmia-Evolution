@@ -747,7 +747,7 @@ end
 
 for y = 1, 14 do -- colors 0 and 15 are black and white, default dyes
 
-	if y ~= 5 and y ~= 8 and Y~= 11 then -- don't register the three greys, they're done separately.
+	if y ~= 4 and y ~= 8 and Y~= 11 then -- don't register the three greys, they're done separately.
 
 		local rgb = string.format("%02x", y*17)..string.format("%02x", y*17)..string.format("%02x", y*17)
 		local name = "grey_"..y
@@ -864,9 +864,9 @@ local greymixes = {
 	{ 1,	"dye:black",			"dye:black",		"dye:black",		"dye:dark_grey",	4 },
 	{ 2,	"dye:black",			"dye:black",		"dye:dark_grey",	nil,				3 },
 	{ 3,	"dye:black",			"dye:dark_grey",	nil,				nil,				2 },
-	{ 4,	"dye:dark_grey",		"dye:dark_grey",	"dye:black",		nil,				3 },
-	{ 5,	"dye:white",			"dye:black",		"dye:black",		nil,				3 },
-	{ 6,	"dye:dark_grey",		"dye:dark_grey",	"dye:grey",			nil,				3 },
+	{ 4,	"dye:white",			"dye:black",		"dye:black",		nil,				3 },
+	{ 5,	"dye:dark_grey",		"dye:dark_grey",	"dye:grey",			nil,				3 },
+	{ 6,	"dye:dark_grey",		"dye:grey",			nil,				nil,				2 },
 	{ 7,	"dye:dark_grey",		"dye:grey",			"dye:grey",			nil,				3 },
 	{ 8,	"dye:white",			"dye:black",		nil,				nil,				2 },
 	{ 9,	"dye:grey", 			"dye:grey",			"dye:light_grey",	nil,				3 },
@@ -885,7 +885,7 @@ for _, i in ipairs(greymixes) do
 	local dye4 = i[5]
 	local yield = i[6]
 	local color = "grey_"..shade
-	if shade == 5 then
+	if shade == 4 then
 		color = "dark_grey"
 	elseif shade == 8 then
 		color = "grey"
@@ -916,7 +916,7 @@ minetest.register_alias("unifieddyes:light_grey", "dye:light_grey")
 minetest.register_alias("unifieddyes:white",      "dye:white")
 
 minetest.register_alias("unifieddyes:grey_0",     "dye:black")
-minetest.register_alias("unifieddyes:grey_5",     "dye:dark_grey")
+minetest.register_alias("unifieddyes:grey_4",     "dye:dark_grey")
 minetest.register_alias("unifieddyes:grey_8",     "dye:grey")
 minetest.register_alias("unifieddyes:grey_11",    "dye:light_grey")
 minetest.register_alias("unifieddyes:grey_15",    "dye:white")
