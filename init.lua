@@ -87,9 +87,6 @@ local HUES_EXTENDED = {
 	{ "crimson",    0xff, 0x00, 0x40 }
 }
 
-for _, i in ipairs(HUES_EXTENDED) do
-	print("[\""..i[1].."\"] =,")
-end
 local SATS = {
 	"",
 	"_s50"
@@ -182,8 +179,6 @@ end
 function unifieddyes.fix_after_screwdriver_nsew(pos, node, user, mode, new_param2)
 	local new_fdir = new_param2 % 8
 	local color = new_param2 - new_fdir
-	print(new_fdir)
-
 	if new_fdir < 2 then
 		new_fdir = 2
 		minetest.swap_node(pos, { name = node.name, param2 = new_fdir + color })
