@@ -663,7 +663,14 @@ end
 
 -- build a table to convert from classic/89-color palette to extended palette
 
-unifieddyes.convert_classic_palette = {}
+-- the first five entries are for the old greyscale - white, light, grey, dark, black
+unifieddyes.convert_classic_palette = {
+	240,
+	244,
+	247,
+	251,
+	253
+}
 
 for hue = 0, 11 do
 	-- light
@@ -676,11 +683,6 @@ for hue = 0, 11 do
 			unifieddyes.convert_classic_palette[paletteidx] = hue*2 + sat*24 + (val*48+96)
 		end
 	end
-end
-
-for grey = 0, 4 do
-	local paletteidx = unifieddyes.getpaletteidx("dye:"..GREYS[grey+1], false)
-	unifieddyes.convert_classic_palette[paletteidx] = 240 + grey
 end
 
 -- Generate all dyes that are not part of the default minetest_game dyes mod
