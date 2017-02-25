@@ -709,7 +709,8 @@ for _, h in ipairs(unifieddyes.HUES_EXTENDED) do
 		local color = string.format("%02x", r2)..string.format("%02x", g2)..string.format("%02x", b2)
 		if minetest.registered_items["dye:"..val..hue] then
 			minetest.override_item("dye:"..val..hue, {
-				inventory_image = "unifieddyes_dye.png^[colorize:#"..color..":200"
+				inventory_image = "unifieddyes_dye.png^[colorize:#"..color..":200",
+				on_use = unifieddyes.on_use
 			})
 		else
 			minetest.register_craftitem(":dye:"..val..hue, {
@@ -766,11 +767,13 @@ for y = 1, 14 do -- colors 0 and 15 are black and white, default dyes
 end
 
 minetest.override_item("dye:grey", {
-	inventory_image = "unifieddyes_dye.png^[colorize:#888888:200"
+	inventory_image = "unifieddyes_dye.png^[colorize:#888888:200",
+	on_use = unifieddyes.on_use
 })
 
 minetest.override_item("dye:dark_grey", {
-	inventory_image = "unifieddyes_dye.png^[colorize:#444444:200"
+	inventory_image = "unifieddyes_dye.png^[colorize:#444444:200",
+	on_use = unifieddyes.on_use
 })
 
 minetest.register_craftitem(":dye:light_grey", {
