@@ -718,7 +718,7 @@ for _, h in ipairs(HUES_EXTENDED) do
 			minetest.register_craftitem(":dye:"..val..hue, {
 				description = S(desc),
 				inventory_image = "unifieddyes_dye.png^[colorize:#"..color..":200",
---				groups = { dye=1, not_in_creative_inventory=1 },
+				groups = { dye=1, not_in_creative_inventory=1 },
 				on_use = unifieddyes.on_use
 			})
 			minetest.register_alias("unifieddyes:"..val..hue, "dye:"..val..hue)
@@ -740,7 +740,7 @@ for _, h in ipairs(HUES_EXTENDED) do
 			minetest.register_craftitem(":dye:"..val..hue.."_s50", {
 				description = S(desc.." (low saturation)"),
 				inventory_image = "unifieddyes_dye.png^[colorize:#"..color..":200",
---				groups = { dye=1, not_in_creative_inventory=1 },
+				groups = { dye=1, not_in_creative_inventory=1 },
 				on_use = unifieddyes.on_use
 			})
 			minetest.register_alias("unifieddyes:"..val..hue.."_s50", "dye:"..val..hue.."_s50")
@@ -761,7 +761,7 @@ for y = 1, 14 do -- colors 0 and 15 are black and white, default dyes
 		minetest.register_craftitem(":dye:"..name, {
 			description = S(desc),
 			inventory_image = "unifieddyes_dye.png^[colorize:#"..rgb..":200",
-		--	groups = { dye=1, not_in_creative_inventory=1 },
+			groups = { dye=1, not_in_creative_inventory=1 },
 			on_use = unifieddyes.on_use
 		})
 		minetest.register_alias("unifieddyes:"..name, "dye:"..name)
