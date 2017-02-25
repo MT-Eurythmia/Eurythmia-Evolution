@@ -747,7 +747,7 @@ end
 
 for y = 1, 14 do -- colors 0 and 15 are black and white, default dyes
 
-	if y ~= 4 and y ~= 7 then -- dark grey and regular grey, default dyes
+	if y ~= 4 and y ~= 7 and Y~= 12 then -- don't register the three greys, they're done separately.
 
 		local rgb = string.format("%02x", y*17)..string.format("%02x", y*17)..string.format("%02x", y*17)
 		local name = "grey_"..y
@@ -763,221 +763,103 @@ for y = 1, 14 do -- colors 0 and 15 are black and white, default dyes
 	end
 end
 
--- Lime
-
-minetest.register_craft( {
-       type = "shapeless",
-       output = "dye:lime 2",
-       recipe = {
-               "dye:yellow",
-               "dye:green",
-		},
+minetest.register_craftitem(":dye:light_grey", {
+	description = S("Light grey Dye"),
+	inventory_image = "unifieddyes_dye.png^[colorize:#cccccc:200",
+	groups = { dye=1, not_in_creative_inventory=1 },
+	on_use = unifieddyes.on_use
 })
 
--- Aqua
+local base_color_crafts = {
+	{ "red",		"flowers:rose",				nil,				nil,				4 },
+	{ "vermilion",	"dye:red",					"dye:orange",		nil,				3 },
+	{ "orange",		"flowers:tulip",			nil,				nil,				4 },
+	{ "orange",		"dye:red",					"dye:yellow",		nil,				2 },
+	{ "amber",		"dye:orange",				"dye:yellow",		nil,				2 },
+	{ "yellow",		"flowers:dandelion_yellow",	nil,				nil,				4 },
+	{ "lime",		"dye:yellow",				"dye:chartreuse",	nil,				2 },
+	{ "chartreuse",	"dye:yellow",				"dye:green",		nil,				2 },
+	{ "harlequin",	"dye:chartreuse",			"dye:green",		nil,				2 },
+	{ "green", 		"default:cactus",			nil,				nil,				4 },
+	{ "green", 		"dye:yellow",				"dye:blue",			nil,				2 },
+	{ "malachite",	"dye:green",				"dye:spring",		nil,				2 },
+	{ "spring",		"dye:green",				"dye:cyan",			nil,				2 },
+	{ "turquoise",	"dye:spring",				"dye:cyan",			nil,				2 },
+	{ "cyan",		"dye:green",				"dye:blue",			nil,				2 },
+	{ "cerulean",	"dye:cyan",					"dye:azure",		nil,				2 },
+	{ "azure",		"dye:cyan",					"dye:blue",			nil,				2 },
+	{ "sapphire",	"dye:azure",				"dye:blue",			nil,				2 },
+	{ "blue",		"flowers:geranium",			nil,				nil,				4 },
+	{ "indigo",		"dye:blue",					"dye:violet",		nil,				2 },
+	{ "violet",		"flowers:viola",			nil,				nil,				4 },
+	{ "violet",		"dye:blue",					"dye:magenta",		nil,				2 },
+	{ "mulberry",	"dye:violet",				"dye:magenta",		nil,				2 },
+	{ "magenta",	"dye:blue",					"dye:red",			nil,				2 },
+	{ "fuchsia",	"dye:magenta",				"dye:rose",			nil,				2 },
+	{ "rose",		"dye:magenta",				"dye:red",			nil,				2 },
+	{ "crimson",	"dye:rose",					"dye:red",			nil,				2 },
 
-minetest.register_craft( {
-       type = "shapeless",
-       output = "dye:spring 2",
-       recipe = {
-               "dye:cyan",
-               "dye:green",
-		},
-})
+	{ "black",		"default:coal_lump",		nil,				nil,				4 },
+	{ "dark_grey",	"dye:white",				"dye:black",		"dye:black",		3 },
+	{ "grey",		"dye:white",				"dye:black",		nil,				3 },
+	{ "light_grey",	"dye:white",				"dye:white",		"dye:black",		3 },
+	{ "white",		"flowers:dandelion_white",	nil,				nil,				4 },
+}
 
--- Sky blue
+local shade_crafts = {
+	{ "faint_",		"",			"dye:white",		"dye:white",	"dye:white",	4 },
+	{ "pastel_",	"",			"dye:white",		"dye:white",	nil,			3 },
+	{ "light_",		"",			"dye:white",		nil,			nil,			2 },
+	{ "bright_",	"",			"color",			"dye:white",	nil,			3 },
+	{ "",			"_s50",		"dye:light_grey",	nil,			nil,			2 },
+	{ "",			"_s50",		"dye:black",		"dye:white",	"dye:white",	3 },
+	{ "medium_",	"",			"dye:black",		nil,			nil,			2 },
+	{ "medium_",	"_s50",		"dye:grey",			nil,			nil,			2 },
+	{ "medium_",	"_s50",		"dye:black",		"dye:white",	nil,			3 },
+	{ "dark_",		"",			"dye:black",		"dye:black",	nil,			3 },
+	{ "dark_",		"_s50",		"dye:dark_grey",	nil,			nil,			2 },
+	{ "dark_",		"_s50",		"dye:black",		"dye:white",	"dye:white",	4 },
+}
 
-minetest.register_craft( {
-       type = "shapeless",
-       output = "dye:azure 2",
-       recipe = {
-               "dye:cyan",
-               "dye:blue",
-		},
-})
-
--- Red-violet
-
-minetest.register_craft( {
-       type = "shapeless",
-       output = "dye:rose 2",
-       recipe = {
-               "dye:red",
-               "dye:magenta",
-		},
-})
-
-
--- Light grey
-
-minetest.register_craft( {
-       type = "shapeless",
-       output = "dye:light_grey 2",
-       recipe = {
-               "dye:grey",
-               "dye:white",
-		},
-})
-
--- Extra craft for black dye
-
-minetest.register_craft( {
-       type = "shapeless",
-       output = "dye:black 4",
-       recipe = {
-               "default:coal_lump",
-		},
-})
-
--- Extra craft for dark grey dye
-
-minetest.register_craft( {
-       type = "shapeless",
-       output = "dye:dark_grey 3",
-       recipe = {
-               "dye:black",
-               "dye:black",
-               "dye:white",
-		},
-})
-
--- Extra craft for light grey dye
-
-minetest.register_craft( {
-       type = "shapeless",
-       output = "dye:light_grey 3",
-       recipe = {
-               "dye:black",
-               "dye:white",
-               "dye:white",
-		},
-})
-
--- Extra craft for green dye
-
-minetest.register_craft( {
-       type = "shapeless",
-       output = "dye:green 4",
-       recipe = {
-               "default:cactus",
-		},
-})
-
--- =================================================================
--- generate recipes
-
-for i = 1, 12 do
-
-	local hue = unifieddyes.HUES[i]
-	local hue2 = unifieddyes.HUES[i]:gsub("%a", string.upper, 1)
-
-	if hue == "skyblue" then
-		hue2 = "Sky Blue"
-	elseif hue == "redviolet" then
-		hue2 = "Red-violet"
-	end
+for _,i in ipairs(base_color_crafts) do
+	local color = i[1]
+	local dye1 = i[2]
+	local dye2 = i[3]
+	local dye3 = i[4]
+	local yield = i[5]
 
 	minetest.register_craft( {
-        type = "shapeless",
-        output = "unifieddyes:dark_" .. hue .. "_s50 2",
-        recipe = {
-                "dye:" .. hue,
-                "dye:dark_grey",
-	        },
-	})
-
-	minetest.register_craft( {
-        type = "shapeless",
-        output = "unifieddyes:dark_" .. hue .. "_s50 4",
-        recipe = {
-                "dye:" .. hue,
-                "dye:black",
-                "dye:black",
-		"dye:white"
-	        },
-	})
-
-	if hue == "green" then
-
-		minetest.register_craft( {
 		type = "shapeless",
-		output = "dye:dark_green 3",
+		output = "dye:"..color.." "..yield,
 		recipe = {
-		        "dye:" .. hue,
-		        "dye:black",
-		        "dye:black",
-			},
-		})
-	else
-		minetest.register_craft( {
-		type = "shapeless",
-		output = "unifieddyes:dark_" .. hue .. " 3",
-		recipe = {
-		        "dye:" .. hue,
-		        "dye:black",
-		        "dye:black",
-			},
-		})
-	end
-
-	minetest.register_craft( {
-        type = "shapeless",
-        output = "unifieddyes:medium_" .. hue .. "_s50 2",
-        recipe = {
-                "dye:" .. hue,
-                "dye:grey",
-	        },
+			dye1,
+			dye2,
+			dye3,
+		},
 	})
 
-	minetest.register_craft( {
-        type = "shapeless",
-        output = "unifieddyes:medium_" .. hue .. "_s50 3",
-        recipe = {
-                "dye:" .. hue,
-		"dye:black",
-                "dye:white",
-	        },
-	})
+	for _,j in ipairs(shade_crafts) do
+		local shade = j[1]
+		local sat = j[2]
+		local dye4 = j[3]
+		local dye5 = j[4]
+		local dye6 = j[5]
 
-	minetest.register_craft( {
-        type = "shapeless",
-        output = "unifieddyes:medium_" .. hue .. " 2",
-        recipe = {
-                "dye:" .. hue,
-                "dye:black",
-	        },
-	})
+		if dye4 == "color" then dye4 = "dye:"..color end
 
-	minetest.register_craft( {
-        type = "shapeless",
-        output = "unifieddyes:" .. hue .. "_s50 2",
-        recipe = {
-                "dye:" .. hue,
-                "dye:grey",
-                "dye:white",
-	        },
-	})
+		if color ~= "black" and color ~= "white" and not string.find(color, "grey") then
 
-	minetest.register_craft( {
-        type = "shapeless",
-        output = "unifieddyes:" .. hue .. "_s50 4",
-        recipe = {
-                "dye:" .. hue,
-                "dye:white",
-                "dye:white",
-                "dye:black",
-	        },
-	})
-
-	if hue ~= "red" then
-		minetest.register_craft( {
-		type = "shapeless",
-		output = "unifieddyes:light_" .. hue .. " 2",
-		recipe = {
-			"dye:" .. hue,
-			"dye:white",
-			},
-		})
+			minetest.register_craft( {
+				type = "shapeless",
+				output = "dye:"..shade..color..sat.." "..yield,
+				recipe = {
+					"dye:"..color,
+					dye4,
+					dye5,
+					dye6
+				},
+			})
+		end
 	end
 end
 
@@ -994,6 +876,7 @@ minetest.register_alias("unifieddyes:white",      "dye:white")
 minetest.register_alias("unifieddyes:grey_0",     "dye:black")
 minetest.register_alias("unifieddyes:grey_4",     "dye:dark_grey")
 minetest.register_alias("unifieddyes:grey_7",     "dye:grey")
+minetest.register_alias("unifieddyes:grey_12",    "dye:light_grey")
 minetest.register_alias("unifieddyes:grey_15",    "dye:white")
 
 minetest.register_alias("unifieddyes:white_paint", "dye:white")
