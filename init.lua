@@ -692,7 +692,7 @@ for _, h in ipairs(unifieddyes.HUES_EXTENDED) do
 		local val = unifieddyes.VALS_EXTENDED[v+1]
 
 		local factor = 40
-		if v > 4 then factor = 75 end
+		if v > 3 then factor = 75 end
 
 		local r2 = math.max(math.min(r + (4-v)*factor, 255), 0)
 		local g2 = math.max(math.min(g + (4-v)*factor, 255), 0)
@@ -719,7 +719,7 @@ for _, h in ipairs(unifieddyes.HUES_EXTENDED) do
 			minetest.register_alias("unifieddyes:"..val..hue, "dye:"..val..hue)
 		end
 
-		if v > 4 then -- also register the low-sat version
+		if v > 3 then -- also register the low-sat version
 
 			local pr = 0.299
 			local pg = 0.587
@@ -818,7 +818,7 @@ local shade_crafts = {
 	{ "medium_",	"_s50",		"dye:black",		"dye:white",	nil,			3 },
 	{ "dark_",		"",			"dye:black",		"dye:black",	nil,			3 },
 	{ "dark_",		"_s50",		"dye:dark_grey",	nil,			nil,			2 },
-	{ "dark_",		"_s50",		"dye:black",		"dye:white",	"dye:white",	4 },
+	{ "dark_",		"_s50",		"dye:black",		"dye:black",	"dye:white",	4 },
 }
 
 for _,i in ipairs(base_color_crafts) do
