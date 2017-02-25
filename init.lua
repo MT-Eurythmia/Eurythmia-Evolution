@@ -706,18 +706,20 @@ for _, h in ipairs(unifieddyes.HUES_EXTENDED) do
 			desc = val:sub(1, -2):gsub("%a", string.upper, 1) .." "..desc
 		end
 
-		if not minetest.registered_items["dye:"..val..hue] then
-
-			local color = string.format("%02x", r2)..string.format("%02x", g2)..string.format("%02x", b2)
-
+		local color = string.format("%02x", r2)..string.format("%02x", g2)..string.format("%02x", b2)
+		if minetest.registered_items["dye:"..val..hue] then
+			minetest.override_item("dye:"..val..hue, {
+				inventory_image = "unifieddyes_dye.png^[colorize:#"..color..":200"
+			})
+		else
 			minetest.register_craftitem(":dye:"..val..hue, {
 				description = S(desc),
 				inventory_image = "unifieddyes_dye.png^[colorize:#"..color..":200",
 				groups = { dye=1, not_in_creative_inventory=1 },
 				on_use = unifieddyes.on_use
 			})
-			minetest.register_alias("unifieddyes:"..val..hue, "dye:"..val..hue)
 		end
+		minetest.register_alias("unifieddyes:"..val..hue, "dye:"..val..hue)
 
 		if v > 3 then -- also register the low-sat version
 
@@ -762,6 +764,14 @@ for y = 1, 14 do -- colors 0 and 15 are black and white, default dyes
 		minetest.register_alias("unifieddyes:"..name, "dye:"..name)
 	end
 end
+
+minetest.override_item("dye:grey", {
+	inventory_image = "unifieddyes_dye.png^[colorize:#888888:200"
+})
+
+minetest.override_item("dye:dark_grey", {
+	inventory_image = "unifieddyes_dye.png^[colorize:#444444:200"
+})
 
 minetest.register_craftitem(":dye:light_grey", {
 	description = S("Light grey Dye"),
