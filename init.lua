@@ -800,9 +800,6 @@ local base_color_crafts = {
 	{ "crimson",	"dye:rose",					"dye:red",			nil,				2 },
 
 	{ "black",		"default:coal_lump",		nil,				nil,				4 },
-	{ "dark_grey",	"dye:white",				"dye:black",		"dye:black",		3 },
-	{ "grey",		"dye:white",				"dye:black",		nil,				3 },
-	{ "light_grey",	"dye:white",				"dye:white",		"dye:black",		3 },
 	{ "white",		"flowers:dandelion_white",	nil,				nil,				4 },
 }
 
@@ -861,6 +858,51 @@ for _,i in ipairs(base_color_crafts) do
 			})
 		end
 	end
+end
+
+local greymixes = {
+	{ 1,	"dye:black",			"dye:black",		"dye:black",		"dye:dark_grey",	4 },
+	{ 2,	"dye:black",			"dye:black",		"dye:dark_grey",	nil,				3 },
+	{ 3,	"dye:black",			"dye:dark_grey",	nil,				nil,				2 },
+	{ 4,	"dye:dark_grey",		"dye:dark_grey",	"dye:black",		nil,				3 },
+	{ 5,	"dye:white",			"dye:black",		"dye:black",		nil,				3 },
+	{ 6,	"dye:dark_grey",		"dye:dark_grey",	"dye:grey",			nil,				3 },
+	{ 7,	"dye:dark_grey",		"dye:grey",			"dye:grey",			nil,				3 },
+	{ 8,	"dye:white",			"dye:black",		nil,				nil,				2 },
+	{ 9,	"dye:grey", 			"dye:grey",			"dye:light_grey",	nil,				3 },
+	{ 10,	"dye:grey",				"dye:light_grey",	"dye:light_grey",	nil,				3 },
+	{ 11,	"dye:white",			"dye:white",		"dye:black",		nil,				3 },
+	{ 12,	"dye:light_grey",		"dye:light_grey",	"dye:white",		nil,				3 },
+	{ 13,	"dye:light_grey",		"dye:white",		nil,				nil,				2 },
+	{ 14,	"dye:white", 			"dye:white",		"dye:light_grey",	nil,				3 },
+}
+
+for _, i in ipairs(greymixes) do
+	local shade = i[1]
+	local dye1 = i[2]
+	local dye2 = i[3]
+	local dye3 = i[4]
+	local dye4 = i[5]
+	local yield = i[6]
+	local color = "grey_"..shade
+	if shade == 5 then
+		color = "dark_grey"
+	elseif shade == 8 then
+		color = "grey"
+	elseif shade == 11 then
+		color = "light_grey"
+	end
+
+	minetest.register_craft( {
+		type = "shapeless",
+		output = "dye:"..color.." "..yield,
+		recipe = {
+			dye1,
+			dye2,
+			dye3,
+			dye4,
+		},
+	})
 end
 
 minetest.register_alias("unifieddyes:light_red",  "dye:pink")
