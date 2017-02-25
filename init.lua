@@ -747,7 +747,7 @@ end
 
 for y = 1, 14 do -- colors 0 and 15 are black and white, default dyes
 
-	if y ~= 4 and y ~= 7 and Y~= 12 then -- don't register the three greys, they're done separately.
+	if y ~= 5 and y ~= 8 and Y~= 11 then -- don't register the three greys, they're done separately.
 
 		local rgb = string.format("%02x", y*17)..string.format("%02x", y*17)..string.format("%02x", y*17)
 		local name = "grey_"..y
@@ -874,9 +874,9 @@ minetest.register_alias("unifieddyes:light_grey", "dye:light_grey")
 minetest.register_alias("unifieddyes:white",      "dye:white")
 
 minetest.register_alias("unifieddyes:grey_0",     "dye:black")
-minetest.register_alias("unifieddyes:grey_4",     "dye:dark_grey")
-minetest.register_alias("unifieddyes:grey_7",     "dye:grey")
-minetest.register_alias("unifieddyes:grey_12",    "dye:light_grey")
+minetest.register_alias("unifieddyes:grey_5",     "dye:dark_grey")
+minetest.register_alias("unifieddyes:grey_8",     "dye:grey")
+minetest.register_alias("unifieddyes:grey_11",    "dye:light_grey")
 minetest.register_alias("unifieddyes:grey_15",    "dye:white")
 
 minetest.register_alias("unifieddyes:white_paint", "dye:white")
