@@ -626,6 +626,9 @@ function unifieddyes.on_use(itemstack, player, pointed_thing)
 			end
 			node.name = newnode
 			minetest.swap_node(pos, node)
+			if palette_type == "extended" then
+				meta:set_string("palette", "ext")
+			end
 			if not creative_mode then
 				return itemstack
 			end
@@ -648,6 +651,9 @@ function unifieddyes.on_use(itemstack, player, pointed_thing)
 				newnode.param2 = paletteidx
 			end
 			minetest.swap_node(pos, newnode)
+			if palette_type == "extended" then
+				meta:set_string("palette", "ext")
+			end
 			if not creative_mode then
 				return itemstack
 			end
