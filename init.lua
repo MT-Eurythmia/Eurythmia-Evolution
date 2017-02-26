@@ -851,44 +851,34 @@ local shade_crafts = {
 
 for _,i in ipairs(base_color_crafts) do
 	local color = i[1]
-	local dye1 = i[2]
-	local dye2 = i[3]
-	local dye3 = i[4]
-	local dye4 = i[5]
-	local dye5 = i[6]
 	local yield = i[7]
 
 	minetest.register_craft( {
 		type = "shapeless",
 		output = "dye:"..color.." "..yield,
 		recipe = {
-			dye1,
-			dye2,
-			dye3,
-			dye4,
-			dye5,
+			i[2],
+			i[3],
+			i[4],
+			i[5],
+			i[6],
 		},
 	})
 
 	for _,j in ipairs(shade_crafts) do
-		local shade = j[1]
-		local sat = j[2]
-		local dye4 = j[3]
-		local dye5 = j[4]
-		local dye6 = j[5]
-
-		if dye4 == "color" then dye4 = "dye:"..color end
+		local firstdye = j[3]
+		if firstdye == "color" then firstdye = "dye:"..color end
 
 		if color ~= "black" and color ~= "white" and not string.find(color, "grey") then
 
 			minetest.register_craft( {
 				type = "shapeless",
-				output = "dye:"..shade..color..sat.." "..yield,
+				output = "dye:"..j[1]..color..j[2].." "..yield,
 				recipe = {
 					"dye:"..color,
-					dye4,
-					dye5,
-					dye6
+					firstdye,
+					j[4],
+					j[5]
 				},
 			})
 		end
