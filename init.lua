@@ -522,17 +522,17 @@ function unifieddyes.on_use(itemstack, player, pointed_thing)
 	local newnode = nodedef.ud_replacement_node
 	local palette_type
 
-	if nodedef.paramtype2 == "color" then
-		if nodedef.palette == "unifieddyes_palette_extended.png" then
-			palette_type = "extended"
-		else
-			palette_type = false
-		end
+	if nodedef.palette == "unifieddyes_palette_extended.png" then
+		palette_type = "extended"
+	elseif nodedef.palette == "unifieddyes_palette.png" then
+		palette_type = false
 	elseif nodedef.paramtype2 == "colorfacedir" then
 		palette_type = true
 	elseif nodedef.paramtype2 == "colorwallmounted" then
 		palette_type = "wallmounted"
 	end
+
+	print(palette_type)
 
 	if minetest.is_protected(pos, playername) and not minetest.check_player_privs(playername, {protection_bypass=true}) then
 		minetest.record_protection_violation(pos, playername)
