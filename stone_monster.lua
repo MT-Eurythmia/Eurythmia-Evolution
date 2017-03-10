@@ -27,7 +27,8 @@ mobs:register_mob("mobs_monster:stone_monster", {
 	},
 	walk_velocity = 1,
 	run_velocity = 2,
-	jump = true,
+	jump_height = 0,
+	stepheight = 1.1,
 	floats = 0,
 	view_range = 10,
 	drops = {
