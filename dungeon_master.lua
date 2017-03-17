@@ -11,7 +11,7 @@ mobs:register_mob("mobs_monster:dungeon_master", {
 	attack_type = "dogshoot",
 	dogshoot_switch = 1,
 	dogshoot_count_max = 12, -- shoot for 10 seconds
-	dogshoot_count2_max = 3, -- chase player for 3 seconds
+	dogshoot_count2_max = 3, -- dogfight for 3 seconds
 	reach = 3,
 	shoot_interval = 2.5,
 	arrow = "mobs_monster:fireball",
