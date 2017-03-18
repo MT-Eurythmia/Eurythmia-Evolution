@@ -134,16 +134,7 @@ local default_dyes = {
 	"yellow"
 }
 
--- this tiles the "extended" palette sideways and then crops it to 256x1
--- to convert it from human readable to something the engine can use as a palette.
---
--- in machine-readable form, the selected color is:
--- [hue] - [shade]*24 for the light colors, or
--- [hue] + [saturation]*24 + [shade]*48 for the dark colors, or
--- 240 + [shade] for the greys, 0 = white.
-
 -- code borrowed from homedecor
-
 -- call this function to reset the rotation of a "wallmounted" object on place
 
 function unifieddyes.fix_rotation(pos, placer, itemstack, pointed_thing)
