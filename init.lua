@@ -132,3 +132,103 @@ mobs:spawn({
 })
 
 mobs:register_egg("mob_horse:horse", "Horse", "wool_brown.png", 1)
+
+
+-- horseshoe elper function
+local apply_shoes = function(name, itemstack, obj, speed, jump, reverse)
+
+	if obj.type ~= "object" then return end
+
+	local mob = obj.ref
+	local ent = mob:get_luaentity()
+
+	if ent.name and ent.name == "mob_horse:horse" then
+
+		ent.max_speed_forward = speed
+		ent.jump_height = jump
+		ent.max_speed_reverse = reverse
+		ent.accel = speed
+
+		minetest.chat_send_player(name, "Horse shoes fitted -"
+				.. " speed: " .. speed
+				.. " , jump height: " .. jump
+				.. " , stop speed: " .. reverse)
+
+		itemstack:take_item() ; return itemstack
+	else
+		minetest.chat_send_player(name, "Horse shoes only work on horses!")
+	end
+end
+
+
+-- steel horseshoes
+minetest.register_craftitem(":mobs:horseshoe_steel", {
+	description = "Steel HorseShoes (use on horse to apply)",
+	inventory_image = "mobs_horseshoe_steel.png",
+	on_use = function(itemstack, user, pointed_thing)
+		return apply_shoes(user:get_player_name(), itemstack, pointed_thing, 7, 4, 2)
+	end,
+})
+
+minetest.register_craft({
+	output = "mobs:horseshoe_steel",
+	recipe = {
+		{"", "default:steelblock", ""},
+		{"default:steel_ingot", "", "default:steel_ingot"},
+		{"default:steel_ingot", "", "default:steel_ingot"},
+	}
+})
+
+-- bronze horseshoes
+minetest.register_craftitem(":mobs:horseshoe_bronze", {
+	description = "Bronze HorseShoes (use on horse to apply)",
+	inventory_image = "mobs_horseshoe_bronze.png",
+	on_use = function(itemstack, user, pointed_thing)
+		return apply_shoes(user:get_player_name(), itemstack, pointed_thing, 7, 4, 4)
+	end,
+})
+
+minetest.register_craft({
+	output = "mobs:horseshoe_bronze",
+	recipe = {
+		{"", "default:bronzeblock", ""},
+		{"default:bronze_ingot", "", "default:bronze_ingot"},
+		{"default:bronze_ingot", "", "default:bronze_ingot"},
+	}
+})
+
+-- mese horseshoes
+minetest.register_craftitem(":mobs:horseshoe_mese", {
+	description = "Mese HorseShoes (use on horse to apply)",
+	inventory_image = "mobs_horseshoe_mese.png",
+	on_use = function(itemstack, user, pointed_thing)
+		return apply_shoes(user:get_player_name(), itemstack, pointed_thing, 9, 5, 8)
+	end,
+})
+
+minetest.register_craft({
+	output = "mobs:horseshoe_mese",
+	recipe = {
+		{"", "default:mese", ""},
+		{"default:mese_crystal_fragment", "", "default:mese_crystal_fragment"},
+		{"default:mese_crystal_fragment", "", "default:mese_crystal_fragment"},
+	}
+})
+
+-- diamond horseshoes
+minetest.register_craftitem(":mobs:horseshoe_diamond", {
+	description = "Diamond HorseShoes (use on horse to apply)",
+	inventory_image = "mobs_horseshoe_diamond.png",
+	on_use = function(itemstack, user, pointed_thing)
+		return apply_shoes(user:get_player_name(), itemstack, pointed_thing, 10, 5, 6)
+	end,
+})
+
+minetest.register_craft({
+	output = "mobs:horseshoe_diamond",
+	recipe = {
+		{"", "default:diamondblock", ""},
+		{"default:diamond", "", "default:diamond"},
+		{"default:diamond", "", "default:diamond"},
+	}
+})
