@@ -73,6 +73,11 @@ mobs:register_mob("mob_horse:horse", {
 			mobs.detach(self.driver, {x = 1, y = 0, z = 1})
 		end
 
+		-- drop any horseshoes added
+		if self.shoed then
+			minetest.add_item(pos, self.shoed)
+		end
+
 	end,
 
 	on_rightclick = function(self, clicker)
@@ -134,8 +139,8 @@ mobs:spawn({
 mobs:register_egg("mob_horse:horse", "Horse", "wool_brown.png", 1)
 
 
--- horseshoe elper function
-local apply_shoes = function(name, itemstack, obj, speed, jump, reverse)
+-- horseshoe helper function
+local apply_shoes = function(name, itemstack, obj, shoes, speed, jump, reverse)
 
 	if obj.type ~= "object" then return end
 
@@ -144,10 +149,15 @@ local apply_shoes = function(name, itemstack, obj, speed, jump, reverse)
 
 	if ent.name and ent.name == "mob_horse:horse" then
 
+		if ent.shoed then
+			minetest.add_item(mob:getpos(), ent.shoed)
+		end
+
 		ent.max_speed_forward = speed
 		ent.jump_height = jump
 		ent.max_speed_reverse = reverse
 		ent.accel = speed
+		ent.shoed = shoes
 
 		minetest.chat_send_player(name, "Horse shoes fitted -"
 				.. " speed: " .. speed
@@ -166,7 +176,8 @@ minetest.register_craftitem(":mobs:horseshoe_steel", {
 	description = "Steel HorseShoes (use on horse to apply)",
 	inventory_image = "mobs_horseshoe_steel.png",
 	on_use = function(itemstack, user, pointed_thing)
-		return apply_shoes(user:get_player_name(), itemstack, pointed_thing, 7, 4, 2)
+		return apply_shoes(user:get_player_name(), itemstack, pointed_thing,
+				"mobs:horseshoe_steel", 7, 4, 2)
 	end,
 })
 
@@ -184,7 +195,8 @@ minetest.register_craftitem(":mobs:horseshoe_bronze", {
 	description = "Bronze HorseShoes (use on horse to apply)",
 	inventory_image = "mobs_horseshoe_bronze.png",
 	on_use = function(itemstack, user, pointed_thing)
-		return apply_shoes(user:get_player_name(), itemstack, pointed_thing, 7, 4, 4)
+		return apply_shoes(user:get_player_name(), itemstack, pointed_thing,
+				"mobs:horseshoe_bronze", 7, 4, 4)
 	end,
 })
 
@@ -202,7 +214,8 @@ minetest.register_craftitem(":mobs:horseshoe_mese", {
 	description = "Mese HorseShoes (use on horse to apply)",
 	inventory_image = "mobs_horseshoe_mese.png",
 	on_use = function(itemstack, user, pointed_thing)
-		return apply_shoes(user:get_player_name(), itemstack, pointed_thing, 9, 5, 8)
+		return apply_shoes(user:get_player_name(), itemstack, pointed_thing,
+				"mobs:horseshoe_mese", 9, 5, 8)
 	end,
 })
 
@@ -220,7 +233,8 @@ minetest.register_craftitem(":mobs:horseshoe_diamond", {
 	description = "Diamond HorseShoes (use on horse to apply)",
 	inventory_image = "mobs_horseshoe_diamond.png",
 	on_use = function(itemstack, user, pointed_thing)
-		return apply_shoes(user:get_player_name(), itemstack, pointed_thing, 10, 5, 6)
+		return apply_shoes(user:get_player_name(), itemstack, pointed_thing,
+				"mobs:horseshoe_diamond", 10, 6, 6)
 	end,
 })
 
