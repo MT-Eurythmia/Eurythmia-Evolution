@@ -963,7 +963,7 @@ for _,i in ipairs(unifieddyes.base_color_crafts) do
 		local firstdye = j[3]
 		if firstdye == "color" then firstdye = "dye:"..color end
 
-		-- ignore black, white, anything containing the word "grey", and medium orange
+		-- ignore black, white, anything containing the word "grey"
 
 		if color ~= "black" and color ~= "white" and not string.find(color, "grey") then
 
@@ -1027,6 +1027,17 @@ for _, i in ipairs(unifieddyes.greymixes) do
 		},
 	})
 end
+
+-- we can't make dark orange anymore because brown/medium orange conflicts
+
+minetest.register_craft( {
+	type = "shapeless",
+	output = "dye:dark_orange",
+	recipe = {
+		"dye:brown",
+		"dye:brown"
+	},
+})
 
 minetest.register_alias("dye:light_red",  "dye:pink")
 minetest.register_alias("dye:medium_orange", "dye:brown")
