@@ -223,14 +223,33 @@ local function find_fruit_trunks_near(ftpos, sect)
 		return nil
 	end
 
-	local all_palms = minetest.find_nodes_in_area(
-				{ x = ftpos.x + 2 * sect.x * sect_hr - sect_hr,
-				  y = ftpos.y - sect_vr,
-				  z = ftpos.z + 2 * sect.z * sect_hr - sect_hr },
-				{ x = ftpos.x + 2 * sect.x * sect_hr + sect_hr,
-				  y = ftpos.y + sect_vr,
-				  z = ftpos.z + 2 * sect.z * sect_hr + sect_hr },
-				{"moretrees:date_palm_mfruit_trunk", "moretrees:date_palm_ffruit_trunk"})
+	local pos1 = {
+		x = ftpos.x + 2 * sect.x * sect_hr - sect_hr,
+		y = ftpos.y - sect_vr,
+		z = ftpos.z + 2 * sect.z * sect_hr - sect_hr,
+	}
+	local pos2 = {
+		x = ftpos.x + 2 * sect.x * sect_hr + sect_hr,
+		y = ftpos.y + sect_vr,
+		z = ftpos.z + 2 * sect.z * sect_hr + sect_hr,
+	}
+	local all_palms = {
+	}
+	local region_size = (
+		pos2.x - pos1.x
+	) * (
+		pos2.y - pos1.y
+	) * (
+		pos2.z - pos1.z
+	)
+	if 551368 <= region_size then
+		minetest.log("warning", "[moretrees] region too big: " .. region_size)
+	else
+		all_palms = minetest.find_nodes_in_area(
+			pos1,
+			pos2,
+			{"moretrees:date_palm_mfruit_trunk", "moretrees:date_palm_ffruit_trunk"})
+	end
 
 	-- Collect different palms in separate lists.
 	local female_palms = {}
