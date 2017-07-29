@@ -147,7 +147,7 @@ local apply_shoes = function(name, itemstack, obj, shoes, speed, jump, reverse)
 	local mob = obj.ref
 	local ent = mob:get_luaentity()
 
-	if ent.name and ent.name == "mob_horse:horse" then
+	if ent and ent.name and ent.name == "mob_horse:horse" then
 
 		if ent.shoed then
 			minetest.add_item(mob:getpos(), ent.shoed)
