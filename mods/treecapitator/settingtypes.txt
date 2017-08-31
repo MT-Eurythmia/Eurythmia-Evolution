@@ -1,0 +1,24 @@
+#    drop items, else get them in the inventory
+treecapitator.drop_items (drop items) bool false
+
+#    if set to false, do not drop leaves, just saplings (leafdecay behaviour)
+treecapitator.drop_leaf (give leaves) bool false
+
+#    play a sound after digging a tree
+treecapitator.play_sound (play sound) bool true
+
+#    capitate moretrees' trees, experimental, use with caution
+treecapitator.moretrees_support (support moretrees) bool false
+
+#    lets trees become capitated <delay> seconds later, only works if it's > 0
+treecapitator.delay (delay) float 0 0
+
+#    If set to true, capitating only works with tools with trunk digging
+#    capabilities and not with the bare hand, so when a tool is worn.
+treecapitator.no_hand_capitation (Disallow bare hand capitation) bool false
+
+#    considers trunks as neighbour trees if there're >= stem_height_min trunks
+#    if set too low, vertical trunk fruits may be recognized as neighbour tree
+#    if set too high, short stemmed neighbour trees are not recognited
+#    stem_height_min can explicitly be overridden in tree definitions
+treecapitator.stem_height_min (minimum neighbour stem height) int 3 2
