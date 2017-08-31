@@ -1,7 +1,6 @@
 fire
 default
 names_per_ip
-mobs
 bucket
 areas
 maptools
@@ -15,3 +14,4 @@ hopper?
 babelfish?
 books?
 mobs_npc?
+mobs_animal?

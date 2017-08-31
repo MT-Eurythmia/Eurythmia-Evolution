@@ -115,15 +115,17 @@ minetest.register_chatcommand("ip", {
 --[[
 Natural hive: don't allow inventory put if the area is protected (don't do this for artificial hives)
 ]]
-minetest.override_item("mobs:beehive", {
-	allow_metadata_inventory_take = function(pos, listname, index, stack, player)
-		print(minetest.is_protected(pos, player:get_player_name()))
-		if minetest.is_protected(pos, player:get_player_name()) and listname == "beehive" then
-			return 0
+if minetest.get_worldpath("mobs_animal") then
+	minetest.override_item("mobs:beehive", {
+		allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+			print(minetest.is_protected(pos, player:get_player_name()))
+			if minetest.is_protected(pos, player:get_player_name()) and listname == "beehive" then
+				return 0
+			end
+			return stack:get_count()
 		end
-		return stack:get_count()
-	end
-})
+	})
+end
 
 --[[
 Lava bucket: place only in areas protected by the placing player (not at unprotected areas)
