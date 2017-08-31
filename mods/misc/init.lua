@@ -113,30 +113,6 @@ minetest.register_chatcommand("ip", {
 })
 
 --[[
-XDecor chair: avoid "flying" usebug
-
-let's give it a try again. It's cool to sit !
-
-minetest.override_item("xdecor:chair", {
-	on_rightclick = function() end
-})
-minetest.override_item("xdecor:cushion", {
-	on_rightclick = function() end
-})
-]]
-
---[[
-Fishing baitball: change its craft
-]]
-minetest.clear_craft({output = "fishing:baitball"})
-minetest.register_craft({
-	type = "shapeless",
-	output = "fishing:baitball 20",
-	recipe = {"farming:flour", "farming:wheat", "bucket:bucket_water"},
-	replacements = {{ "bucket:bucket_water", "bucket:bucket_empty"}}
-})
-
---[[
 Natural hive: don't allow inventory put if the area is protected (don't do this for artificial hives)
 ]]
 minetest.override_item("mobs:beehive", {
@@ -148,19 +124,6 @@ minetest.override_item("mobs:beehive", {
 		return stack:get_count()
 	end
 })
-
---[[
-Ropes aren't protected against destruction in protected areas... let's protect them
-]]
-minetest.register_on_punchnode(function(pos, oldnode, digger)
-	if oldnode.name == "xdecor:rope" then
-		if minetest.is_protected(pos, digger:get_player_name()) then
-			return 0
-		else
-			rope:remove(pos, oldnode, digger, "xdecor:rope")
-		end
-	end
-end)
 
 --[[
 Lava bucket: place only in areas protected by the placing player (not at unprotected areas)
@@ -260,13 +223,6 @@ register_stair_and_slab_maptools("stone", "Stone", "default_stone.png", default.
 register_stair_and_slab_maptools("cobble", "Cobblestone", "default_cobble.png", default.node_sound_stone_defaults())
 
 -- Unbreakable Public streets and Lighting (EmuRe style)
-minetest.register_node(":maptools:stone_tile", {
-	description = "Unbreakable Stone Tile",
-	tiles = {"xdecor_stone_tile.png"},
-	is_ground_content = false,
-	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
-	sounds = default.node_sound_stone_defaults()
-})
 default.register_fence(":maptools:fence_aspen_wood", {
 	description = "Unbreakable Aspen Fence",
 	texture = "default_fence_aspen_wood.png",
@@ -278,15 +234,6 @@ default.register_fence(":maptools:fence_aspen_wood", {
 })
 -- Side effect: clear the auto-generated recipe for this uncraftable node
 minetest.clear_craft({output = ":maptools:fence_aspen_wood"})
-minetest.register_node(":maptools:wooden_lightbox", {
-	description = "Unbreakable Wooden Light Box",
-	tiles = {"xdecor_wooden_lightbox.png"},
-	paramtype = "light",
-	is_ground_content = false,
-	groups = {unbreakable = 1, not_in_creative_inventory = maptools.creative},
-	light_source = 13,
-	sounds = default.node_sound_glass_defaults()
-})
 
 --[[
 Screwdriver: do not rotate unbreakable nodes
@@ -342,16 +289,6 @@ end
 Decapitalize chat messages
 ]]
 dofile(minetest.get_modpath("misc").."/decapitalizer.lua")
-
---[[
-Hopper: add shared chest
-]]
-if minetest.get_modpath("hopper") and minetest.get_modpath("chesttools") then
-	hopper:add_container({
-		{"bottom", "chesttools:shared_chest", "main"},
-		{"side", "chesttools:shared_chest", "main"},
-	})
-end
 
 --[[
 Babelfish: don't display compliance
