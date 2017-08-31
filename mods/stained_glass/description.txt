@@ -1,0 +1,1 @@
+Adds stained glass blocks and panes.
