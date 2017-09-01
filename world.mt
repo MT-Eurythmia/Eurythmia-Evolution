@@ -173,4 +173,5 @@ load_mod_3dmushrooms = true
 load_mod_dryplants = true
 load_mod_mesecons_doors = true
 load_mod_flowers_plus = true
+load_mod_caverealms = true
 load_mod_unifieddyes = true
