@@ -1,5 +1,5 @@
 creative_mode = false
-player_backend = leveldb
+player_backend = sqlite3
 gameid = minetest
 enable_damage = true
 backend = redis
