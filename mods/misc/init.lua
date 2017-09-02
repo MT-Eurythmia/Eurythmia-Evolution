@@ -384,3 +384,21 @@ minetest.register_on_joinplayer(function(player)
    override_table.sneak_glitch = true
    player:set_physics_override(override_table)
 end)
+
+--[[
+Awesome wood frames!
+]]
+xpanes.register_pane(":xdecor:wood_frame", {
+	description = "Wood Frame",
+	tiles = {"xdecor_wood_frame.png"},
+	drawtype = "airlike",
+	paramtype = "light",
+	textures = {"xdecor_wood_frame.png", "xdecor_wood_frame.png", "xpanes_space.png"},
+	inventory_image = "xdecor_wood_frame.png",
+	wield_image = "xdecor_wood_frame.png",
+	groups = {choppy=2, pane=1, flammable=2},
+	sounds = default.node_sound_wood_defaults(),
+	recipe = {{"group:wood", "group:stick", "group:wood"},
+		  {"group:stick", "group:stick", "group:stick"},
+		  {"group:wood", "group:stick", "group:wood"}}
+})
