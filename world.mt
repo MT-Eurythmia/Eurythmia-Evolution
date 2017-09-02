@@ -175,3 +175,4 @@ load_mod_mesecons_doors = true
 load_mod_flowers_plus = true
 load_mod_caverealms = true
 load_mod_unifieddyes = true
+load_mod_moreores = true
