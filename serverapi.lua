@@ -11,7 +11,7 @@ local function encode_post_body(params)
 end
 
 local function do_request(post_get, command, params)
-	local URI = umabis.settings():get("api_uri") .. command
+	local URI = umabis.settings:get("api_uri") .. command
 
 	local body, code
 	if post_get == "GET" then
