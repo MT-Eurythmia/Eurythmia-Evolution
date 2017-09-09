@@ -52,7 +52,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			minetest.show_formspec(name, "umabis:provide_info", umabis.formspecs.provide_info)
 		elseif fields.exit then
 			minetest.kick_player(name, "Exiting.")
-			sessions[name] = nil
+			-- Session will be cleared in the on_leaveplayer callback.
 		else
 			minetest.after(0.2, minetest.show_formspec, name, "umabis:welcome", string.format(umabis.formspecs.welcome, name))
 		end
@@ -70,7 +70,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			minetest.show_formspec(name, "umabis:registration_done", umabis.formspecs.registration_done)
 		elseif fields.exit then
 			minetest.kick_player(name, "Exiting.")
-			sessions[name] = nil
+			-- Session will be cleared in the on_leaveplayer callback.
 		else
 			minetest.after(0.2, minetest.show_formspec, name, "umabis:provide_info", umabis.formspecs.provide_info)
 		end
@@ -145,7 +145,7 @@ minetest.register_globalstep(function(dtime)
 
 	local current_time = os.time()
 	for name, t in pairs(sessions) do
-		if t.last_sign_of_life + umabis.session.ping_interval <= current_time then
+		if t.token and t.last_sign_of_life + umabis.session.ping_interval <= current_time then
 			minetest.log("info", "[umabis] Pinging for session "..name)
 			umabis.serverapi.ping(name, sessions[name].token)
 		end
