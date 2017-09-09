@@ -16,18 +16,23 @@ local version = {
 
 local registered_on_reload = {}
 
--- Avoid "Assignement to undeclared global" warning
-umabis = nil
+umabis = {
+	-- This function is available only during the initial load.
+	register_on_reload = function(action)
+		table.insert(registered_on_reload, action)
+	end
+}
+
+dofile(minetest.get_modpath("umabis") .. "/auth_handler.lua")
+dofile(minetest.get_modpath("umabis") .. "/formspecs.lua")
+dofile(minetest.get_modpath("umabis") .. "/session.lua")
 
 local function load()
 	umabis = {
 		version_major = version.major,
 		version_minor = version.minor,
 		version_patch = version.patch,
-		version_string = version.major.."."..version.minor.."."..version.patch,
-		register_on_reload = function(action)
-			table.insert(registered_on_reload, action)
-		end
+		version_string = version.major.."."..version.minor.."."..version.patch
 	}
 
 	dofile(minetest.get_modpath("umabis") .. "/settings.lua")
@@ -58,7 +63,7 @@ minetest.register_chatcommand("umabis_reload", {
 		if load() then
 			return true, "Successfully reloaded Umabis."
 		else
-			return false, minetest.colorize("#FF0000", "Error occured while reloading. See debug.txt for more details.")
+			return false, minetest.colorize("#FF0000", "Error occured while reloading. See debug.txt for more details. Umabis is currently is a very inconsistent state, please reload again as soon as possible.")
 		end
 	end
 })
@@ -67,14 +72,17 @@ minetest.register_on_prejoinplayer(function(name, ip)
 	--[[
 	TODO: check if the user is blacklisted
 	]]
+	umabis.session.prepare_session(name, ip)
 end)
 
 minetest.register_on_joinplayer(function(player)
-	--[[
-	TODO: ask the user to register or authenticate
-	]]
+	umabis.session.new_session(player:get_player_name())
+end)
+
+minetest.register_on_leaveplayer(function(player)
+	umabis.session.clear_session(player:get_player_name())
 end)
 
 minetest.register_on_shutdown(function()
-	--umabis.sessions.close_all()
+	umabis.session.clear_all()
 end)

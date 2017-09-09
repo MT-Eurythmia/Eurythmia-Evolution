@@ -49,7 +49,8 @@ function umabis.serverapi.hello()
 
 	umabis.serverapi.params = {
 		session_expiration_time = server_params.SESSION_EXPIRATION_TIME,
-		version_string = server_params.VERSION
+		version_string = server_params.VERSION,
+		name = server_params.NAME
 	}
 
 	local major, minor, patch = string.match(server_params.VERSION, "(%d+)%.(%d+)%.(%d+)")
@@ -74,4 +75,126 @@ function umabis.serverapi.hello()
 	end
 
 	return true
+end
+
+-- FIXME: code redundancy
+
+function umabis.serverapi.ping(name, token)
+	local code, body = do_request("POST", "ping", {name = name, token = token})
+	if not code then
+		return false
+	end
+	if code == "012" then
+		minetest.log("error", "[umabis] Command 'ping' failed: missing parameter.")
+		return false, "Missing parameter."
+	end
+
+	umabis.session.update_last_sign_of_life(name)
+
+	return true
+end
+
+function umabis.serverapi.is_registered(name, ip_address)
+	local code, body = do_request("GET", "is_registered", {name = name, ip_address = ip_address})
+	if not code then
+		return false
+	end
+	if code == "012" then
+		minetest.log("error", "[umabis] Command 'is_registered' failed: missing parameter.")
+		return false, "Missing parameter."
+	end
+
+	return tonumber(body)
+end
+
+function umabis.serverapi.register(name, hash, email, is_email_public, ip_address)
+	local code, body = do_request("POST", "register", {
+		name = name,
+		hash = hash,
+		["e-mail"] = email,
+		is_email_public = is_email_public and 1 or 0,
+		ip_address = ip_address
+	})
+
+	if not code then
+		return false
+	end
+	if code == "012" then
+		minetest.log("error", "[umabis] Command 'register' failed: missing parameter.")
+		return false, "012"
+	end
+	if code == "015" then
+		minetest.log("error", "[umabis] Command 'register' failed: there is already an account with the same name.")
+		return false, "015"
+	end
+	if code == "005" then
+		minetest.log("error", "[umabis] Command 'register' failed: IP is blacklisted. Entry: "..body)
+		return false, "005", minetest.parse_json(body)
+	end
+
+	return true
+end
+
+function umabis.serverapi.authenticate(name, hash, ip_address)
+	local code, body = do_request("POST", "authenticate", {
+		name = name,
+		hash = hash,
+		ip_address = ip_address
+	})
+
+	if not code then
+		return false
+	end
+	if code == "012" then
+		minetest.log("error", "[umabis] Command 'authenticate' failed: missing parameter.")
+		return false, "012"
+	end
+	if code == "005" then
+		minetest.log("error", "[umabis] Command 'authenticate' failed: IP is blacklisted. Entry: "..body)
+		return false, "005", minetest.parse_json(body)
+	end
+	if code == "001" then
+		minetest.log("error", "[umabis] Command 'authenticate' failed: user is not registered.")
+		return false, "001"
+	end
+	if code == "002" then
+		minetest.log("error", "[umabis] Command 'authenticate' failed: password does not match.")
+		return false, "002"
+	end
+	if code == "003" then
+		minetest.log("error", "[umabis] Command 'authenticate' failed: user is already authenticated.")
+		return false, "003"
+	end
+	if code == "004" then
+		minetest.log("error", "[umabis] Command 'authenticate' failed: more than 3 unsuccessful attemps to authenticate.")
+		return false, "002"
+	end
+
+	umabis.session.update_last_sign_of_life(name)
+
+	return body
+end
+
+function umabis.serverapi.close_session(name, token)
+	local code, body = do_request("POST", "close_session", {name = name, token = token})
+
+	if not code then
+		return false
+	end
+	if code == "012" then
+		minetest.log("error", "[umabis] Command 'close_session' failed: missing parameter.")
+		return false, "012"
+	end
+	if code == "006" then
+		minetest.log("error", "[umabis] Command 'close_session' failed: session token does not match.")
+		return false, "006"
+	end
+	if code == "013" then
+		minetest.log("error", "[umabis] Command 'close_session' failed: session expired.")
+		return false, "013"
+	end
+	if code == "014" then
+		minetest.log("error", "[umabis] Command 'close_session' failed: user is not authenticated.")
+		return false, "014"
+	end
 end
