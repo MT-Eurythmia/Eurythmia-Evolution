@@ -107,12 +107,16 @@ function umabis.serverapi.is_registered(name, ip_address)
 	return tonumber(body)
 end
 
-function umabis.serverapi.register(name, hash, email, is_email_public, ip_address)
+function umabis.serverapi.register(name, hash, email, is_email_public, language_main,
+	language_fallback_1, language_fallback_2, ip_address)
 	local code, body = do_request("POST", "register", {
 		name = name,
 		hash = hash,
 		["e-mail"] = email,
 		is_email_public = is_email_public and 1 or 0,
+		language_main = language_main,
+		language_fallback_1 = language_fallback_1,
+		language_fallback_2 = language_fallback_2,
 		ip_address = ip_address
 	})
 

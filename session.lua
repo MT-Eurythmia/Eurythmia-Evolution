@@ -32,8 +32,9 @@ local function authenticate(name)
 end
 
 local function register(name)
-	umabis.serverapi.register(name, minetest.get_auth_handler().get_auth(name).password, sessions[name].email,
-		sessions[name].is_email_public, sessions[name].ip_address)
+	local a, b = umabis.serverapi.register(name, minetest.get_auth_handler().get_auth(name).password, sessions[name].email,
+		sessions[name].is_email_public, sessions[name].language_main, sessions[name].language_fallback_1,
+		sessions[name].language_fallback_2, sessions[name].ip_address)
 	-- TODO: error handling
 	authenticate(name)
 	priv_back(name)
