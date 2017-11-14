@@ -48,6 +48,8 @@ local function load()
 		end
 	end
 
+	dofile(minetest.get_modpath("umabis") .. "/chatcmds.lua")
+
 	minetest.log("action", "[umabis] Umabis version "..umabis.version_string.." loaded!")
 	return true
 end

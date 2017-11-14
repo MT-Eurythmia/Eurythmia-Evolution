@@ -202,3 +202,36 @@ function umabis.serverapi.close_session(name, token)
 		return false, "014"
 	end
 end
+
+function umabis.serverapi.blacklist_user(name, token, blacklisted_name, reason, category, time)
+	local code, body = do_request("POST", "blacklist_user", {name = name, token = token, blacklisted_name = blacklisted_name, reason = reason, category = category, time = time})
+
+	if not code then
+		return false
+	end
+
+	if code == "008" then
+		minetest.log("error", "[umabis] Command 'blacklisted_user' failed: unsufficient privileges.")
+		return false, "018"
+	end
+	if code == "012" then
+		minetest.log("error", "[umabis] Command 'blacklisted_user' failed: missing parameter.")
+		return false, "012"
+	end
+	if code == "009" then
+		minetest.log("error", "[umabis] Command 'blacklisted_user' failed: requested nick does not exist.")
+		return false, "009"
+	end
+	if code == "010" then
+		minetest.log("error", "[umabis] Command 'blacklisted_user' failed: user is already blacklisted.")
+		return false, "010"
+	end
+	if code == "016" then
+		minetest.log("error", "[umabis] Command 'blacklisted_user' failed: user is whitelisted.")
+		return false, "016"
+	end
+	if code == "011" then
+		minetest.log("error", "[umabis] Command 'blacklisted_user' failed: invalid category.")
+		return false, "011"
+	end
+end
