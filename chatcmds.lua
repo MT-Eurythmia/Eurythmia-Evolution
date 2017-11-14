@@ -1,31 +1,71 @@
-local commands_descriptors = {
-	-- TODO: help
-	blacklist = {
-		params = 3,
-		func = function(name, token, blacklisted_name, reason, category, time)
-			-- Thanks xban2!
-			local function parse_time(t) --> secs
-				local unit_to_secs = {
-					s = 1, m = 60, h = 3600,
-					D = 86400, W = 604800, M = 2592000, Y = 31104000,
-					[""] = 1,
-				}
-
-				local secs = 0
-				for num, unit in t:gmatch("(%d+)([smhDWMY]?)") do
-					secs = secs + (tonumber(num) * (unit_to_secs[unit] or 1))
-				end
-				return secs
+-- TODO: privileges management
+local commands_descriptors = {}
+commands_descriptors.help = {
+	description = "print help about a subcommand or list all subcommands",
+	usage = "[<subcommand>]",
+	params = 0,
+	func = function(name, token, cmd)
+		if not cmd then
+			local str = "Available subcommands:\n"
+			for cmd, dsc in pairs(commands_descriptors) do
+				str = str .. "  " .. cmd .. " - " .. dsc.description .. "\n"
 			end
-
-			print("Running the blacklist_user command")
-			local ok, err = umabis.serverapi.blacklist_user(name, token, blacklisted_name, reason, category, time and parse_time(time))
-			if not ok then
-				return false, err
-			end
-			return true, "Blacklisted "..blacklisted_name
+			str = str .. "Type /umabis help <subcommand> to get help about a subcommand."
+			return true, str
 		end
-	}
+
+		local descriptor = commands_descriptors[cmd]
+		if not descriptor then
+			return false, "Subcommand " .. cmd .. " does not exist. Type /umabis help for a list of available subcommands."
+		end
+
+		if descriptor.additional_info then
+			return true, "/umabis " .. cmd .. " " .. descriptor.usage .. "\n" ..
+			             descriptor.description .. "\n" ..
+				     descriptor.additional_info
+		else
+			return true, "/umabis " .. cmd .. " " .. descriptor.usage .. "\n" ..
+			             descriptor.description
+		end
+	end
+}
+commands_descriptors.blacklist = {
+	description = "globally blacklist a user",
+	usage = "<nick> <reason> <category> [<time>]",
+	-- TODO: add available categories in additional_info.
+	additional_info = "Format of <time>:\n"..
+	                  "* 1s or 1 - one second\n"..
+			  "* 1m - one minute\n"..
+			  "* 1h - one hour\n"..
+			  "* 1D - one day\n"..
+			  "* 1W - one week\n"..
+			  "* 1M - one month (30 days)\n"..
+			  "* 1Y - one year (360 days)\n"..
+			  "Values can be combined. For example \"1D3h3m7s\" will blacklist for 1 day, 3 hours, 3 minutes, and 7 seconds.",
+	params = 3,
+	func = function(name, token, blacklisted_name, reason, category, time)
+		-- Thanks xban2!
+		local function parse_time(t) --> secs
+			local unit_to_secs = {
+				s = 1, m = 60, h = 3600,
+				D = 86400, W = 604800, M = 2592000, Y = 31104000,
+				[""] = 1,
+			}
+
+			local secs = 0
+			for num, unit in t:gmatch("(%d+)([smhDWMY]?)") do
+				secs = secs + (tonumber(num) * (unit_to_secs[unit] or 1))
+			end
+			return secs
+		end
+
+		print("Running the blacklist_user command")
+		local ok, err = umabis.serverapi.blacklist_user(name, token, blacklisted_name, reason, category, time and parse_time(time))
+		if not ok then
+			return false, err
+		end
+		return true, "Blacklisted "..blacklisted_name
+	end
 }
 
 minetest.register_chatcommand("umabis", {
