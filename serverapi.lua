@@ -35,10 +35,46 @@ local function do_request(post_get, command, params)
 	return umabis_code, umabis_body
 end
 
+local error_codes = {
+	["001"] = "user is not registered",
+	["002"] = "password hash does not match",
+	["003"] = "user is already authenticated",
+	["004"] = "more than 3 unsuccessful authentication attemps in last 30 minutes",
+	["005"] = "user is blacklisted",
+	["006"] = "name and token do not match",
+	["007"] = "user e-mail is not public",
+	["008"] = "unsufficient privileges",
+	["009"] = "requested nick does not exist",
+	["010"] = "user already (not) blacklisted/whitelisted",
+	["011"] = "invalid category",
+	["012"] = "missing parameter",
+	["013"] = "session expired",
+	["014"] = "user is not authenticated",
+	["015"] = "name already registered",
+	["016"] = "blacklisting a whitelisted user/whitelisting a blacklisted user"
+}
+
+local function check_code(code, command)
+	if not code then
+		umabis.errstr = "no code returned"
+		minetest.log("error", "[umabis] No code returned after serverapi command "..command)
+		return false, "No code returned. This is a bug. Please contact the server administrator."
+	end
+
+	if error_codes[code] then
+		umabis.errstr = error_codes[code]
+		minetest.log("warning", "[umabis] Command '"..command.."' failed: "..error_codes[code])
+		return false, string.gsub(error_codes[code], "^%l", string.upper)
+	end
+
+	return true
+end
+
 function umabis.serverapi.hello()
 	local code, body = do_request("GET", "hello", {})
-	if not code then
-		return false
+	local ret, e = check_code(code, "hello")
+	if not ret then
+		return ret, e
 	end
 
 	local server_params = minetest.parse_json(body)
@@ -81,12 +117,9 @@ end
 
 function umabis.serverapi.ping(name, token)
 	local code, body = do_request("POST", "ping", {name = name, token = token})
-	if not code then
-		return false
-	end
-	if code == "012" then
-		minetest.log("error", "[umabis] Command 'ping' failed: missing parameter.")
-		return false, "Missing parameter."
+	local ret, e = check_code(code, "ping")
+	if not ret then
+		return ret, e
 	end
 
 	umabis.session.update_last_sign_of_life(name)
@@ -96,12 +129,9 @@ end
 
 function umabis.serverapi.is_registered(name, ip_address)
 	local code, body = do_request("GET", "is_registered", {name = name, ip_address = ip_address})
-	if not code then
-		return false
-	end
-	if code == "012" then
-		minetest.log("error", "[umabis] Command 'is_registered' failed: missing parameter.")
-		return false, "Missing parameter."
+	local ret, e = check_code(code, "is_registered")
+	if not ret then
+		return ret, e
 	end
 
 	return tonumber(body)
@@ -120,23 +150,7 @@ function umabis.serverapi.register(name, hash, email, is_email_public, language_
 		ip_address = ip_address
 	})
 
-	if not code then
-		return false
-	end
-	if code == "012" then
-		minetest.log("error", "[umabis] Command 'register' failed: missing parameter.")
-		return false, "012"
-	end
-	if code == "015" then
-		minetest.log("error", "[umabis] Command 'register' failed: there is already an account with the same name.")
-		return false, "015"
-	end
-	if code == "005" then
-		minetest.log("error", "[umabis] Command 'register' failed: IP is blacklisted. Entry: "..body)
-		return false, "005", minetest.parse_json(body)
-	end
-
-	return true
+	return check_code(code, "register")
 end
 
 function umabis.serverapi.authenticate(name, hash, ip_address)
@@ -146,32 +160,9 @@ function umabis.serverapi.authenticate(name, hash, ip_address)
 		ip_address = ip_address
 	})
 
-	if not code then
-		return false
-	end
-	if code == "012" then
-		minetest.log("error", "[umabis] Command 'authenticate' failed: missing parameter.")
-		return false, "012"
-	end
-	if code == "005" then
-		minetest.log("error", "[umabis] Command 'authenticate' failed: IP is blacklisted. Entry: "..body)
-		return false, "005", minetest.parse_json(body)
-	end
-	if code == "001" then
-		minetest.log("error", "[umabis] Command 'authenticate' failed: user is not registered.")
-		return false, "001"
-	end
-	if code == "002" then
-		minetest.log("error", "[umabis] Command 'authenticate' failed: password does not match.")
-		return false, "002"
-	end
-	if code == "003" then
-		minetest.log("error", "[umabis] Command 'authenticate' failed: user is already authenticated.")
-		return false, "003"
-	end
-	if code == "004" then
-		minetest.log("error", "[umabis] Command 'authenticate' failed: more than 3 unsuccessful attemps to authenticate.")
-		return false, "002"
+	local ret, e = check_code(code, "authenticate")
+	if not ret then
+		return ret, e
 	end
 
 	umabis.session.update_last_sign_of_life(name)
@@ -182,56 +173,11 @@ end
 function umabis.serverapi.close_session(name, token)
 	local code, body = do_request("POST", "close_session", {name = name, token = token})
 
-	if not code then
-		return false
-	end
-	if code == "012" then
-		minetest.log("error", "[umabis] Command 'close_session' failed: missing parameter.")
-		return false, "012"
-	end
-	if code == "006" then
-		minetest.log("error", "[umabis] Command 'close_session' failed: session token does not match.")
-		return false, "006"
-	end
-	if code == "013" then
-		minetest.log("error", "[umabis] Command 'close_session' failed: session expired.")
-		return false, "013"
-	end
-	if code == "014" then
-		minetest.log("error", "[umabis] Command 'close_session' failed: user is not authenticated.")
-		return false, "014"
-	end
+	return check_code(code, "close_session")
 end
 
 function umabis.serverapi.blacklist_user(name, token, blacklisted_name, reason, category, time)
 	local code, body = do_request("POST", "blacklist_user", {name = name, token = token, blacklisted_name = blacklisted_name, reason = reason, category = category, time = time})
 
-	if not code then
-		return false
-	end
-
-	if code == "008" then
-		minetest.log("error", "[umabis] Command 'blacklisted_user' failed: unsufficient privileges.")
-		return false, "018"
-	end
-	if code == "012" then
-		minetest.log("error", "[umabis] Command 'blacklisted_user' failed: missing parameter.")
-		return false, "012"
-	end
-	if code == "009" then
-		minetest.log("error", "[umabis] Command 'blacklisted_user' failed: requested nick does not exist.")
-		return false, "009"
-	end
-	if code == "010" then
-		minetest.log("error", "[umabis] Command 'blacklisted_user' failed: user is already blacklisted.")
-		return false, "010"
-	end
-	if code == "016" then
-		minetest.log("error", "[umabis] Command 'blacklisted_user' failed: user is whitelisted.")
-		return false, "016"
-	end
-	if code == "011" then
-		minetest.log("error", "[umabis] Command 'blacklisted_user' failed: invalid category.")
-		return false, "011"
-	end
+	return check_code(code, "blacklist_user")
 end

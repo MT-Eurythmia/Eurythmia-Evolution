@@ -55,6 +55,7 @@ local function load()
 end
 if not load() then
 	minetest.log("error", "[umabis] Failed to load Umabis version "..umabis.version_string..".")
+	error("Failed to load Umabis version "..umabis.version_string..". See debug.txt for more info.")
 end
 
 minetest.register_chatcommand("umabis_reload", {
@@ -74,6 +75,7 @@ minetest.register_on_prejoinplayer(function(name, ip)
 	--[[
 	TODO: check if the user is blacklisted
 	]]
+	print(dump(umabis))
 	umabis.session.prepare_session(name, ip)
 	--[[
 	FIXME: the user password must be checked in this callback.

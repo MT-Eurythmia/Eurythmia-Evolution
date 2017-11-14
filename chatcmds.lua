@@ -19,8 +19,11 @@ local commands_descriptors = {
 			end
 
 			print("Running the blacklist_user command")
-			umabis.serverapi.blacklist_user(name, token, blacklisted_name, reason, category, time and parse_time(time))
-			-- TODO: handle error during blacklist_user
+			local ok, err = umabis.serverapi.blacklist_user(name, token, blacklisted_name, reason, category, time and parse_time(time))
+			if not ok then
+				return false, err
+			end
+			return true, "Blacklisted "..blacklisted_name
 		end
 	}
 }
