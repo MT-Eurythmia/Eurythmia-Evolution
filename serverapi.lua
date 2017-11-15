@@ -78,7 +78,6 @@ function umabis.serverapi.hello()
 	end
 
 	local server_params = minetest.parse_json(body)
-	print(dump(server_params))
 
 	if not server_params or type(server_params) ~= "table" then
 		return false

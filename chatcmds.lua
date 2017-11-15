@@ -27,6 +27,14 @@ commands_descriptors.help = {
 			return false, "Subcommand " .. cmd .. " does not exist. Type /umabis help for a list of available subcommands."
 		end
 
+		if descriptor.privs then
+			for _, priv in ipairs(descriptor.privs) do
+				if not minetest.check_player_privs(name, priv) then
+					return false, "You don't have permission to run this command. Missing privilege: "..priv
+				end
+			end
+		end
+
 		if descriptor.additional_info then
 			return true, "/umabis " .. cmd .. " " .. descriptor.usage .. "\n" ..
 			             descriptor.description .. "\n" ..
@@ -34,6 +42,20 @@ commands_descriptors.help = {
 		else
 			return true, "/umabis " .. cmd .. " " .. descriptor.usage .. "\n" ..
 			             descriptor.description
+		end
+	end
+}
+commands_descriptors.reload = {
+	description = "reload Umabis",
+	usage = "",
+	additional_info = "using this command will apply any change made in a file of the mod, except in init.lua",
+	privs = {"ban"},
+	params = 0,
+	func = function(name, token)
+		if umabis.reload() then
+			return true, "Successfully reloaded Umabis."
+		else
+			return false, minetest.colorize("#FF0000", "Error occured while reloading. See debug.txt for more details. Umabis is currently is a very inconsistent state, please reload again as soon as possible.")
 		end
 	end
 }

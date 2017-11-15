@@ -53,23 +53,15 @@ local function load()
 	minetest.log("action", "[umabis] Umabis version "..umabis.version_string.." loaded!")
 	return true
 end
+
+umabis.register_on_reload(function()
+	umabis.reload = load
+end)
+
 if not load() then
 	minetest.log("error", "[umabis] Failed to load Umabis version "..umabis.version_string..".")
 	error("Failed to load Umabis version "..umabis.version_string..". See debug.txt for more info.")
 end
-
-minetest.register_chatcommand("umabis_reload", {
-	description = "Reloads Umabis",
-	privs = {ban = true},
-	params = "",
-	func = function(name, param)
-		if load() then
-			return true, "Successfully reloaded Umabis."
-		else
-			return false, minetest.colorize("#FF0000", "Error occured while reloading. See debug.txt for more details. Umabis is currently is a very inconsistent state, please reload again as soon as possible.")
-		end
-	end
-})
 
 minetest.register_on_prejoinplayer(function(name, ip)
 	--[[
