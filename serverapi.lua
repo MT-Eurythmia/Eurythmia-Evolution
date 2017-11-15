@@ -78,6 +78,7 @@ function umabis.serverapi.hello()
 	end
 
 	local server_params = minetest.parse_json(body)
+	print(dump(server_params))
 
 	if not server_params or type(server_params) ~= "table" then
 		return false
@@ -86,7 +87,8 @@ function umabis.serverapi.hello()
 	umabis.serverapi.params = {
 		session_expiration_time = server_params.SESSION_EXPIRATION_TIME,
 		version_string = server_params.VERSION,
-		name = server_params.NAME
+		name = server_params.NAME,
+		available_blacklist_categories = server_params.AVAILABLE_BLACKLIST_CATEGORIES
 	}
 
 	local major, minor, patch = string.match(server_params.VERSION, "(%d+)%.(%d+)%.(%d+)")
@@ -112,8 +114,6 @@ function umabis.serverapi.hello()
 
 	return true
 end
-
--- FIXME: code redundancy
 
 function umabis.serverapi.ping(name, token)
 	local code, body = do_request("POST", "ping", {name = name, token = token})

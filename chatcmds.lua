@@ -5,6 +5,14 @@ commands_descriptors.help = {
 	usage = "[<subcommand>]",
 	params = 0,
 	func = function(name, token, cmd)
+		local function get_string_or_func(str_or_func)
+			if type(str_or_func) == "string" then
+				return str_or_func
+			else
+				return str_or_func(name)
+			end
+		end
+
 		if not cmd then
 			local str = "Available subcommands:\n"
 			for cmd, dsc in pairs(commands_descriptors) do
@@ -22,7 +30,7 @@ commands_descriptors.help = {
 		if descriptor.additional_info then
 			return true, "/umabis " .. cmd .. " " .. descriptor.usage .. "\n" ..
 			             descriptor.description .. "\n" ..
-				     descriptor.additional_info
+				     get_string_or_func(descriptor.additional_info)
 		else
 			return true, "/umabis " .. cmd .. " " .. descriptor.usage .. "\n" ..
 			             descriptor.description
@@ -33,15 +41,22 @@ commands_descriptors.blacklist = {
 	description = "globally blacklist a user",
 	usage = "<nick> <reason> <category> [<time>]",
 	-- TODO: add available categories in additional_info.
-	additional_info = "Format of <time>:\n"..
-	                  "* 1s or 1 - one second\n"..
-			  "* 1m - one minute\n"..
-			  "* 1h - one hour\n"..
-			  "* 1D - one day\n"..
-			  "* 1W - one week\n"..
-			  "* 1M - one month (30 days)\n"..
-			  "* 1Y - one year (360 days)\n"..
-			  "Values can be combined. For example \"1D3h3m7s\" will blacklist for 1 day, 3 hours, 3 minutes, and 7 seconds.",
+	additional_info = function()
+		local str = "Format of <time>:\n"..
+	                    "* 1s or 1 - one second\n"..
+		            "* 1m - one minute\n"..
+		            "* 1h - one hour\n"..
+		            "* 1D - one day\n"..
+		            "* 1W - one week\n"..
+		            "* 1M - one month (30 days)\n"..
+		            "* 1Y - one year (360 days)\n"..
+		            "Values can be combined. For example \"1D3h3m7s\" will blacklist for 1 day, 3 hours, 3 minutes, and 7 seconds.\n\n"..
+			    "Available categories are:\n"
+		for category, description in pairs(umabis.serverapi.params.available_blacklist_categories) do
+			str = str .. "* " .. category .. " - " .. description .. "\n"
+		end
+		return str
+	end,
 	params = 3,
 	func = function(name, token, blacklisted_name, reason, category, time)
 		-- Thanks xban2!
