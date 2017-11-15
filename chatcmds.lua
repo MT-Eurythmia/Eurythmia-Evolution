@@ -62,10 +62,9 @@ commands_descriptors.reload = {
 commands_descriptors.blacklist = {
 	description = "globally blacklist a user",
 	usage = "<nick> <reason> <category> [<time>]",
-	-- TODO: add available categories in additional_info.
 	additional_info = function()
 		local str = "Format of <time>:\n"..
-	                    "* 1s or 1 - one second\n"..
+		            "* 1s or 1 - one second\n"..
 		            "* 1m - one minute\n"..
 		            "* 1h - one hour\n"..
 		            "* 1D - one day\n"..
@@ -96,12 +95,47 @@ commands_descriptors.blacklist = {
 			return secs
 		end
 
-		print("Running the blacklist_user command")
 		local ok, err = umabis.serverapi.blacklist_user(name, token, blacklisted_name, reason, category, time and parse_time(time))
 		if not ok then
-			return false, err
+			return false, minetest.colorize("#FF0000", err)
 		end
 		return true, "Blacklisted "..blacklisted_name
+	end
+}
+commands_descriptors.unblacklist = {
+	description = "globally unblacklist a user",
+	usage = "<nick>",
+	params = 1,
+	func = function(name, token, blacklisted_name)
+		local ok, err = umabis.serverapi.unblacklist_user(name, token, blacklisted_name)
+		if not ok then
+			return false, minetest.colorize("#FF0000", err)
+		end
+		return true, "Unblacklisted "..blacklisted_name
+	end
+}
+commands_descriptors.whitelist = {
+	description = "globally whitelist a user",
+	usage = "<nick>",
+	params = 1,
+	func = function(name, token, whitelisted_name)
+		local ok, err = umabis.serverapi.whitelist_user(name, token, whitelisted_name)
+		if not ok then
+			return false, minetest.colorize("#FF0000", err)
+		end
+		return true, "Whitelisted "..whitelisted_name
+	end
+}
+commands_descriptors.unwhitelist = {
+	description = "globally unwhitelist a user",
+	usage = "<nick>",
+	params = 1,
+	func = function(name, token, whitelisted_name)
+		local ok, err = umabis.serverapi.unwhitelist_user(name, token, whitelisted_name)
+		if not ok then
+			return false, minetest.colorize("#FF0000", err)
+		end
+		return true, "Unwhitelisted "..whitelisted_name
 	end
 }
 

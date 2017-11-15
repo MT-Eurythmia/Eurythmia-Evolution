@@ -180,3 +180,21 @@ function umabis.serverapi.blacklist_user(name, token, blacklisted_name, reason, 
 
 	return check_code(code, "blacklist_user")
 end
+
+function umabis.serverapi.unblacklist_user(name, token, blacklisted_name)
+	local code, body = do_request("POST", "unblacklist_user", {name = name, token = token, blacklisted_name = blacklisted_name})
+
+	return check_code(code, "unblacklist_user")
+end
+
+function umabis.serverapi.whitelist_user(name, token, whitelisted_name)
+	local code, body = do_request("POST", "whitelist_user", {name = name, token = token, whitelisted_name = whitelisted_name})
+
+	return check_code(code, "whitelist_user")
+end
+
+function umabis.serverapi.unwhitelist_user(name, token, whitelisted_name)
+	local code, body = do_request("POST", "unwhitelist_user", {name = name, token = token, whitelisted_name = whitelisted_name})
+
+	return check_code(code, "unwhitelist_user")
+end
