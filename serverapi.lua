@@ -224,3 +224,9 @@ function umabis.serverapi.is_blacklisted(name, ip_address)
 		return true, "ip", entry
 	end
 end
+
+function umabis.serverapi.set_pass(name, token, hash)
+	local code, body = do_request("POST", "set_pass", {name = name, token = token, hash = hash})
+
+	return check_code(code, "set_pass")
+end

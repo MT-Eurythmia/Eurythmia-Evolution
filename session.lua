@@ -117,7 +117,13 @@ umabis.register_on_reload(function()
 	end
 
 	function umabis.session.set_password(name, password)
-		-- FIXME: Unimplemented
+		local ok, err = umabis.serverapi.set_pass(name, sessions[name].token, password)
+		if not ok then
+			minetest.log("error", "[umabis] Error while setting password: " .. err)
+			minetest.chat_send_player(name, minetest.colorize("#FF0000", "There was a problem while setting your password. Your password should have been left unchanged."))
+			return false
+		end
+		return true
 	end
 
 
