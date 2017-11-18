@@ -64,9 +64,32 @@ if not load() then
 end
 
 minetest.register_on_prejoinplayer(function(name, ip)
-	--[[
-	TODO: check if the user is blacklisted
-	]]
+	local function format_entry(entries)
+		local str = ""
+		for _, entry in ipairs(entries) do
+			str = str .. "---"
+			        .. "\nDate: " .. entry.date
+			        .. "\nCategory: " .. entry.category
+			        .. "\nReason: " .. entry.reason
+			        .. "\nUntil: " .. (entry.expiration_time and os.date("%c", entry.expiration_time) or "the end of times")
+			if umabis.settings:get_bool("blacklist_show_source_moderator") then
+				str = str .. "\nBy moderator: " .. entry.source_moderator
+			end
+		end
+		return str
+	end
+
+	local ok, blacklisted, entry = umabis.serverapi.is_blacklisted(name, ip)
+	if not ok then
+		return "A bug occured while checking if you were blacklisted on the Umabis server. Please contact the server administrator."
+	end
+
+	if blacklisted == "nick" then
+		return "Your nick ("..name..") is blacklisted on the Umabis server.\n" .. format_entry(entry)
+	elseif blacklisted == "ip" then
+		return "You IP address ("..ip..") is blacklisted on the Umabis server.\n" .. format_entry(entry)
+	end
+
 	umabis.session.prepare_session(name, ip)
 	--[[
 	FIXME: the user password must be checked in this callback.

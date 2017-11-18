@@ -198,3 +198,29 @@ function umabis.serverapi.unwhitelist_user(name, token, whitelisted_name)
 
 	return check_code(code, "unwhitelist_user")
 end
+
+function umabis.serverapi.is_blacklisted(name, ip_address)
+	local code, body = do_request("GET", "is_blacklisted", {ip_address = ip_address, name = name})
+
+	local ret, e = check_code(code, "is_blacklisted")
+	if not ret then
+		return ret, e
+	end
+
+	if body:sub(1, 1) == "0" then
+		return true, "not"
+	end
+
+	local entry = minetest.parse_json(body:sub(2))
+	if not entry then
+		-- An error message describing the error should already have been logged by minetest.parse_json
+		minetest.log("error", "[umabis] Command 'is_blacklisted' failed (error parsing JSON).")
+		return false
+	end
+
+	if body:sub(1, 1) == "1" then
+		return true, "nick", entry
+	else
+		return true, "ip", entry
+	end
+end
