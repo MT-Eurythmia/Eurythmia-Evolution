@@ -166,7 +166,7 @@ function umabis.serverapi.authenticate(name, hash, ip_address)
 
 	umabis.session.update_last_sign_of_life(name)
 
-	return body
+	return true, body
 end
 
 function umabis.serverapi.close_session(name, token)

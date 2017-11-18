@@ -25,19 +25,26 @@ local function create_session(name)
 end
 
 local function authenticate(name)
-	local token = umabis.serverapi.authenticate(name, minetest.get_auth_handler().get_auth(name).password, sessions[name].ip_address)
-	-- TODO: error handling
+	local ok, token = umabis.serverapi.authenticate(name, minetest.get_auth_handler().get_auth(name).password, sessions[name].ip_address)
+	if not ok then
+		-- token contains the error string
+		return false, token
+	end
 	sessions[name].token = token
 	minetest.log("action", "[umabis] Player "..name.." was successfully authenticated.")
+	return true
 end
 
 local function register(name)
-	local a, b = umabis.serverapi.register(name, minetest.get_auth_handler().get_auth(name).password, sessions[name].email,
+	local ok, e = umabis.serverapi.register(name, minetest.get_auth_handler().get_auth(name).password, sessions[name].email,
 		sessions[name].is_email_public, sessions[name].language_main, sessions[name].language_fallback_1,
 		sessions[name].language_fallback_2, sessions[name].ip_address)
-	-- TODO: error handling
+	if not ok then
+		return false, e
+	end
 	authenticate(name)
 	priv_back(name)
+	return true
 end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
@@ -66,9 +73,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			sessions[name].language_fallback_1 = fields.language_fallback_1
 			sessions[name].language_fallback_2 = fields.language_fallback_2
 
-			register(name)
-
-			minetest.show_formspec(name, "umabis:registration_done", umabis.formspecs.registration_done)
+			local ok, e = register(name)
+			if ok then
+				minetest.show_formspec(name, "umabis:registration_done", umabis.formspecs.registration_done)
+			else
+				minetest.kick_player(name, "An error occured while registering your account: " .. e
+					.. "\nPlease contact the server administrator.")
+			end
 		elseif fields.exit then
 			minetest.kick_player(name, "Exiting.")
 			-- Session will be cleared in the on_leaveplayer callback.
@@ -84,22 +95,45 @@ umabis.register_on_reload(function()
 
 	function umabis.session.prepare_session(name, ip_address)
 		sessions[name] = {
-			ip_address = ip_address
+			ip_address = ip_address,
+			timeout = true
 		}
+
+		local is_registered = umabis.serverapi.is_registered(name, ip_address)
+		if is_registered ~= 0 then
+			local ok, e = authenticate(name)
+			if not ok then
+				sessions[name] = nil
+				return false, e
+			end
+		else
+			sessions[name].to_create = true
+		end
+
+		-- Set a timeout (in case another on_prejoinplayer callback kicks the player before on_joinplayer is executed)
+		minetest.after(umabis.settings:get_int("joinplayer_timeout"), function()
+			if sessions[name].timeout then
+				minetest.log("warning", "[umabis] Joinplayer callback timeout for session '" .. name .."'")
+				sessions[name] = nil
+			end
+		end)
+		return true
 	end
 
 	function umabis.session.new_session(name)
 		local session = sessions[name]
 
 		if not session then
-			minetest.kick_player(name, "Sorry, it seems that your Umabis session was not prepared. This is a bug. Use the latest version of Minetest and contact the server administrator (their nick is "..minetest.settings:get("name")..").")
+			minetest.kick_player(name, "Sorry, it seems that your Umabis session was not prepared."..
+				"This is a bug. Use the latest version of Minetest and contact the server administrator"..
+				" (their nick is "..minetest.settings:get("name")..").")
 		end
 
-		local is_registered = umabis.serverapi.is_registered(name, session.ip_address)
-		if is_registered == 0 then
+		session.timeout = nil
+
+		if session.to_create then
 			create_session(name)
-		else
-			authenticate(name)
+			session.to_create = nil
 		end
 	end
 

@@ -7,8 +7,12 @@ end
 
 umabis.settings = {
 	settings_table = settings_table,
+	default_settings = default_settings,
 	get = function(self, key)
 		return self.settings_table[key]
+	end,
+	get_int = function(self, key)
+		return tonumber(self.settings_table[key]) or tonumber(self.default_settings:get(key))
 	end,
 	get_bool = function(self, key)
 		return self.settings_table[key] == "true"

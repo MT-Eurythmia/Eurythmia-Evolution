@@ -90,15 +90,10 @@ minetest.register_on_prejoinplayer(function(name, ip)
 		return "You IP address ("..ip..") is blacklisted on the Umabis server.\n" .. format_entry(entry)
 	end
 
-	umabis.session.prepare_session(name, ip)
-	--[[
-	FIXME: the user password must be checked in this callback.
-	If this is the first time the user joins this MT server but is already registered
-	on the Umabis server, and if the password is wrong, deny their access and set
-	their password to the Umabis password.
-	The user should also be authenticated in the callback, registration being the only
-	operation left in the on_joinplayer callback.
-	]]
+	local ok, e = umabis.session.prepare_session(name, ip)
+	if not ok then
+		return e
+	end
 end)
 
 minetest.register_on_joinplayer(function(player)
