@@ -1,4 +1,18 @@
--- TODO: privileges management
+-- Thanks xban2!
+local function parse_time(t) --> secs
+	local unit_to_secs = {
+		s = 1, m = 60, h = 3600,
+		D = 86400, W = 604800, M = 2592000, Y = 31104000,
+		[""] = 1,
+	}
+
+	local secs = 0
+	for num, unit in t:gmatch("(%d+)([smhDWMY]?)") do
+		secs = secs + (tonumber(num) * (unit_to_secs[unit] or 1))
+	end
+	return secs
+end
+
 local commands_descriptors = {}
 commands_descriptors.help = {
 	description = "print help about a subcommand or list all subcommands",
@@ -60,7 +74,7 @@ commands_descriptors.reload = {
 	end
 }
 commands_descriptors.blacklist = {
-	description = "globally blacklist a user",
+	description = "globally blacklist a player",
 	usage = "<nick> <reason> <category> [<time>]",
 	additional_info = function()
 		local str = "Format of <time>:\n"..
@@ -80,21 +94,6 @@ commands_descriptors.blacklist = {
 	end,
 	params = 3,
 	func = function(name, token, blacklisted_name, reason, category, time)
-		-- Thanks xban2!
-		local function parse_time(t) --> secs
-			local unit_to_secs = {
-				s = 1, m = 60, h = 3600,
-				D = 86400, W = 604800, M = 2592000, Y = 31104000,
-				[""] = 1,
-			}
-
-			local secs = 0
-			for num, unit in t:gmatch("(%d+)([smhDWMY]?)") do
-				secs = secs + (tonumber(num) * (unit_to_secs[unit] or 1))
-			end
-			return secs
-		end
-
 		local ok, err = umabis.serverapi.blacklist_user(name, token, blacklisted_name, reason, category, time and parse_time(time))
 		if not ok then
 			return false, minetest.colorize("#FF0000", err)
@@ -103,7 +102,7 @@ commands_descriptors.blacklist = {
 	end
 }
 commands_descriptors.unblacklist = {
-	description = "globally unblacklist a user",
+	description = "globally unblacklist a player",
 	usage = "<nick>",
 	params = 1,
 	func = function(name, token, blacklisted_name)
@@ -115,7 +114,7 @@ commands_descriptors.unblacklist = {
 	end
 }
 commands_descriptors.whitelist = {
-	description = "globally whitelist a user",
+	description = "globally whitelist a player",
 	usage = "<nick>",
 	params = 1,
 	func = function(name, token, whitelisted_name)
@@ -127,7 +126,7 @@ commands_descriptors.whitelist = {
 	end
 }
 commands_descriptors.unwhitelist = {
-	description = "globally unwhitelist a user",
+	description = "globally unwhitelist a player",
 	usage = "<nick>",
 	params = 1,
 	func = function(name, token, whitelisted_name)
@@ -138,6 +137,92 @@ commands_descriptors.unwhitelist = {
 		return true, "Unwhitelisted "..whitelisted_name
 	end
 }
+
+if umabis.settings:get_bool("enable_local_ban") then
+	commands_descriptors.ban = {
+		description = "locally ban a player",
+		usage = "<reason> <nicks and/or IP addresses...> [--time=<time>] [--drastic]",
+		params = 2,
+		additional_info = "Format of <time>:\n"..
+			"* 1s or 1 - one second\n"..
+			"* 1m - one minute\n"..
+			"* 1h - one hour\n"..
+			"* 1D - one day\n"..
+			"* 1W - one week\n"..
+			"* 1M - one month (30 days)\n"..
+			"* 1Y - one year (360 days)\n"..
+			"Values can be combined. For example \"1D3h3m7s\" will blacklist for 1 day, 3 hours, 3 minutes, and 7 seconds.",
+		privs = {"ban"},
+		func = function(name, token, ...)
+			local params = {...}
+
+			local drastic = nil
+			if params[#params] == "--drastic" then
+				table.remove(params, #params)
+				drastic = true
+			end
+
+			local time = nil
+			local time_param = params[#params]
+			if time_param:sub(1, 7) == "--time=" then
+				time = parse_time(time_param:sub(8))
+				table.remove(params, #params)
+			end
+
+			local reason = params[1]
+			table.remove(params, 1)
+
+			local nicks = {}
+			local ips = {}
+			for _, param in ipairs(params) do
+				if string.match(param, "%d%d?%d?%.%d%d?%d?%.%d%d?%d?%.%d%d?%d?") then -- If param in an IP address
+					ips[param] = true
+				else
+					nicks[param] = true
+				end
+			end
+
+			return umabis.ban.ban_players(name, nicks, ips, reason, drastic, time)
+		end
+	}
+	commands_descriptors.unban = {
+		description = "locally unban a player",
+		usage = "<nick or IP address>",
+		params = 1,
+		privs = {"ban"},
+		func = function(name, token, nick_or_ip)
+			return umabis.ban.unban_player(nick_or_ip)
+		end
+	}
+	commands_descriptors.get_ban = {
+		description = "display the ban entry of a player",
+		usage = "<nick  or IP address>",
+		params = 1,
+		privs = (function()
+			if umabis.settings:get_bool(ban_entries_visible) then
+				return {}
+			else
+				return {"ban"}
+			end
+		end)(),
+		func = function(name, token, nick_or_ip)
+			local entries = umabis.ban.get_entry(nick_or_ip)
+			if not entries then
+				return false, "Nick or IP " .. nick_or_ip .. " is not banned."
+			end
+
+			if #entries > 1 then
+				local str = "Warning: found more than one (" .. #entries .. ") entries! This is abnormal."
+				for _, entry in ipairs(entries) do
+					str = str .. "\n---\n" .. umabis.ban.format_entry(nick_or_ip, entry)
+				end
+				return true, str
+			else
+				return true, umabis.ban.format_entry(nick_or_ip, entries[1])
+			end
+		end
+	}
+end
 
 minetest.register_chatcommand("umabis", {
 	params = "<subcommand> [<subcommand parameters...>]",

@@ -35,10 +35,15 @@ local function load()
 		version_string = version.major.."."..version.minor.."."..version.patch
 	}
 
+	-- It is important to load the settings first, since they are used next.
 	dofile(minetest.get_modpath("umabis") .. "/settings.lua")
 
 	dofile(minetest.get_modpath("umabis") .. "/serverapi.lua")
 	if not umabis.serverapi.hello() then
+		return false
+	end
+
+	if dofile(minetest.get_modpath("umabis") .. "/ban.lua") == false then
 		return false
 	end
 
@@ -64,6 +69,13 @@ if not load() then
 end
 
 minetest.register_on_prejoinplayer(function(name, ip)
+	if umabis.settings:get_bool("enable_local_ban") then
+		local ret = umabis.ban.on_prejoinplayer(name, ip)
+		if ret then
+			return ret
+		end
+	end
+
 	local function format_entry(entries)
 		local str = ""
 		for _, entry in ipairs(entries) do
