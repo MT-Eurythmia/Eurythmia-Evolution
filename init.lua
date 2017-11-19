@@ -76,17 +76,13 @@ minetest.register_on_prejoinplayer(function(name, ip)
 		end
 	end
 
-	local function format_entry(entries)
-		local str = ""
-		for _, entry in ipairs(entries) do
-			str = str .. "---"
-			        .. "\nDate: " .. entry.date
-			        .. "\nCategory: " .. entry.category
-			        .. "\nReason: " .. entry.reason
-			        .. "\nUntil: " .. (entry.expiration_time and os.date("%c", entry.expiration_time) or "the end of times")
-			if umabis.settings:get_bool("blacklist_show_source_moderator") then
-				str = str .. "\nBy moderator: " .. entry.source_moderator
-			end
+	local function format_entry(entry)
+		local str = "\nDate: " .. entry.date
+		         .. "\nCategory: " .. entry.category
+		         .. "\nReason: " .. entry.reason
+		         .. "\nUntil: " .. (entry.exp_time_UNIX and os.date("%c", entry.exp_time_UNIX) or "the end of times")
+		if umabis.settings:get_bool("blacklist_show_source_moderator") then
+			str = str .. "\nBy moderator: " .. entry.source_moderator
 		end
 		return str
 	end
