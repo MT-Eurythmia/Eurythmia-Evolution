@@ -230,3 +230,21 @@ function umabis.serverapi.set_pass(name, token, hash)
 
 	return check_code(code, "set_pass")
 end
+
+function umabis.serverapi.get_user_info(name, token, requested_name)
+	local code, body = do_request("GET", "get_user_info", {name = name, token = token, requested_name = requested_name})
+
+	local ret, e = check_code(code, "get_user_info")
+	if not ret then
+		return ret, e
+	end
+
+	local table = minetest.parse_json(body)
+	if not table then
+		-- An error message describing the error should already have been logged by minetest.parse_json
+		minetest.log("error", "[umabis] Command 'get_user_info' failed (error parsing JSON).")
+		return false
+	end
+
+	return true, table
+end
