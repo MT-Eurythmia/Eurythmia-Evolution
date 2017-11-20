@@ -1,4 +1,6 @@
-umabis.serverapi = {}
+umabis.serverapi = {
+	last_sign_of_life = 0
+}
 
 local http = require("socket.http")
 
@@ -13,12 +15,20 @@ end
 local function do_request(post_get, command, params)
 	local URI = umabis.settings:get("api_uri") .. command
 
+	if umabis.serverapi.params then
+		-- Add the server name and token
+		params.server_name = umabis.settings:get("server_name")
+		params.server_token = umabis.serverapi.params.token
+	end
+
 	local body, code
 	if post_get == "GET" then
 		body, code = http.request(URI .. "?" .. encode_post_body(params))
 	else
 	 	body, code = http.request(URI, encode_post_body(params))
 	end
+
+	umabis.serverapi.last_sign_of_life = os.time()
 
 	if not body then
 		minetest.log("error", "[umabis] "..post_get.." request to server ("..URI..") failed: "..code)
@@ -51,7 +61,13 @@ local error_codes = {
 	["013"] = "session expired",
 	["014"] = "user is not authenticated",
 	["015"] = "name already registered",
-	["016"] = "blacklisting a whitelisted user/whitelisting a blacklisted user"
+	["016"] = "blacklisting a whitelisted user/whitelisting a blacklisted user",
+	["017"] = "the server name is not registered",
+	["018"] = "the server password does not match",
+	["019"] = "the server IP does not match",
+	["020"] = "the server session expired",
+	["021"] = "the server is not authenticated",
+	["022"] = "the server token does not match"
 }
 
 local function check_code(code, command)
@@ -71,7 +87,8 @@ local function check_code(code, command)
 end
 
 function umabis.serverapi.hello()
-	local code, body = do_request("GET", "hello", {})
+	-- Server name will be added by do_request
+	local code, body = do_request("POST", "hello", {server_name = umabis.settings:get("server_name"), server_password = umabis.settings:get("server_password")})
 	local ret, e = check_code(code, "hello")
 	if not ret then
 		return ret, e
@@ -84,10 +101,12 @@ function umabis.serverapi.hello()
 	end
 
 	umabis.serverapi.params = {
-		session_expiration_time = server_params.SESSION_EXPIRATION_TIME,
+		session_expiration_delay = server_params.SESSION_EXPIRATION_DELAY,
+		server_expiration_delay = server_params.SERVER_EXPIRATION_DELAY,
 		version_string = server_params.VERSION,
 		name = server_params.NAME,
-		available_blacklist_categories = server_params.AVAILABLE_BLACKLIST_CATEGORIES
+		available_blacklist_categories = server_params.AVAILABLE_BLACKLIST_CATEGORIES,
+		token = server_params.TOKEN
 	}
 
 	local major, minor, patch = string.match(server_params.VERSION, "(%d+)%.(%d+)%.(%d+)")
@@ -112,6 +131,16 @@ function umabis.serverapi.hello()
 	end
 
 	return true
+end
+
+function umabis.serverapi.goodbye()
+	local code, body = do_request("POST", "goodbye", {})
+	return check_code(code, "goodbye")
+end
+
+function umabis.serverapi.server_ping()
+	local code, body = do_request("POST", "server_ping", {})
+	return check_code(code, "server_ping")
 end
 
 function umabis.serverapi.ping(name, token)

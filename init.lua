@@ -26,6 +26,7 @@ umabis = {
 dofile(minetest.get_modpath("umabis") .. "/auth_handler.lua")
 dofile(minetest.get_modpath("umabis") .. "/formspecs.lua")
 dofile(minetest.get_modpath("umabis") .. "/session.lua")
+dofile(minetest.get_modpath("umabis") .. "/ping.lua")
 
 local function load()
 	umabis = {
@@ -113,5 +114,8 @@ minetest.register_on_leaveplayer(function(player)
 end)
 
 minetest.register_on_shutdown(function()
+	-- Close all sessions
 	umabis.session.clear_all()
+	-- Say goodbye to server
+	umabis.serverapi.goodbye()
 end)
