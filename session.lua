@@ -57,7 +57,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if formname == "umabis:welcome" then
 		if fields.continue then
 			sessions[name].is_email_public = true
-			minetest.show_formspec(name, "umabis:provide_info", umabis.formspecs.provide_info)
+			minetest.after(0.1, function()
+				minetest.show_formspec(name, "umabis:provide_info", umabis.formspecs.provide_info)
+			end)
 		elseif fields.exit then
 			minetest.kick_player(name, "Exiting.")
 			-- Session will be cleared in the on_leaveplayer callback.
