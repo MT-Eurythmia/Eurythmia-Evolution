@@ -179,3 +179,4 @@ load_mod_caverealms = true
 load_mod_unifieddyes = true
 load_mod_moreores = true
 load_mod_workbench = true
+load_mod_umabis = true
