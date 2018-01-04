@@ -1,0 +1,214 @@
+mgcarpathian_np_cavern = {
+	lacunarity = 2
+	persistence = 0.63
+	octaves = 5
+	offset = 0
+	scale = 1
+	flags = defaults
+	spread = (384,128,384)
+	seed = 723
+}
+mgcarpathian_np_cave2 = {
+	lacunarity = 2
+	persistence = 0.5
+	octaves = 3
+	offset = 0
+	scale = 12
+	flags = defaults
+	spread = (67,67,67)
+	seed = 10325
+}
+mgcarpathian_np_cave1 = {
+	lacunarity = 2
+	persistence = 0.5
+	octaves = 3
+	offset = 0
+	scale = 12
+	flags = defaults
+	spread = (61,61,61)
+	seed = 52534
+}
+mgcarpathian_np_mnt_var = {
+	lacunarity = 2
+	persistence = 0.6
+	octaves = 5
+	offset = 0
+	scale = 1
+	flags = defaults
+	spread = (499,499,499)
+	seed = 2490
+}
+mgcarpathian_np_step_mnt = {
+	lacunarity = 2
+	persistence = 0.6
+	octaves = 6
+	offset = 0
+	scale = 8
+	flags = defaults
+	spread = (509,509,509)
+	seed = 2590
+}
+mgcarpathian_np_step_terrain = {
+	lacunarity = 2
+	persistence = 0.5
+	octaves = 5
+	offset = 1
+	scale = 1
+	flags = defaults
+	spread = (1889,1889,1889)
+	seed = 4157
+}
+mgcarpathian_np_hills_terrain = {
+	lacunarity = 2
+	persistence = 0.5
+	octaves = 5
+	offset = 1
+	scale = 1
+	flags = defaults
+	spread = (1301,1301,1301)
+	seed = 1692
+}
+mgcarpathian_np_height4 = {
+	lacunarity = 2
+	persistence = 0.5
+	octaves = 5
+	offset = 0
+	scale = 5
+	flags = defaults
+	spread = (631,631,631)
+	seed = 1583
+}
+seed = 616
+mg_biome_np_humidity = {
+	lacunarity = 2
+	persistence = 0.5
+	octaves = 3
+	offset = 50
+	scale = 50
+	flags = defaults
+	spread = (1000,1000,1000)
+	seed = 842
+}
+mg_biome_np_humidity_blend = {
+	lacunarity = 2
+	persistence = 1
+	octaves = 2
+	offset = 0
+	scale = 1.5
+	flags = defaults
+	spread = (8,8,8)
+	seed = 90003
+}
+mgcarpathian_cavern_limit = -256
+mgcarpathian_np_hills = {
+	lacunarity = 2
+	persistence = 0.5
+	octaves = 6
+	offset = 0
+	scale = 3
+	flags = defaults
+	spread = (257,257,257)
+	seed = 6604
+}
+mg_name = carpathian
+water_level = 1
+mg_biome_np_heat_blend = {
+	lacunarity = 2
+	persistence = 1
+	octaves = 2
+	offset = 0
+	scale = 1.5
+	flags = defaults
+	spread = (8,8,8)
+	seed = 13
+}
+mg_biome_np_heat = {
+	lacunarity = 2
+	persistence = 0.5
+	octaves = 3
+	offset = 50
+	scale = 50
+	flags = defaults
+	spread = (1000,1000,1000)
+	seed = 5349
+}
+mgcarpathian_lava_depth = -256
+mgcarpathian_cave_width = 0.09
+mgcarpathian_cavern_threshold = 0.7
+chunksize = 5
+mapgen_limit = 31000
+mgcarpathian_cavern_taper = 256
+mgcarpathian_spflags = caverns
+mgcarpathian_large_cave_depth = -33
+mgcarpathian_np_base = {
+	lacunarity = 0.5
+	persistence = 0.8
+	octaves = 4
+	offset = 12
+	scale = 1
+	flags = defaults
+	spread = (2557,2557,2557)
+	seed = 6538
+}
+mgcarpathian_np_height1 = {
+	lacunarity = 2
+	persistence = 0.5
+	octaves = 5
+	offset = 0
+	scale = 5
+	flags = defaults
+	spread = (251,251,251)
+	seed = 9613
+}
+mgcarpathian_np_ridge_terrain = {
+	lacunarity = 2
+	persistence = 0.5
+	octaves = 5
+	offset = 1
+	scale = 1
+	flags = defaults
+	spread = (1889,1889,1889)
+	seed = 3568
+}
+mgcarpathian_np_filler_depth = {
+	lacunarity = 2
+	persistence = 0.7
+	octaves = 3
+	offset = 0
+	scale = 1
+	flags = defaults
+	spread = (128,128,128)
+	seed = 261
+}
+mgcarpathian_np_ridge_mnt = {
+	lacunarity = 2
+	persistence = 0.7
+	octaves = 6
+	offset = 0
+	scale = 12
+	flags = defaults
+	spread = (743,743,743)
+	seed = 5520
+}
+mgcarpathian_np_height2 = {
+	lacunarity = 2
+	persistence = 0.5
+	octaves = 5
+	offset = 0
+	scale = 5
+	flags = defaults
+	spread = (383,383,383)
+	seed = 1949
+}
+mg_flags = caves, nodungeons, light, decorations
+mgcarpathian_np_height3 = {
+	lacunarity = 2
+	persistence = 0.5
+	octaves = 5
+	offset = 0
+	scale = 5
+	flags = defaults
+	spread = (509,509,509)
+	seed = 3211
+}
+[end_of_params]
