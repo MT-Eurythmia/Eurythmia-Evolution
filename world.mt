@@ -46,7 +46,6 @@ load_mod_extranodes = false
 load_mod_itemframes = true
 load_mod_moremesecons_commandblock = true
 load_mod_treecapitator = true
-load_mod_names_per_ip = true
 load_mod_mob_horse = true
 load_mod_mesecons_noteblock = true
 load_mod_homedecor_i18n = true
