@@ -91,26 +91,28 @@ minetest.register_decoration({
 Admin chatcommand: players IPs
 ]]
 
-minetest.register_chatcommand("ip", {
-	description = "Get player IP",
-	params = "<player>",
-	privs = { kick=true },
-	func = function(name, params)
-		local player = params:match("%S+")
-		if not player then
-			return false, "Invalid usage"
-		end
+if minetest.get_modpath("names_per_ip") then
+	minetest.register_chatcommand("ip", {
+		description = "Get player IP",
+		params = "<player>",
+		privs = { kick=true },
+		func = function(name, params)
+			local player = params:match("%S+")
+			if not player then
+				return false, "Invalid usage"
+			end
 
-		if not ipnames.data[player] then
-			minetest.chat_send_player(name, "The player '"..player.."' did not join yet.")
-			return
-		end
+			if not ipnames.data[player] then
+				minetest.chat_send_player(name, "The player '"..player.."' did not join yet.")
+				return
+			end
 
-		local ip = ipnames.data[player][1]
+			local ip = ipnames.data[player][1]
 
-		return true, ip
-	end,
-})
+			return true, ip
+		end,
+	})
+end
 
 --[[
 Natural hive: don't allow inventory put if the area is protected (don't do this for artificial hives)
