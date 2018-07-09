@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/stujones11/minetest-3d_armor.git
+	branch = master
+	commit = 2d162505493cb8dbb4e1cc0994106fae0afceb8c
+	parent = 79da0660837fb9664a80ee2f1a467433c9540474
+	cmdver = 0.3.1
