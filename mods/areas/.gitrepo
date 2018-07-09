@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/ShadowNinja/areas.git
+	branch = master
+	commit = b87c89e67bc7fb202d651b6235a87ea42bbfc26f
+	parent = 2ce82fba1aa5770c1dee41c0cb8e1e9a439aad75
+	cmdver = 0.3.1
