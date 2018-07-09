@@ -1,6 +1,7 @@
 -- support for i18n
 local S = armor_i18n.gettext
 local F = armor_i18n.fgettext
+local has_technic = minetest.get_modpath("technic") ~= nil
 
 if not minetest.global_exists("unified_inventory") then
 	minetest.log("warning", S("3d_armor_ui: Mod loaded but unused."))

@@ -321,11 +321,23 @@ minetest.register_entity("3d_armor_stand:armor_entity", {
 	end,
 })
 
+minetest.register_abm({
+	nodenames = {"3d_armor_stand:locked_armor_stand", "3d_armor_stand:armor_stand"},
+	interval = 15,
+	chance = 1,
+	action = function(pos, node, active_object_count, active_object_count_wider)
+		local num
+		num = #minetest.get_objects_inside_radius(pos, 0.5)
+		if num > 0 then return end
+		update_entity(pos)
+	end
+})
+
 minetest.register_craft({
 	output = "3d_armor_stand:armor_stand",
 	recipe = {
-		{"", "default:fence_wood", ""},
-		{"", "default:fence_wood", ""},
+		{"", "group:fence", ""},
+		{"", "group:fence", ""},
 		{"default:steel_ingot", "default:steel_ingot", "default:steel_ingot"},
 	}
 })
