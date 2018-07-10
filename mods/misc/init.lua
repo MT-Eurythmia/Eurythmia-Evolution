@@ -390,7 +390,7 @@ end)
 --[[
 Awesome wood frames!
 ]]
-xpanes.register_pane(":xdecor:wood_frame", {
+xpanes.register_pane("wood_frame", {
 	description = "Wood Frame",
 	tiles = {"xdecor_wood_frame.png"},
 	drawtype = "airlike",
@@ -404,3 +404,5 @@ xpanes.register_pane(":xdecor:wood_frame", {
 		  {"group:stick", "group:stick", "group:stick"},
 		  {"group:wood", "group:stick", "group:wood"}}
 })
+
+minetest.register_alias("xpanes::xdecor:wood_frame_flat", "xpanes:wood_frame_flat")
