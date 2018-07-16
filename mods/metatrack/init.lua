@@ -106,7 +106,7 @@ minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
 			-- This is a security risk and should never happen
 			minetest.log("warning", string.format("Player %s tried to place item %s at position %s with a creative metadata set to %s.",
 				name, itemstack:get_name(), minetest.pos_to_string(pos), meta:get_string("creative")))
-			minetest.remove_node(pos)
+			minetest.set_node(pos, oldnode)
 			return
 		end
 
@@ -121,7 +121,7 @@ minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
 		if not allowed then
 			minetest.log("action", string.format("Player %s tried to place creative item %s at unallowed position %s.",
 				name, itemstack:get_name(), minetest.pos_to_string(pos)))
-			minetest.remove_node(pos)
+			minetest.set_node(pos, oldnode)
 		end
 	end
 end)
