@@ -148,6 +148,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			local inv = player:get_inventory()
 			local stack = ItemStack(clicked_item)
 			stack:set_count(stack:get_stack_max())
+			-- Eurythmia change START
+			stack:get_meta():set_string("creative", player_name)
+			-- Eurythmia change END
 			if inv:room_for_item("main", stack) then
 				inv:add_item("main", stack)
 			end
