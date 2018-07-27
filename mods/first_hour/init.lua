@@ -7,7 +7,7 @@ local PLAY_ENOUGH_MINUTES = 1
 local FRENCH_SIGN = {x=-9, y=1, z=1}
 local ENGLISH_SIGN = {x=10, y=1, z=1}
 local INITIAL_SPAWNPOINT = {x=0, y=0, z=0}
-local SECOND_SPAWNPOINT = {french = {x=24, y=1, z=0}, english = {x=-24, y=1, z=0}}
+local SECOND_SPAWNPOINT = {french = {x=-24, y=1, z=0}, english = {x=24, y=1, z=0}}
 local START_GAME_SPAWNPOINT = {french = {x=35, y=12, z=-291}, english = {x=27, y=12, z=-291}}
 
 --Development values
@@ -19,7 +19,7 @@ local THECODE = '431C' --will be randomly chosen when first player joins
 local MSG = {
 	welcome = {
 		['french'] = "Bienvenue sur le serveur Eurythmia !\nVous êtes invincible et ne pouvez pas frapper les autres joueurs pendant une heure.\nVous ne pouvez pas encore jouer, c'est normal.",
-		['english'] = "Welcome to the Eurythmia server!\nYou are invincible and you cannot hit other players during a hour.\nYou cannot play yet, this is normal."
+		['english'] = "Welcome to the Eurythmia server!\nYou are invincible and you cannot hit other players during an hour.\nYou cannot play yet, this is normal."
 	},
 	read_the_signs = {
 		['french'] = "Maintenant, lisez tous les panneaux !",
