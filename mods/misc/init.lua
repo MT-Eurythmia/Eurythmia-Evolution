@@ -117,7 +117,7 @@ end
 --[[
 Natural hive: don't allow inventory put if the area is protected (don't do this for artificial hives)
 ]]
-if minetest.get_worldpath("mobs_animal") then
+if minetest.get_modpath("mobs_animal") then
 	minetest.override_item("mobs:beehive", {
 		allow_metadata_inventory_take = function(pos, listname, index, stack, player)
 			print(minetest.is_protected(pos, player:get_player_name()))
@@ -406,3 +406,20 @@ xpanes.register_pane("wood_frame", {
 })
 
 minetest.register_alias("xpanes::xdecor:wood_frame_flat", "xpanes:wood_frame_flat")
+
+--[[
+Double uses of all tools
+]]
+minetest.register_on_mods_loaded(function()
+	for tool, def in pairs(minetest.registered_tools) do
+		local caps = (def.tool_capabilities or {}).groupcaps
+		if caps then
+			for _, cap in ipairs({"cracky", "crumbly", "snappy", "choppy"}) do
+				local gr = caps[cap]
+				if gr then
+					gr.uses = gr.uses * 2
+				end
+			end
+		end
+	end
+end)
