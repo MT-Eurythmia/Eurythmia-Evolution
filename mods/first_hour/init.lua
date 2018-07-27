@@ -7,7 +7,8 @@ local PLAY_ENOUGH_MINUTES = 1
 local FRENCH_SIGN = {x=-9, y=1, z=1}
 local ENGLISH_SIGN = {x=10, y=1, z=1}
 local INITIAL_SPAWNPOINT = {x=0, y=0, z=0}
-local SECOND_SPAWNPOINT = {french = {x=35, y=12, z=-291}, english = {x=27, y=12, z=-291}}
+local SECOND_SPAWNPOINT = {french = {x=24, y=1, z=0}, english = {x=-24, y=1, z=0}}
+local START_GAME_SPAWNPOINT = {french = {x=35, y=12, z=-291}, english = {x=27, y=12, z=-291}}
 
 --Development values
 --local FRENCH_SIGN = {x=144, y=30003, z=105}
@@ -132,7 +133,7 @@ minetest.register_on_chat_message(function(name, message)
 				return true
 			end
 			played_enough[name] = nil
-			player:setpos({x = 0, y = 18, z = 0})
+			player:setpos(START_GAME_SPAWNPOINT[players[name]])
 			minetest.chat_send_player(name, MSG.interact[players[name]])
 			minetest.chat_send_all(name..MSG.new_player[players[name]])
 			return true
