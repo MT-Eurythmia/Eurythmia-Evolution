@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/taikedz-mt/babelfish.git
+	branch = master
+	commit = 10b5e167bf57e1da90e74fbd71cf4b31d64b2830
+	parent = 589dc064c0f3319157f94ebf303b7dc4fdef53eb
+	method = rebase
+	cmdver = 0.4.0
