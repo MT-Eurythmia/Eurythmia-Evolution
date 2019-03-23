@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://notabug.org/TenPlus1/ethereal.git
+	branch = master
+	commit = 7a1a8728b09e2291a2f7e9006dc3e6d76e76a9b1
+	parent = 4b73f3cec464a202bb5132d7a4165adbff30ebbb
+	method = rebase
+	cmdver = 0.4.0
