@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://notabug.org/TenPlus1/mobs_redo.git
+	branch = master
+	commit = a1d4e9bbfcce07062ade3088e8744aab39a7c3cd
+	parent = 40d23ddda5edaf69949707246fab5961c8e27175
+	method = rebase
+	cmdver = 0.4.0
