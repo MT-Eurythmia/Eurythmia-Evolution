@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://gitlab.com/VanessaE/homedecor_modpack.git
+	branch = master
+	commit = ac71c0f18997bbadc72d251e26a2d75200988309
+	parent = ca4b06cf53c0a6857a76505554b2deed1b8e98ef
+	method = rebase
+	cmdver = 0.4.0
