@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://repo.or.cz/minetest_easyvend.git
+	branch = master
+	commit = 8fd517a0bb23a9d944893c8ea17d10fb69ffba91
+	parent = 93cb57939e71c50707bb699c871cfc0af8cea4d8
+	method = rebase
+	cmdver = 0.4.0
