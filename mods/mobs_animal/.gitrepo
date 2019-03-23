@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://notabug.org/TenPlus1/mobs_animal.git
+	branch = master
+	commit = 43a813d4f14d3a0ac162d1fb3b6d9d5720d26660
+	parent = 4405b7b7df401e814c5d504b055fa55966a84e28
+	method = rebase
+	cmdver = 0.4.0
