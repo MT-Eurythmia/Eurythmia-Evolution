@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/minetest-mods/maptools.git
+	branch = master
+	commit = 81b988d631660ea6c6afd0132a2b5bcbce1e50c8
+	parent = 911d487fa6df028ed417ffe80c3a0fc54dfd90ec
+	method = rebase
+	cmdver = 0.4.0
