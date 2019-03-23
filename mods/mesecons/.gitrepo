@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/minetest-mods/mesecons.git
+	branch = master
+	commit = 073c92d487af464136610dc17b0730b2d174c320
+	parent = 15684025d266757bec8e192a5e7f86b39bd1d0c1
+	method = rebase
+	cmdver = 0.4.0
