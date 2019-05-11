@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/minetest-mods/xban2.git
+	branch = master
+	commit = 3b700453651e7119c2c48c62d009ed2edf336c93
+	parent = 7e5779a947c92f17e386eb21dbe3bcd94351e9eb
+	method = merge
+	cmdver = 0.4.0
