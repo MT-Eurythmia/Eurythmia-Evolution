@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://gitlab.com/VanessaE/unifieddyes.git
+	branch = master
+	commit = f59c8affc19af2ad4c14d4d757dde99b13b74986
+	parent = 2f4f5c6c63b56b0edc9ce40aa2eefa1f8e44bc7a
+	method = merge
+	cmdver = 0.4.0
