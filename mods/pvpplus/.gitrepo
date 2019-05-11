@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/MT-Eurythmia/pvpplus.git
+	branch = master
+	commit = b67fe9ea0dc478c222273e3c8f03a9e621c970d4
+	parent = 23a5060825525690ee3e0d5d67b076b4d76ae02f
+	method = merge
+	cmdver = 0.4.0
