@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/minetest-mods/skinsdb.git
+	branch = master
+	commit = 92bb46682595f0724746c3d7132c66048898dc39
+	parent = 211e2fd054540ec2bb6d759424f1c477c616e409
+	method = merge
+	cmdver = 0.4.0
