@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/minetest-mods/more_chests.git
+	branch = master
+	commit = c597779acafb5e9a4444e2276af9b3c2a88b1681
+	parent = 6f33b33a3e08b5d851b4ba2454338791a240568e
+	method = merge
+	cmdver = 0.4.0
