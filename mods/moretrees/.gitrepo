@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://gitlab.com/VanessaE/moretrees.git
+	branch = master
+	commit = d521e34758d4297ac2de9027848fed5e3594f950
+	parent = e2bbc5c7663d3f528800d9eaaba85bf7390738bd
+	method = merge
+	cmdver = 0.4.0
