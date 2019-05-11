@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/bousket/unified_inventory_plus.git
+	branch = master
+	commit = a5b613f1e020c210df1418021532c578e106bdd3
+	parent = ac61a45e0c8cedbf782e3e090b7788d1da955506
+	method = merge
+	cmdver = 0.4.0
