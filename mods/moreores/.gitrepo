@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/minetest-mods/moreores.git
+	branch = master
+	commit = 564cb11ba6ae33f7df6fae33330eb81932c2906f
+	parent = 8d2d2469e3ccc76aec177bd841c751e853762b26
+	method = merge
+	cmdver = 0.4.0
