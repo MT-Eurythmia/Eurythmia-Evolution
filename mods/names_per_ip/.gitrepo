@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/SmallJoker/names_per_ip.git
+	branch = master
+	commit = 846e1848ea1e71a60c6c6c82ba658e723f9a31c8
+	parent = 96b607eb4271d86b11bbae7b7bedb622c9791893
+	method = merge
+	cmdver = 0.4.0
