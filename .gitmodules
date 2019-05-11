@@ -1,6 +1,3 @@
 [submodule "mods/irc/irc"]
 	path = mods/irc/irc
 	url = https://github.com/ShadowNinja/LuaIRC.git
-[submodule "mods/umabis"]
-	path = mods/umabis
-	url = https://github.com/MT-Eurythmia/Umabis.git
