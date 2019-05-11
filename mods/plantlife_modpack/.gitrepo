@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://gitlab.com/VanessaE/plantlife_modpack.git
+	branch = master
+	commit = 0d228f705cf523dece105a62f57d139f16c5f9dc
+	parent = 7138c90a8c52d0f6fef600571aea3df6f70eb36e
+	method = merge
+	cmdver = 0.4.0
