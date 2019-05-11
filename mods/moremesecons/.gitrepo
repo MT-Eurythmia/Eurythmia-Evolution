@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/minetest-mods/MoreMesecons.git
+	branch = master
+	commit = 2b2faeca028f46f8dc57ff788b53a3e14001f9d8
+	parent = df5faf8c4b0e5692ec91193594edbfbc68334f0c
+	method = merge
+	cmdver = 0.4.0
