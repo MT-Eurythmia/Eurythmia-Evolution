@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/JustinLaw64/stained_glass.git
+	branch = master
+	commit = c50b0192c777632883c27ea93148ddc51c9079c7
+	parent = 8d3b6c33a6a1d7b3fd4a419c259738d46059abd0
+	method = merge
+	cmdver = 0.4.0
