@@ -74,7 +74,6 @@ load_mod_technic_chests = true
 load_mod_jumping = true
 load_mod_technic = false
 load_mod_plasmascreen = true
-load_mod_protector = true
 load_mod_moremesecons_utils = true
 load_mod_fail = true
 load_mod_signs_lib = true
