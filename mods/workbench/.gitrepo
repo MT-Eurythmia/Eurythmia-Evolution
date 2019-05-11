@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/minetest-mods/workbench.git
+	branch = master
+	commit = bd14f59f09fe5a282343fcf05ecff408f1c4cbc7
+	parent = fc6f3aabd207ccc3bad41f13a3cb11724e50aeab
+	method = merge
+	cmdver = 0.4.0
