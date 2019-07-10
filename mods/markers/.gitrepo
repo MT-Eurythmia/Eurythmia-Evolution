@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/Sokomine/markers.git
+	branch = master
+	commit = ad3c999f64ebc4023bd85635a5f6169043d6faff
+	parent = e2e90d273d23754d867f8c7845a9bd0b87b502b1
+	method = merge
+	cmdver = 0.4.0
