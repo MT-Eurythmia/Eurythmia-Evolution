@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://notabug.org/Piezo_/minetest-hangglider.git
+	branch = master
+	commit = 206704ffabcdddc61150ed798c88add9965a110d
+	parent = dcd1cf5c76abf1de47db09d0a31fb40419f2e2f1
+	method = merge
+	cmdver = 0.4.0
