@@ -423,3 +423,43 @@ minetest.register_on_mods_loaded(function()
 		end
 	end
 end)
+
+--[[
+Lava shield
+]]
+if minetest.get_modpath("3d_armor") then
+	local function play_sound_effect(player, name)
+		if not disable_sounds and player then
+			local pos = player:get_pos()
+			if pos then
+				minetest.sound_play(name, {
+					pos = pos,
+					max_hear_distance = 10,
+					gain = 0.5,
+				})
+			end
+		end
+	end
+	armor:register_armor("misc:shield_lava", {
+		description = "Lava Shield",
+		inventory_image = "misc_inv_shield_lava.png",
+		groups = {armor_shield=1, armor_heal=1, armor_use=700, armor_fire=6, flammable=1},
+		armor_groups = {},
+		damage_groups = {cracky=2, snappy=1, level=3},
+		reciprocate_damage = false,
+		on_damage = function(player, index, stack)
+			play_sound_effect(player, "default_dig_metal")
+		end,
+		on_destroy = function(player, index, stack)
+			play_sound_effect(player, "default_dug_metal")
+		end,
+	})
+	minetest.register_craft({
+		output = "misc:shield_lava",
+		type = "shapeless",
+		recipe = {
+			"shields:shield_crystal",
+			"bucket:bucket_lava",
+		}
+	})
+end

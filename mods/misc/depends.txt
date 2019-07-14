@@ -15,3 +15,4 @@ babelfish?
 books?
 mobs_npc?
 mobs_animal?
+3d_armor?
