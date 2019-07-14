@@ -443,7 +443,7 @@ if minetest.get_modpath("3d_armor") then
 	armor:register_armor("misc:shield_lava", {
 		description = "Lava Shield",
 		inventory_image = "misc_inv_shield_lava.png",
-		groups = {armor_shield=1, armor_heal=1, armor_use=700, armor_fire=6, flammable=1},
+		groups = {armor_shield=1, armor_heal=1, armor_use=900, armor_fire=6, flammable=1},
 		armor_groups = {},
 		damage_groups = {cracky=2, snappy=1, level=3},
 		reciprocate_damage = false,
@@ -458,7 +458,7 @@ if minetest.get_modpath("3d_armor") then
 		output = "misc:shield_lava",
 		type = "shapeless",
 		recipe = {
-			"shields:shield_crystal",
+			"shields:shield_diamond",
 			"bucket:bucket_lava",
 		}
 	})
