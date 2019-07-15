@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://notabug.org/TenPlus1/bonemeal.git
+	branch = master
+	commit = 1299f391265ecb4f55b5eee929aee0b6276f23bb
+	parent = b14e34bb68aa19417b23838a759291e4183d0098
+	method = merge
+	cmdver = 0.4.0
