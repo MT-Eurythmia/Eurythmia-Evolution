@@ -462,4 +462,18 @@ if minetest.get_modpath("3d_armor") then
 			"bucket:bucket_lava",
 		}
 	})
+
+	--[[
+	Stop evil torches
+	]]
+	-- Because of changes in indexation when entries are removed, it is necessary
+	-- to entirely re-iterate for each type of torch.
+	for _, torch_name in ipairs({"default:torch", "default:torch_ceiling", "default:torch_wall"}) do
+		for i, v in ipairs(armor.fire_nodes) do
+			if v[1] == torch_name then
+				table.remove(armor.fire_nodes, i)
+				break
+			end
+		end
+	end
 end
