@@ -477,3 +477,13 @@ if minetest.get_modpath("3d_armor") then
 		end
 	end
 end
+
+--[[
+Tree aliases
+]]
+if minetest.get_modpath("moretrees") then
+	minetest.register_alias_force("default:jungletree", "moretrees:jungletree_trunk")
+	if minetest.get_modpath("ethereal") then
+		minetest.register_alias_force("ethereal:birch_trunk", "moretrees:birch_trunk")
+	end
+end
