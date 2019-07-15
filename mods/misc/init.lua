@@ -482,8 +482,13 @@ end
 Tree aliases
 ]]
 if minetest.get_modpath("moretrees") then
-	minetest.register_alias_force("default:jungletree", "moretrees:jungletree_trunk")
+	minetest.register_alias_force("moretrees:jungletree_trunk", "default:jungletree")
 	if minetest.get_modpath("ethereal") then
 		minetest.register_alias_force("ethereal:birch_trunk", "moretrees:birch_trunk")
+		minetest.register_alias_force("ethereal:birch_wood", "moretrees:birch_planks")
+		minetest.register_alias_force("stairs:slab_birch_wood", "stairs:slab_moretrees_birch_planks")
+		minetest.register_alias_force("stairs:stair_birch_wood", "stairs:stair_moretrees_birch_planks")
+		minetest.register_alias_force("stairs:stair_inner_birch_wood", "stairs:stair_inner_moretrees_birch_planks")
+		minetest.register_alias_force("stairs:stair_outer_birch_wood", "stairs:stair_outer_moretrees_birch_planks")
 	end
 end
