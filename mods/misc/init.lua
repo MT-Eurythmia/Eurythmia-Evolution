@@ -492,3 +492,10 @@ if minetest.get_modpath("moretrees") then
 		minetest.register_alias_force("stairs:stair_outer_birch_wood", "stairs:stair_outer_moretrees_birch_planks")
 	end
 end
+
+--[[
+Send death position in chat when players die
+]]
+minetest.register_on_dieplayer(function(player)
+	minetest.chat_send_player(player:get_player_name(), string.format("You died at position %s.", minetest.pos_to_string(player:get_pos(), 0)))
+end)
