@@ -499,3 +499,49 @@ Send death position in chat when players die
 minetest.register_on_dieplayer(function(player)
 	minetest.chat_send_player(player:get_player_name(), string.format("You died at position %s.", minetest.pos_to_string(player:get_pos(), 0)))
 end)
+
+--[[
+Workbench -> moreblocks aliases
+]]
+if minetest.get_modpath("moreblocks") then
+	local function register_workbench_alias(nodename)
+		local modname, sub_nodename = string.match(nodename, "(.*):(.*)")
+		if modname == "default" then
+			modname = "moreblocks"
+		end
+		minetest.register_alias(nodename .. "_nanoslab", modname .. ":micro_" .. sub_nodename .. "_1")
+		minetest.register_alias(nodename .. "_micropanel", modname .. ":panel_" .. sub_nodename .. "_1")
+		minetest.register_alias(nodename .. "_microslab", modname .. ":slab_" .. sub_nodename .. "_1")
+		minetest.register_alias(nodename .. "_thinstair", modname .. ":stair_" .. sub_nodename .. "_alt_1")
+		minetest.register_alias(nodename .. "_cube", modname .. ":micro_" .. sub_nodename)
+		minetest.register_alias(nodename .. "_panel", modname .. ":panel_" .. sub_nodename)
+		minetest.register_alias(nodename .. "_doublepanel", modname .. ":stair_" .. sub_nodename .. "_alt")
+		minetest.register_alias(nodename .. "_halfstair", modname .. ":stair_" .. sub_nodename .. "_half")
+		minetest.register_alias(nodename .. "_outerstair", modname .. ":stair_" .. sub_nodename .. "_outer")
+		minetest.register_alias(nodename .. "_innerstair", modname .. ":stair_" .. sub_nodename .. "_inner")
+	end
+	local nodes = {}
+	for node, def in pairs(minetest.registered_nodes) do
+		if (def.drawtype == "normal" or def.drawtype:sub(1,5) == "glass") and
+			(def.groups.cracky or def.groups.choppy) and
+			not def.on_construct and
+			not def.after_place_node and
+			not def.on_rightclick and
+			not def.on_blast and
+			not def.allow_metadata_inventory_take and
+			not (def.groups.not_in_creative_inventory == 1) and
+			not (def.groups.not_cuttable == 1) and
+			(def.tiles and type(def.tiles[1]) == "string" and not
+			def.tiles[1]:find("default_mineral")) and
+			not def.mesecons and
+			def.description and
+			def.description ~= "" and
+			def.light_source == 0
+		then
+			nodes[#nodes+1] = node
+		end
+	end
+	for _, node in ipairs(nodes) do
+		register_workbench_alias(node)
+	end
+end
