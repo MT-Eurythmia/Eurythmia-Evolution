@@ -504,6 +504,7 @@ end)
 Workbench -> moreblocks aliases
 ]]
 if minetest.get_modpath("moreblocks") then
+	-- Create an alias for every old workbench node.
 	local function register_workbench_alias(nodename)
 		local modname, sub_nodename = string.match(nodename, "(.*):(.*)")
 		if modname == "default" then
@@ -519,6 +520,11 @@ if minetest.get_modpath("moreblocks") then
 		minetest.register_alias(nodename .. "_halfstair", modname .. ":stair_" .. sub_nodename .. "_half")
 		minetest.register_alias(nodename .. "_outerstair", modname .. ":stair_" .. sub_nodename .. "_outer")
 		minetest.register_alias(nodename .. "_innerstair", modname .. ":stair_" .. sub_nodename .. "_inner")
+
+		if modname ~= "moreblocks" then
+			minetest.register_alias("stairs:stair_" .. sub_nodename, modname .. ":stair_" .. sub_nodename)
+			minetest.register_alias("stairs:slab_" .. sub_nodename, modname .. ":slab_" .. sub_nodename)
+		end
 	end
 	local nodes = {}
 	for node, def in pairs(minetest.registered_nodes) do
@@ -538,10 +544,24 @@ if minetest.get_modpath("moreblocks") then
 			def.description ~= "" and
 			def.light_source == 0
 		then
-			nodes[#nodes+1] = node
+			nodes[node] = true
+			register_workbench_alias(node)
 		end
 	end
-	for _, node in ipairs(nodes) do
-		register_workbench_alias(node)
+
+	-- Also create a stairs alias for every moreblocks node (fixes moretrees & ethereal unknwon blocks)
+	for nodename, def in pairs(circular_saw.known_nodes) do
+		local modname, sub_nodename = def[1], def[2]
+		if modname == "default" or modname == "moreblocks" or nodes[nodename] then
+			-- Do nothing, no alias required
+		elseif modname == "moretrees" then
+			minetest.register_alias("stairs:stair_" .. modname .. "_" .. sub_nodename, modname .. ":stair_" .. sub_nodename)
+			minetest.register_alias("stairs:slab_" .. modname .. "_" .. sub_nodename, modname .. ":slab_" .. sub_nodename)
+		elseif modname == "ethereal" then
+			minetest.register_alias("stairs:stair_" .. sub_nodename, modname .. ":stair_" .. sub_nodename)
+			minetest.register_alias("stairs:slab_" .. sub_nodename, modname .. ":slab_" .. sub_nodename)
+		else
+			minetest.log("warning", "[misc] Unkown moreblocks alias format for mod: " .. modname)
+		end
 	end
 end
