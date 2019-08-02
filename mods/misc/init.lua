@@ -521,7 +521,8 @@ if minetest.get_modpath("moreblocks") then
 		minetest.register_alias(nodename .. "_outerstair", modname .. ":stair_" .. sub_nodename .. "_outer")
 		minetest.register_alias(nodename .. "_innerstair", modname .. ":stair_" .. sub_nodename .. "_inner")
 
-		if modname ~= "moreblocks" then
+		-- Moreblocks automatically creates the aliases, and moretrees requires different aliases.
+		if modname ~= "moreblocks" and modname ~= "moretrees" then
 			minetest.register_alias("stairs:stair_" .. sub_nodename, modname .. ":stair_" .. sub_nodename)
 			minetest.register_alias("stairs:slab_" .. sub_nodename, modname .. ":slab_" .. sub_nodename)
 		end
@@ -552,11 +553,11 @@ if minetest.get_modpath("moreblocks") then
 	-- Also create a stairs alias for every moreblocks node (fixes moretrees & ethereal unknwon blocks)
 	for nodename, def in pairs(circular_saw.known_nodes) do
 		local modname, sub_nodename = def[1], def[2]
-		if modname == "default" or modname == "moreblocks" or nodes[nodename] then
-			-- Do nothing, no alias required
-		elseif modname == "moretrees" then
+		if modname == "moretrees" then
 			minetest.register_alias("stairs:stair_" .. modname .. "_" .. sub_nodename, modname .. ":stair_" .. sub_nodename)
 			minetest.register_alias("stairs:slab_" .. modname .. "_" .. sub_nodename, modname .. ":slab_" .. sub_nodename)
+		elseif modname == "default" or modname == "moreblocks" or nodes[nodename] then
+			-- Do nothing, no alias required
 		elseif modname == "ethereal" then
 			minetest.register_alias("stairs:stair_" .. sub_nodename, modname .. ":stair_" .. sub_nodename)
 			minetest.register_alias("stairs:slab_" .. sub_nodename, modname .. ":slab_" .. sub_nodename)
