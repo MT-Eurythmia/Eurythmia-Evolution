@@ -378,7 +378,7 @@ minetest.register_craft( {
 	output = "pw_like:autocrafter 2",
 	recipe = {
 	        { "default:steel_ingot", "default:mese_crystal", "default:steel_ingot" },
-	        { "", "xdecor:workbench", "" },
+	        { "", "moreblocks:circular_saw", "" },
 	        { "default:steel_ingot", "default:mese_crystal", "default:steel_ingot" }
 	},
 })
