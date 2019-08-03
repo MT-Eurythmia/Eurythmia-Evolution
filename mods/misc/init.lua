@@ -504,6 +504,26 @@ end)
 Workbench -> moreblocks aliases
 ]]
 if minetest.get_modpath("moreblocks") then
+	-- Some blocks could be cut with the workbench but are not anymore with the circular saw.
+	-- Re-register some useful ones.
+	if minetest.get_modpath("caverealms") then
+		stairsplus:register_all("caverealms", "thin_ice", "caverealms:thin_ice", {
+			description = "Thin Ice",
+			tiles = {"caverealms_thin_ice.png"},
+			is_ground_content = true,
+			groups = {cracky=3},
+			sounds = default.node_sound_glass_defaults(),
+			use_texture_alpha = true,
+			drawtype = "glasslike",
+			sunlight_propagates = true,
+			freezemelt = "default:water_source",
+			paramtype = "light",
+		})
+		-- Plus some aliases for hanging thin ice
+		minetest.register_alias("stairs:slab_hanging_thin_ice", "caverealms:slab_thin_ice")
+		minetest.register_alias("stairs:stair_hanging_thin_ice", "caverealms:stair_thin_ice")
+	end
+
 	-- Create an alias for every old workbench node.
 	local function register_workbench_alias(nodename)
 		local modname, sub_nodename = string.match(nodename, "(.*):(.*)")
