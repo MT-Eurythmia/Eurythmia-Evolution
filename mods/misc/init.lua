@@ -585,4 +585,7 @@ if minetest.get_modpath("moreblocks") then
 			minetest.log("warning", "[misc] Unkown moreblocks alias format for mod: " .. modname)
 		end
 	end
+
+	-- Replace workbenches with circular saws
+	minetest.register_alias("xdecor:workbench", "moreblocks:circular_saw")
 end
