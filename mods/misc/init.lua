@@ -588,4 +588,20 @@ if minetest.get_modpath("moreblocks") then
 
 	-- Replace workbenches with circular saws
 	minetest.register_alias("xdecor:workbench", "moreblocks:circular_saw")
+	-- It turned out too late that the alias is not enough, and converted
+	-- workbenches keep the workbench formspec. The following fixes that.
+	minetest.register_lbm({
+		label = "Replace workbenches with circular saws",
+		name = "misc:workbench_to_circular_saw",
+		nodenames = {"moreblocks:circular_saw"},
+		run_at_every_load = false,
+		action = function(pos, node)
+			local meta = minetest.get_meta(pos)
+			-- Workbenches can be recognized by the presence of the word "hammer" in the formspec.
+			local formspec = meta:get_string("formspec")
+			if string.find(formspec, "hammer", 1, true) then
+				circular_saw.on_construct(pos)
+			end
+		end,
+	})
 end
