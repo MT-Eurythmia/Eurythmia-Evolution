@@ -484,12 +484,27 @@ Tree aliases
 if minetest.get_modpath("moretrees") then
 	minetest.register_alias_force("moretrees:jungletree_trunk", "default:jungletree")
 	if minetest.get_modpath("ethereal") then
+		-- Birch
 		minetest.register_alias_force("ethereal:birch_trunk", "moretrees:birch_trunk")
 		minetest.register_alias_force("ethereal:birch_wood", "moretrees:birch_planks")
-		minetest.register_alias_force("stairs:slab_birch_wood", "stairs:slab_moretrees_birch_planks")
-		minetest.register_alias_force("stairs:stair_birch_wood", "stairs:stair_moretrees_birch_planks")
-		minetest.register_alias_force("stairs:stair_inner_birch_wood", "stairs:stair_inner_moretrees_birch_planks")
-		minetest.register_alias_force("stairs:stair_outer_birch_wood", "stairs:stair_outer_moretrees_birch_planks")
+		--[[
+		if minetest.get_modpath("moreblocks") then
+			stairsplus:register_alias_force_all("ethereal", "birch_trunk", "moretrees", "brich_trunk")
+			stairsplus:register_alias_force_all("ethereal", "birch_wood", "moretrees", "brich_planks")
+		end
+		]]
+
+		-- Palm tree
+		minetest.register_alias_force("ethereal:palm_trunk", "moretrees:palm_trunk")
+		minetest.register_alias_force("ethereal:palmleaves", "moretrees:palm_leaves")
+		minetest.register_alias_force("ethereal:palm_wood", "moretrees:palm_planks")
+		--[[
+		if minetest.get_modpath("moreblocks") then
+			stairsplus:register_alias_force_all("ethereal", "palm_trunk", "moretrees", "palm_trunk")
+			stairsplus:register_alias_force_all("ethereal", "palmleaves", "moretrees", "palm_leaves")
+			stairsplus:register_alias_force_all("ethereal", "palm_wood", "moretrees", "palm_leaves")
+		end
+		]]
 	end
 end
 
