@@ -106,7 +106,7 @@ minetest.register_node(":homedecor:curtain_closed", {
 	drawtype = 'signlike',
 	use_texture_alpha = true,
 	walkable = false,
-	groups = { snappy = 3, ud_param2_colorable = 1 },
+	groups = { snappy = 3, ud_param2_colorable = 1, not_in_creative_inventory=1 },
 	sounds = default.node_sound_leaves_defaults(),
 	paramtype = "light",
 	paramtype2 = "colorwallmounted",
@@ -115,13 +115,9 @@ minetest.register_node(":homedecor:curtain_closed", {
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		unifieddyes.fix_rotation(pos, placer, itemstack, pointed_thing)
 	end,
+	on_dig = unifieddyes.on_dig,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		local topnode = minetest.get_node({x=pos.x, y=pos.y+1.0, z=pos.z})
-		if string.find(topnode.name, "homedecor:curtainrod") then
-			-- Open the curtains
-			local fdir = node.param2
-			minetest.set_node(pos, { name = "homedecor:curtain_open", param2 = fdir })
-		end
+		minetest.set_node(pos, { name = "homedecor:curtain_open", param2 = node.param2 })
 		return itemstack
 	end
 })
@@ -142,13 +138,9 @@ minetest.register_node(":homedecor:curtain_open", {
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		unifieddyes.fix_rotation(pos, placer, itemstack, pointed_thing)
 	end,
+	on_dig = unifieddyes.on_dig,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		local topnode = minetest.get_node({x=pos.x, y=pos.y+1.0, z=pos.z})
-		if string.find(topnode.name, "homedecor:curtainrod") then
-			-- Close the curtains
-			local fdir = node.param2
-			minetest.set_node(pos, { name = "homedecor:curtain_closed", param2 = fdir })
-		end
+		minetest.set_node(pos, { name = "homedecor:curtain_closed", param2 = node.param2 })
 		return itemstack
 	end
 })
@@ -253,6 +245,7 @@ homedecor.register("shutter", {
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		unifieddyes.fix_rotation(pos, placer, itemstack, pointed_thing)
 	end,
+	on_dig = unifieddyes.on_dig,
 })
 
 homedecor.register("shutter_colored", {
@@ -270,6 +263,7 @@ homedecor.register("shutter_colored", {
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		unifieddyes.fix_rotation(pos, placer, itemstack, pointed_thing)
 	end,
+	on_dig = unifieddyes.on_dig,
 })
 
 minetest.register_alias("homedecor:shutter_purple", "homedecor:shutter_violet")
@@ -390,7 +384,7 @@ minetest.register_craft({
 
 
 minetest.register_craft( {
-	output = "homedecor:curtain_closed 4",
+	output = "homedecor:curtain_open 4",
 		recipe = {
 		{ "wool:white", "", ""},
 		{ "wool:white", "", ""},
@@ -399,7 +393,7 @@ minetest.register_craft( {
 })
 
 minetest.register_craft( {
-	output = "homedecor:curtain_closed 4",
+	output = "homedecor:curtain_open 4",
 		recipe = {
 		{ "cottages:wool", "", ""},
 		{ "cottages:wool", "", ""},

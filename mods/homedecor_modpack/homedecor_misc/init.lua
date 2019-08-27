@@ -478,6 +478,7 @@ for _, side in ipairs({"diagonal_left", "diagonal_right", "horizontal"}) do
 			def.airbrush_replacement_node = "homedecor:banister_wood_"..side.."_grey"
 			def.groups.ud_param2_colorable = 1
 			def.paramtype2 = "colorfacedir"
+			def.on_dig = unifieddyes.on_dig
 		end
 		homedecor.register(nodename, def)
 
@@ -998,4 +999,59 @@ unifieddyes.register_color_craft({
 		"NEUTRAL_NODE",
 		"MAIN_DYE",
 	}
+})
+
+-- Japanese-style wood/paper wall pieces and door
+
+local jp_cbox = {
+	type = "fixed",
+	fixed = {-0.5, -0.5, 0, 0.5, 0.5, 0.0625},
+}
+
+minetest.register_node(":homedecor:japanese_wall_top", {
+	description = S("Japanese wall (top)"),
+	drawtype = "mesh",
+	mesh = "homedecor_wall_japanese_top.obj",
+	tiles = {
+		homedecor.lux_wood,
+		"homedecor_japanese_paper.png"
+	},
+	paramtype = "light",
+	paramtype2 = "facedir",
+	groups = {snappy=3},
+	selection_box = jp_cbox,
+	collision_box = jp_cbox,
+	sounds = default.node_sound_wood_defaults(),
+})
+
+minetest.register_node(":homedecor:japanese_wall_middle", {
+	description = S("Japanese wall"),
+	drawtype = "mesh",
+	mesh = "homedecor_wall_japanese_middle.obj",
+	tiles = {
+		homedecor.lux_wood,
+		"homedecor_japanese_paper.png"
+	},
+	paramtype = "light",
+	paramtype2 = "facedir",
+	groups = {snappy=3},
+	selection_box = jp_cbox,
+	collision_box = jp_cbox,
+	sounds = default.node_sound_wood_defaults(),
+})
+
+minetest.register_node(":homedecor:japanese_wall_bottom", {
+	description = S("Japanese wall (bottom)"),
+	drawtype = "mesh",
+	mesh = "homedecor_wall_japanese_bottom.obj",
+	tiles = {
+		homedecor.lux_wood,
+		"homedecor_japanese_paper.png"
+	},
+	paramtype = "light",
+	paramtype2 = "facedir",
+	groups = {snappy=3},
+	selection_box = jp_cbox,
+	collision_box = jp_cbox,
+	sounds = default.node_sound_wood_defaults(),
 })

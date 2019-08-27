@@ -1,294 +1,200 @@
 -- Node definitions for Homedecor doors
 
 local S = homedecor.gettext
+local mesecons_mp = minetest.get_modpath("mesecons")
 
-local function N_(x) return x end
+-- new doors using minetest_game doors API
 
-local m_rules
-if minetest.global_exists("mesecon") then
-	m_rules = mesecon and mesecon.rules and mesecon.rules.pplate
-end
-
--- doors
-
-local function isSolid(pos, adjust)
-    local adj = {x = adjust[1], y = adjust[2], z = adjust[3]}
-    local node = minetest.get_node(vector.add(pos,adj))
-    if node then
-        local idef = minetest.registered_nodes[minetest.get_node(vector.add(pos,adj)).name]
-        if idef then
-            return idef.walkable
-        end
-    end
-    return false
-end
-
-local function countSolids(pos,node,level)
-    local solids = 0
-    for x = -1, 1 do
-        for z = -1, 1 do
-            local y = (node.param2 == 5) and -level or level
-            -- special cases when x == z == 0
-            if x == 0 and z == 0 then
-                if level == 1 then
-                    -- when looking past the trap door, cannot be solid in center
-                    if isSolid(pos,{x,y,z}) then
-                        return false
-                    end
-                    -- no else. it doesn't matter if x == y == z is solid, that's us.
-                end
-            elseif isSolid(pos,{x,y,z}) then
-                solids = solids + 1
-            end
-        end
-    end
-    return solids
-end
-
-local function calculateClosed(pos)
-    local node = minetest.get_node(pos)
-    -- the door is considered closed if it is closing off something.
-
-    local direction = node.param2 % 6
-    local isTrap = direction == 0 or direction == 5
-    if isTrap then
-        -- the trap door is considered closed when all nodes on its sides are solid
-        -- or all nodes in the 3x3 above/below it are solid except the center
-        for level = 0, 1 do
-            local solids = countSolids(pos,node,level)
-            if solids == 8 then
-                return true
-            end
-        end
-        return false
-    else
-        -- the door is considered closed when the nodes on its sides are solid
-        -- or the 3 nodes in its facing direction are solid nonsolid solid
-        -- if the door has two levels (i.e. not a gate) then this must
-        -- be true for the top node as well.
-
-        -- sorry I dunno the math to figure whether to x or z
-        if direction == 1 or direction == 2 then
-            if isSolid(pos,{0,0,-1}) and isSolid(pos,{0,0,1}) then
-                if string.find(node.name,'_bottom_') then
-                    return calculateClosed({x=pos.x,y=pos.y+1,z=pos.z})
-                else
-                    return true
-                end
-            end
-            local x = (direction == 1) and 1 or -1
-            if isSolid(pos,{x,0,-1}) and not isSolid(pos,{x,0,0}) and isSolid(pos,{x,0,1}) then
-                if string.find(node.name,'_bottom_') then
-                    return calculateClosed({x=pos.x,y=pos.y+1,z=pos.z})
-                else
-                    return true
-                end
-            end
-            return false
-        else
-            -- direction == 3 or 4
-            if isSolid(pos,{-1,0,0}) and isSolid(pos,{1,0,0}) then
-                if string.find(node.name,'_bottom_') then
-                    return calculateClosed({x=pos.x,y=pos.y+1,z=pos.z})
-                else
-                    return true
-                end
-            end
-            local z = (direction == 3) and 1 or -1
-            if isSolid(pos,{-1,0,z}) and not isSolid(pos,{0,0,z}) and isSolid(pos,{1,0,z}) then
-                if string.find(node.name,'_bottom_') then
-                    return calculateClosed({x=pos.x,y=pos.y+1,z=pos.z})
-                else
-                    return true
-                end
-            end
-            return false
-        end
-    end
-end
-
--- isClosed flag, is 0 or 1 0 = open, 1 = closed
-local function getClosed(pos)
-    local isClosed = minetest.get_meta(pos):get_string('closed')
-    if isClosed=='' then
-	return calculateClosed(pos)
-    else
-        isClosed = tonumber(isClosed)
-        -- may be closed or open (1 or 0)
-        return isClosed == 1
-    end
-end
-
-local function addDoorNode(pos,def,isClosed)
-    minetest.set_node(pos, def)
-    minetest.get_meta(pos):set_int('closed', isClosed and 1 or 0)
-end
-
-local door_model_list = {
-	{	name = "closet_mahogany",
-		description = N_("Mahogany Closet Door (@1 opening)"),
-		mesh = "homedecor_door_closet.obj"
-	},
-
-	{	name = "closet_oak",
-		description = N_("Oak Closet Door (@1 opening)"),
-		mesh = "homedecor_door_closet.obj"
+local door_list = {
+	{	name = "wood_plain",
+		description = "Plain Wooden Door",
+		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+		sounds = {
+			main = default.node_sound_wood_defaults(),
+			open = "homedecor_door_open",
+			close = "homedecor_door_close",
+		}
 	},
 
 	{	name = "exterior_fancy",
-		description = N_("Fancy Wood/Glass Door (@1 opening)"),
-		mesh = "homedecor_door_fancy.obj",
-		tiles = {
-			"homedecor_door_exterior_fancy.png",
-			"homedecor_door_exterior_fancy_insert.png"
+		description = "Fancy Wood/Glass Door",
+		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+		sounds = {
+			main = default.node_sound_wood_defaults(),
+			open = "homedecor_door_open",
+			close = "homedecor_door_close",
 		},
-		usealpha = true
+		backface = true,
+		alpha = true,
+		custom_model = "homedecor_door_fancy"
 	},
 
-	{	name = "wood_glass_oak",
-		description = N_("Glass and Wood, Oak-colored (@1 opening)"),
-		mesh = "homedecor_door_wood_glass.obj",
-		tiles = {
-			"homedecor_door_wood_glass_oak.png",
-			"homedecor_door_wood_glass_insert.png",
+	{	name = "french_oak",
+		description = "French door, Oak-colored",
+		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+		sounds = {
+			main = default.node_sound_glass_defaults(),
+		},
+		backface = true,
+		alpha = true,
+		custom_model = "homedecor_door_french"
+	},
+
+	{	name = "french_mahogany",
+		description = "French door, Mahogany-colored",
+		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+		sounds = {
+			main = default.node_sound_glass_defaults(),
+		},
+		backface = true,
+		alpha = true,
+		custom_model = "homedecor_door_french"
+	},
+
+	{	name = "french_white",
+		description = "French door, White",
+		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+		sounds = {
+			main = default.node_sound_glass_defaults(),
+		},
+		backface = true,
+		alpha = true,
+		custom_model = "homedecor_door_french"
+	},
+
+	{	name = "basic_panel",
+		description = "Basic white panel Door",
+		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+		sounds = {
+			main = default.node_sound_wood_defaults(),
+			open = "homedecor_door_open",
+			close = "homedecor_door_close",
 		}
-	},
-
-	{	name = "wood_glass_mahogany",
-		description = N_("Glass and Wood, Mahogany-colored (@1 opening)"),
-		mesh = "homedecor_door_wood_glass.obj",
-		tiles = {
-			"homedecor_door_wood_glass_mahogany.png",
-			"homedecor_door_wood_glass_insert.png",
-		}
-	},
-
-	{	name = "wood_glass_white",
-		description = N_("Glass and Wood, White (@1 opening)"),
-		mesh = "homedecor_door_wood_glass.obj",
-		tiles = {
-			"homedecor_door_wood_glass_white.png",
-			"homedecor_door_wood_glass_insert.png",
-		}
-	},
-
-	{	name = "wood_plain",
-		description = N_("Plain Wooden Door (@1 opening)"),
-		mesh = "homedecor_door_plain.obj"
-	},
-
-	{	name = "bedroom",
-		description = N_("White Bedroom Door (@1 opening)"),
-		mesh = "homedecor_door_plain.obj"
 	},
 
 	{	name = "wrought_iron",
-		description = N_("Wrought Iron Gate/Door (@1 opening)"),
-		mesh = "homedecor_door_wrought_iron.obj"
+		description = "Wrought Iron Gate/Door",
+		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+		sounds = {
+			main = default.node_sound_metal_defaults(),
+			open = "doors_steel_door_open",
+			close = "doors_steel_door_close",
+		},
+		backface = true,
+		custom_model = "homedecor_door_wrought_iron"
+	},
+
+	{	name = "carolina",
+		description = "Wooden Carolina door",
+		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+		sounds = {
+			main = default.node_sound_wood_defaults(),
+			open = "homedecor_door_open",
+			close = "homedecor_door_close",
+		},
+		backface = true,
+		alpha = true
 	},
 
 	{	name = "woodglass",
-		description = N_("Wooden door with glass insert (@1 opening)"),
-		mesh = "homedecor_door_woodglass_typea.obj",
-		tiles = {
-			"homedecor_door_woodglass_typea.png",
-			"homedecor_door_woodglass_typea_insert.png",
+		description = "Wooden door with glass insert, type 3",
+		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+		sounds = {
+			main = default.node_sound_wood_defaults(),
+			open = "homedecor_door_open",
+			close = "homedecor_door_close",
 		},
-		usealpha = true
+		backface = true,
+		alpha = true,
+		custom_model = "homedecor_door_wood_glass_3"
 	},
 
-	{	name = "woodglass2",
-		description = N_("Wooden door with glass insert, type 2 (@1 opening)"),
-		mesh = "homedecor_door_plain.obj",
-		usealpha = true
+	{	name = "closet_mahogany",
+		description = "Mahogany Closet Door",
+		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+		sounds = {
+			main = default.node_sound_wood_defaults(),
+		},
+		custom_model = "homedecor_door_closet"
+	},
+
+	{	name = "closet_oak",
+		description = "Oak Closet Door",
+		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+		sounds = {
+			main = default.node_sound_wood_defaults(),
+		},
+		custom_model = "homedecor_door_closet"
 	},
 }
 
-local def_selbox = {
-	type = "fixed",
-	fixed = { -0.5, -0.5, 0.375, 0.5, 1.5, 0.5 }
-}
+local old_doors = {}
+local mesecons
 
-local sides = { N_("left"), N_("right") }
-
-for i, side in ipairs(sides) do
-
-	for _, door_model in ipairs(door_model_list) do
-
-		local doorname = door_model.name
-
-		local selbox = door_model.selectbox or def_selbox
-		local colbox = door_model.collisionbox or door_model.selectbox or def_selbox
-		local mesh = door_model.mesh
-		local groups = {snappy = 3}
-
-		if side == "right" then
-			mesh = string.gsub(door_model.mesh, ".obj", "_right.obj")
-			groups = {snappy = 3, not_in_creative_inventory = 1}
-		end
-
-		minetest.register_node(":homedecor:door_"..doorname.."_"..side, {
-			description = S(door_model.description, S(side)),
-			drawtype = "mesh",
-			mesh = mesh,
-			tiles = door_model.tiles or { "homedecor_door_"..doorname..".png" },
-			inventory_image = "homedecor_door_"..doorname.."_inv.png",
-			wield_image = "homedecor_door_"..doorname.."_inv.png",
-			paramtype = "light",
-			paramtype2 = "facedir",
-			groups = groups,
-			sounds = default.node_sound_wood_defaults(),
-			use_texture_alpha = door_model.usealpha,
-			selection_box = selbox,
-			collision_box = colbox,
-			on_rotate = screwdriver.rotate_simple,
-			on_place = function(itemstack, placer, pointed_thing)
-				return homedecor.stack_wing(itemstack, placer, pointed_thing,
-					"homedecor:door_"..doorname.."_left", "air",
-					"homedecor:door_"..doorname.."_right", "air")
+-- This part blatantly copied from Mesecons, and modified :-)
+if mesecons_mp then
+	mesecons = {
+		effector = {
+			action_on = function(pos, node)
+				local door = doors.get(pos)
+				if door then
+					door:open()
+				end
 			end,
-			on_construct = function(pos)
-				minetest.get_meta(pos):set_int("closed", 1)
+			action_off = function(pos, node)
+				local door = doors.get(pos)
+				if door then
+					door:close()
+				end
 			end,
-			on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-				homedecor.flip_door(pos, node, clicker, doorname, side)
-				return itemstack
-			end,
-		    -- both left and right doors may be used for open or closed doors
-		    -- so they have to have both action_on and action_off and just
-		    -- check when that action is invoked if to continue
+			rules = mesecon.rules.pplate
+		}
+	}
+end
 
-		    on_punch = function(pos, node, puncher)
-		        minetest.get_meta(pos):set_string('closed',nil)
-		    end,
-			drop = "homedecor:door_"..doorname.."_left",
-		    mesecons = {
-		        effector = {
-					rules = m_rules,
-		            action_on = function(pos,node)
-		                local isClosed = getClosed(pos)
-		                if isClosed then
-		                    homedecor.flip_door(pos,node,nil,doorname,side,isClosed)
-		                end
-		            end,
-		            action_off = function(pos,node)
-		                local isClosed = getClosed(pos)
-		                if not isClosed then
-		                    homedecor.flip_door(pos,node,nil,doorname,side,isClosed)
-		                end
-		            end
-		        }
-		    }
-		})
+local hd_3d = minetest.get_modpath("homedecor_3d_extras")
 
-		minetest.register_alias("homedecor:door_"..doorname.."_top_"..side, "air")
-		minetest.register_alias("homedecor:door_"..doorname.."_bottom_"..side, "homedecor:door_"..doorname.."_"..side)
+for _, door in ipairs(door_list) do
+	doors.register("homedecor_"..door.name, {
+			tiles = {{ name = "homedecor_door_"..door.name..".png", backface_culling = door.backface }},
+			description = door.description,
+			inventory_image = "homedecor_door_"..door.name.."_inv.png",
+			groups = table.copy(door.groups),
+			sounds = door.sounds.main,
+			sound_open = door.sounds.open,
+			sound_close = door.sounds.close,
+			mesecons = mesecons
+	})
 
+	local nn_a = "doors:homedecor_"..door.name.."_a"
+	local nn_b = "doors:homedecor_"..door.name.."_b"
+
+	if door.alpha then
+		local def = table.copy(minetest.registered_nodes[nn_a])
+			def.use_texture_alpha = true
+			def.mesh = "door_a.obj"                -- leaving this out will break the _a model
+			minetest.register_node(":"..nn_a, def) -- assignment when the override takes place
+
+		def = table.copy(minetest.registered_nodes[nn_b])
+			def.use_texture_alpha = true
+			minetest.register_node(":"..nn_b, def)
 	end
 
-	minetest.register_alias("homedecor:door_wood_glass_top_"..side, "air")
-	minetest.register_alias("homedecor:door_wood_glass_bottom_"..side, "homedecor:door_wood_glass_oak_"..side)
+	if door.custom_model and hd_3d then
+		def = table.copy(minetest.registered_nodes[nn_a])
+			def.mesh = door.custom_model.."_a.obj"
+			minetest.register_node(":"..nn_a, def)
 
+		def = table.copy(minetest.registered_nodes[nn_b])
+			def.mesh = door.custom_model.."_b.obj"
+			minetest.register_node(":"..nn_b, def)
+	end
+
+	old_doors[#old_doors + 1] = "homedecor:door_"..door.name.."_left"
+	old_doors[#old_doors + 1] = "homedecor:door_"..door.name.."_right"
+
+	minetest.register_alias("doors:"..door.name.."_a", "doors:homedecor_"..door.name.."_a")
+	minetest.register_alias("doors:"..door.name.."_b", "doors:homedecor_"..door.name.."_b")
 end
 
 -- Gates
@@ -404,13 +310,16 @@ for i, g in ipairs(gate_list) do
 			homedecor.flip_gate(pos, node, clicker, gate, "closed")
 			return itemstack
 		end,
-        mesecons = {
+	}
+
+	if mesecons_mp then
+        def.mesecons = {
             effector = {
-				rules = m_rules,
+				rules = mesecon.rules.pplate,
                 action_on = function(pos,node) homedecor.flip_gate(pos,node,nil,gate, "closed") end
             }
         }
-	}
+	end
 
     -- gates when placed default to closed, closed.
 
@@ -434,10 +343,13 @@ for i, g in ipairs(gate_list) do
         homedecor.flip_gate(pos, node, clicker, gate, "open")
         return itemstack
 	end
-    def.mesecons.effector = {
-		rules = m_rules,
-        action_off = function(pos,node) homedecor.flip_gate(pos,node,nil,gate, "open") end
-    }
+
+	if mesecons_mp then
+		def.mesecons.effector = {
+			rules = mesecon.rules.pplate,
+			action_off = function(pos,node) homedecor.flip_gate(pos,node,nil,gate, "open") end
+		}
+	end
 
 	minetest.register_node(":homedecor:gate_"..gate.."_open", def)
 end
@@ -451,55 +363,10 @@ minetest.register_alias("homedecor:fence_picket_gate_closed",       "homedecor:g
 minetest.register_alias("homedecor:fence_picket_gate_white_open",   "homedecor:gate_picket_white_open")
 minetest.register_alias("homedecor:fence_picket_gate_white_closed", "homedecor:gate_picket_white_closed")
 
--- to open a door, you switch left for right and subtract from param2, or vice versa right for left
--- that is to say open "right" doors become left door nodes, and open left doors right door nodes.
--- also adjusting param2 so the node is at 90 degrees.
-
-function homedecor.flip_door(pos, node, player, name, side, isClosed)
-    if isClosed == nil then
-        isClosed = getClosed(pos)
-    end
-    -- this is where we swap the isClosed status!
-    -- i.e. if isClosed, we're adding an open door
-    -- and if not isClosed, a closed door
-    isClosed = not isClosed
-
-	local rside
-	local nfdir
-	local ofdir = node.param2 or 0
-	if side == "left" then
-		rside = "right"
-		nfdir=ofdir - 1
-		if nfdir < 0 then nfdir = 3 end
-	else
-		rside = "left"
-		nfdir=ofdir + 1
-		if nfdir > 3 then nfdir = 0 end
-	end
-	local sound = isClosed and 'close' or 'open'
-	minetest.sound_play("homedecor_door_"..sound, {
-		pos=pos,
-        max_hear_distance = 5,
-		gain = 2,
-	})
-    -- XXX: does the top half have to remember open/closed too?
-	minetest.set_node({x=pos.x, y=pos.y+1, z=pos.z}, { name =  "homedecor:door_"..name.."_top_"..rside, param2=nfdir})
-
-    addDoorNode(pos,{ name = "homedecor:door_"..name.."_bottom_"..rside, param2=nfdir },isClosed)
-end
-
 function homedecor.flip_gate(pos, node, player, gate, oc)
-    local isClosed = getClosed(pos);
-    minetest.sound_play("homedecor_gate_open_close", {
-		pos=pos,
-		max_hear_distance = 5,
-		gain = 2,
-	})
+
 
 	local fdir = node.param2 or 0
-
-    -- since right facing gates use "open" nodes for closed, we need an
-    -- isClosed flag to tell if it's "really" closed.
 
 	local gateresult
 	if oc == "closed" then
@@ -508,12 +375,14 @@ function homedecor.flip_gate(pos, node, player, gate, oc)
 		gateresult = "homedecor:gate_"..gate.."_closed"
 	end
 
-    local def = {name=gateresult, param2=fdir}
-
-    addDoorNode(pos, def, isClosed)
+	minetest.set_node(pos, {name = gateresult, param2 = fdir})
+    minetest.sound_play("homedecor_gate_open_close", {
+		pos=pos,
+		max_hear_distance = 5,
+		gain = 2,
+	})
 
     -- the following opens and closes gates below and above in sync with this one
-    -- (without three gate open/close sounds)
 
     local above = {x=pos.x, y=pos.y+1, z=pos.z}
     local below = {x=pos.x, y=pos.y-1, z=pos.z}
@@ -521,69 +390,15 @@ function homedecor.flip_gate(pos, node, player, gate, oc)
     local nodebelow = minetest.get_node(below)
 
 	if string.find(nodeabove.name, "homedecor:gate_"..gate) then
-        addDoorNode(above, def, isClosed)
+        minetest.set_node(above, {name = gateresult, param2 = fdir})
 	end
 
 	if string.find(nodebelow.name, "homedecor:gate_"..gate) then
-        addDoorNode(below, def, isClosed)
+        minetest.set_node(below, {name = gateresult, param2 = fdir})
 	end
 end
 
--- Japanese-style wood/paper wall pieces and door
-
-local jp_cbox = {
-	type = "fixed",
-	fixed = {-0.5, -0.5, 0, 0.5, 0.5, 0.0625},
-}
-
-minetest.register_node(":homedecor:japanese_wall_top", {
-	description = S("Japanese wall (top)"),
-	drawtype = "mesh",
-	mesh = "homedecor_wall_japanese_top.obj",
-	tiles = {
-		homedecor.lux_wood,
-		"homedecor_japanese_paper.png"
-	},
-	paramtype = "light",
-	paramtype2 = "facedir",
-	groups = {snappy=3},
-	selection_box = jp_cbox,
-	collision_box = jp_cbox,
-	sounds = default.node_sound_wood_defaults(),
-})
-
-minetest.register_node(":homedecor:japanese_wall_middle", {
-	description = S("Japanese wall"),
-	drawtype = "mesh",
-	mesh = "homedecor_wall_japanese_middle.obj",
-	tiles = {
-		homedecor.lux_wood,
-		"homedecor_japanese_paper.png"
-	},
-	paramtype = "light",
-	paramtype2 = "facedir",
-	groups = {snappy=3},
-	selection_box = jp_cbox,
-	collision_box = jp_cbox,
-	sounds = default.node_sound_wood_defaults(),
-})
-
-minetest.register_node(":homedecor:japanese_wall_bottom", {
-	description = S("Japanese wall (bottom)"),
-	drawtype = "mesh",
-	mesh = "homedecor_wall_japanese_bottom.obj",
-	tiles = {
-		homedecor.lux_wood,
-		"homedecor_japanese_paper.png"
-	},
-	paramtype = "light",
-	paramtype2 = "facedir",
-	groups = {snappy=3},
-	selection_box = jp_cbox,
-	collision_box = jp_cbox,
-	sounds = default.node_sound_wood_defaults(),
-})
-
+-- Japanese-style wood/paper door
 homedecor.register("door_japanese_closed", {
 	description = S("Japanese-style door"),
 	inventory_image = "homedecor_door_japanese_inv.png",
@@ -635,6 +450,26 @@ homedecor.register("door_japanese_open", {
 })
 
 -- crafting
+
+-- half-doors
+
+minetest.register_craft( {
+	type = "shapeless",
+	output = "homedecor:gate_half_door_closed 4",
+	recipe = {
+		"doors:homedecor_wood_plain_a",
+		"doors:homedecor_wood_plain_a"
+	},
+})
+
+minetest.register_craft( {
+	type = "shapeless",
+	output = "homedecor:gate_half_door_white_closed 4",
+	recipe = {
+		"doors:homedecor_bedroom_a",
+		"doors:homedecor_bedroom_a"
+	},
+})
 
 -- Gates
 
@@ -707,7 +542,7 @@ minetest.register_craft( {
 -- plain wood, non-windowed
 
 minetest.register_craft( {
-        output = "homedecor:door_wood_plain_left 2",
+        output = "doors:homedecor_wood_plain 2",
         recipe = {
 			{ "group:wood", "group:wood", "" },
 			{ "group:wood", "group:wood", "default:steel_ingot" },
@@ -718,7 +553,7 @@ minetest.register_craft( {
 -- fancy exterior
 
 minetest.register_craft( {
-        output = "homedecor:door_exterior_fancy_left 2",
+        output = "doors:homedecor_exterior_fancy 2",
         recipe = {
 			{ "group:wood", "default:glass" },
 			{ "group:wood", "group:wood" },
@@ -726,12 +561,10 @@ minetest.register_craft( {
         },
 })
 
--- wood and glass (grid style)
-
--- bare
+-- French style wood/glass
 
 minetest.register_craft( {
-        output = "homedecor:door_wood_glass_oak_left 2",
+        output = "doors:homedecor_french_oak 2",
         recipe = {
 			{ "default:glass", "group:wood" },
 			{ "group:wood", "default:glass" },
@@ -740,46 +573,31 @@ minetest.register_craft( {
 })
 
 minetest.register_craft( {
-        output = "homedecor:door_wood_glass_oak_left 2",
+        output = "doors:homedecor_french_oak 2",
         recipe = {
 			{ "group:wood", "default:glass" },
 			{ "default:glass", "group:wood" },
 			{ "group:wood", "default:glass" },
-        },
-})
-
--- mahogany
-
-minetest.register_craft( {
-	type = "shapeless",
-        output = "homedecor:door_wood_glass_mahogany_left 2",
-        recipe = {
-			"default:dirt",
-			"default:coal_lump",
-			"homedecor:door_wood_glass_oak_left",
-			"homedecor:door_wood_glass_oak_left"
         },
 })
 
 minetest.register_craft( {
 	type = "shapeless",
-        output = "homedecor:door_wood_glass_mahogany_left 2",
+        output = "doors:homedecor_french_mahogany 2",
         recipe = {
 			"dye:brown",
-			"homedecor:door_wood_glass_oak_left",
-			"homedecor:door_wood_glass_oak_left"
+			"doors:homedecor_french_oak",
+			"doors:homedecor_french_oak"
         },
 })
 
--- white
-
 minetest.register_craft( {
 	type = "shapeless",
-        output = "homedecor:door_wood_glass_white_left 2",
+        output = "doors:homedecor_french_white 2",
         recipe = {
 			"dye:white",
-			"homedecor:door_wood_glass_oak_left",
-			"homedecor:door_wood_glass_oak_left"
+			"doors:homedecor_french_oak",
+			"doors:homedecor_french_oak"
         },
 })
 
@@ -788,7 +606,7 @@ minetest.register_craft( {
 -- oak
 
 minetest.register_craft( {
-        output = "homedecor:door_closet_oak_left 2",
+        output = "doors:homedecor_closet_oak 2",
         recipe = {
 			{ "", "group:stick", "group:stick" },
 			{ "default:steel_ingot", "group:stick", "group:stick" },
@@ -800,29 +618,18 @@ minetest.register_craft( {
 
 minetest.register_craft( {
 	type = "shapeless",
-        output = "homedecor:door_closet_mahogany_left 2",
+        output = "doors:homedecor_closet_mahogany 2",
         recipe = {
-			"homedecor:door_closet_oak_left",
-			"homedecor:door_closet_oak_left",
-			"default:dirt",
-			"default:coal_lump",
-        },
-})
-
-minetest.register_craft( {
-	type = "shapeless",
-        output = "homedecor:door_closet_mahogany_left 2",
-        recipe = {
-			"homedecor:door_closet_oak_left",
-			"homedecor:door_closet_oak_left",
+			"doors:homedecor_closet_oak_a",
+			"doors:homedecor_closet_oak_a",
 			"dye:brown"
         },
 })
 
--- wrought fence-like door
+-- wrought iron fence-like door
 
 minetest.register_craft( {
-        output = "homedecor:door_wrought_iron_left 2",
+        output = "doors:homedecor_wrought_iron 2",
         recipe = {
 			{ "homedecor:pole_wrought_iron", "default:iron_lump" },
 			{ "homedecor:pole_wrought_iron", "default:iron_lump" },
@@ -830,21 +637,21 @@ minetest.register_craft( {
         },
 })
 
--- bedroom door
+-- bedroom/panel door
 
 minetest.register_craft( {
-	output = "homedecor:door_bedroom_left",
+	output = "doors:homedecor_basic_panel",
 	recipe = {
 		{ "dye:white", "dye:white", "" },
-		{ "homedecor:door_wood_plain_left", "basic_materials:brass_ingot", "" },
+		{ "doors:homedecor_wood_plain_a", "basic_materials:brass_ingot", "" },
 		{ "", "", "" },
 	},
 })
 
--- woodglass door
+-- basic wood/glass single-lite door
 
 minetest.register_craft( {
-	output = "homedecor:door_woodglass_left",
+	output = "doors:homedecor_woodglass",
 	recipe = {
 		{ "group:wood", "default:glass", "" },
 		{ "group:wood", "default:glass", "basic_materials:brass_ingot" },
@@ -852,10 +659,10 @@ minetest.register_craft( {
 	},
 })
 
--- woodglass door type 2
+-- "Carolina" door
 
 minetest.register_craft( {
-	output = "homedecor:door_woodglass2_left",
+	output = "doors:homedecor_carolina",
 	recipe = {
 		{ "default:glass", "default:glass", "" },
 		{ "group:wood", "group:wood", "default:iron_lump" },
@@ -874,11 +681,80 @@ minetest.register_craft({
 
 -- aliases
 
-minetest.register_alias("homedecor:jpn_door_top", "air")
-minetest.register_alias("homedecor:jpn_door_bottom", "homedecor:door_japanese_closed")
+minetest.register_alias("homedecor:jpn_door_top",               "air")
+minetest.register_alias("homedecor:jpn_door_top_open",          "air")
 
-minetest.register_alias("homedecor:jpn_door_top_open", "air")
-minetest.register_alias("homedecor:jpn_door_bottom_open", "homedecor:door_japanese_open")
+minetest.register_alias("homedecor:jpn_door_bottom",            "homedecor:door_japanese_closed")
+minetest.register_alias("homedecor:jpn_door_bottom_open",       "homedecor:door_japanese_open")
 
-minetest.register_alias("homedecor:door_glass_right", "doors:door_glass_b")
-minetest.register_alias("homedecor:door_glass_left", "doors:door_glass_a")
+minetest.register_alias("homedecor:door_glass_right",           "doors:door_glass_b")
+minetest.register_alias("homedecor:door_glass_left",            "doors:door_glass_a")
+
+minetest.register_alias("doors:wood_glass_oak_a",               "doors:homedecor_french_oak_a")
+minetest.register_alias("doors:wood_glass_oak_b",               "doors:homedecor_french_oak_b")
+
+minetest.register_alias("doors:wood_glass_white_a",             "doors:homedecor_french_white_a")
+minetest.register_alias("doors:wood_glass_white_b",             "doors:homedecor_french_white_b")
+
+minetest.register_alias("doors:wood_glass_mahogany_a",          "doors:homedecor_french_mahogany_a")
+minetest.register_alias("doors:wood_glass_mahogany_b",          "doors:homedecor_french_mahogany_b")
+
+minetest.register_alias("doors:homedecor_wood_glass_oak_a",     "doors:homedecor_french_oak_a")
+minetest.register_alias("doors:homedecor_wood_glass_oak_b",     "doors:homedecor_french_oak_b")
+
+minetest.register_alias("doors:homedecor_wood_glass_white_a",   "doors:homedecor_french_white_a")
+minetest.register_alias("doors:homedecor_wood_glass_white_b",   "doors:homedecor_french_white_b")
+
+minetest.register_alias("doors:homedecor_wood_glass_mahogany_a", "doors:homedecor_french_mahogany_a")
+minetest.register_alias("doors:homedecor_wood_glass_mahogany_b", "doors:homedecor_french_mahogany_b")
+
+minetest.register_alias("doors:homedecor_woodglass2_a",         "doors:homedecor_carolina_a")
+minetest.register_alias("doors:homedecor_woodglass2_b",         "doors:homedecor_carolina_b")
+
+minetest.register_alias("doors:woodglass2_a",                   "doors:homedecor_carolina_a")
+minetest.register_alias("doors:woodglass2_b",                   "doors:homedecor_carolina_b")
+
+minetest.register_alias("doors:homedecor_bedroom_a",            "doors:homedecor_basic_panel_a")
+minetest.register_alias("doors:homedecor_bedroom_b",            "doors:homedecor_basic_panel_b")
+
+minetest.register_alias("doors:bedroom_a",                      "doors:homedecor_basic_panel_a")
+minetest.register_alias("doors:bedroom_b",                      "doors:homedecor_basic_panel_b")
+
+-- flip old homedecor doors around, since they use minetest_game doors API now
+
+old_doors[#old_doors + 1] = "homedecor:door_wood_glass_oak_left"
+old_doors[#old_doors + 1] = "homedecor:door_wood_glass_oak_right"
+
+old_doors[#old_doors + 1] = "homedecor:door_wood_glass_white_left"
+old_doors[#old_doors + 1] = "homedecor:door_wood_glass_white_right"
+
+old_doors[#old_doors + 1] = "homedecor:door_wood_glass_mahogany_left"
+old_doors[#old_doors + 1] = "homedecor:door_wood_glass_mahogany_right"
+
+old_doors[#old_doors + 1] = "homedecor:door_woodglass2_left"
+old_doors[#old_doors + 1] = "homedecor:door_woodglass2_right"
+
+old_doors[#old_doors + 1] = "homedecor:door_bedroom_left"
+old_doors[#old_doors + 1] = "homedecor:door_bedroom_right"
+
+minetest.register_lbm({
+	name = ":homedecor:convert_doors_3",
+	label = "Convert Homedecor doors to mtg doors API",
+	nodenames = old_doors,
+	run_at_every_load = false,
+	action = function(pos, node)
+		-- old doors param2:  N=0, E=1, S=2, W=3
+		local newparam2 = (node.param2 + 2) % 4
+		local e = string.find(node.name, "_", -7)
+		local dir = string.sub(node.name, e+1)
+		local newname = "doors:homedecor_"..string.sub(node.name, 16, e-1)
+		if dir == "right" then
+			print("Want to replace "..node.name.." with "..newname.."_a")
+			minetest.set_node(pos, {name = newname.."_a", param2 = newparam2 })
+		else
+			print("Want to replace "..node.name.." with "..newname.."_b")
+			minetest.set_node(pos, {name = newname.."_b", param2 = newparam2 })
+		end
+		minetest.set_node({x=pos.x, y=pos.y+1, z=pos.z}, {name = "doors:hidden"})
+	end
+})
