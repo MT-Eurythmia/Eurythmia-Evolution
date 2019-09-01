@@ -109,24 +109,27 @@ minetest.register_on_joinplayer(function(player)
 	end
 
 	player:setpos(INITIAL_SPAWNPOINT)
-	show_initial_formspec(name)
+	minetest.after(1, function()
+		show_initial_formspec(name)
+	end)
 end)
 
 minetest.register_on_chat_message(function(name, message)
+	if not players[name] then
+		return
+	end
+
 	if string.upper(message) == THECODE then
 		if minetest.get_player_privs(name).interact then
-			if players[name] ~= nil then
-				minetest.chat_send_player(name, MSG.code_with_interact[players[name]])
-			else
-				minetest.chat_send_player(name, MSG.code_with_interact['both'])
-			end
+			minetest.chat_send_player(name, MSG.code_with_interact[players[name]])
 			return true
 		end
+
 		minetest.log("info", "Player "..name.." entered the right code.")
 		if played_enough[name] ~= nil then
 			minetest.log("info", "Player "..name.." played enough time.")
 
-			minetest.set_player_privs(name, {interact = true, home = true, shout = true, zoom = true, spawn=true, pvp=true})
+			minetest.set_player_privs(name, {interact = true, home = true, shout = true, spawn = true, pvp = true})
 			minetest.log("info", "Player "..name.." got the interact privilege.")
 			local player = minetest.get_player_by_name(name)
 			if not player then -- If the player has disconnected
@@ -138,7 +141,7 @@ minetest.register_on_chat_message(function(name, message)
 			minetest.chat_send_all(name..MSG.new_player[players[name]])
 			return true
 		else
-			minetest.log("info", "Player "..name.." didn't play enough time yet.")
+			minetest.log("info", "Player "..name.." hasn't played enough time yet.")
 			minetest.chat_send_player(name, MSG.code_too_early[players[name]])
 			return true
 		end
