@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/Sokomine/replacer.git
+	branch = master
+	commit = 7bfcb7360747ddea6c739ae8e991d07099002262
+	parent = c06a210d7f5dbf4f122209db1198740947695e59
+	method = merge
+	cmdver = 0.4.0
