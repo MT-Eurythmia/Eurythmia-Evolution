@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/minetest-mods/castle_gates.git
+	branch = master
+	commit = 81756a6207721cc0918ee245fdd6e980e54b2da2
+	parent = ce32f834c1013b32e2befdd660f0bc483898a3f7
+	method = merge
+	cmdver = 0.4.0
