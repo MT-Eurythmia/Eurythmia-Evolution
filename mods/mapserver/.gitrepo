@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/minetest-mapserver/mapserver_mod.git
+	branch = master
+	commit = 500a0c9453c48b39c0647997638c2367678e8222
+	parent = 6621d4eeb22a71d6759e66d42e55914834932f09
+	method = merge
+	cmdver = 0.4.0
