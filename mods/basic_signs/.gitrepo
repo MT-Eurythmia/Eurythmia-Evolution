@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://gitlab.com/VanessaE/basic_signs.git
+	branch = master
+	commit = 896a1935a6ca4a36737d49d335c53b8f53356718
+	parent = d46171d105e29969a52445012b06b097a51e8956
+	method = merge
+	cmdver = 0.4.0
