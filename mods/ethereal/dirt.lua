@@ -61,8 +61,7 @@ dirts = {
 	"ethereal:prairie_dirt", "ethereal:cold_dirt", "ethereal:crystal_dirt",
 	"ethereal:mushroom_dirt", "ethereal:fiery_dirt", "ethereal:gray_dirt",
 	"default:dirt_with_grass", "default:dirt_with_dry_grass",
-	"default:dirt_with_snow", "default:dirt_with_dry_grass",
-	"default:dirt_with_rainforest_litter"
+	"default:dirt_with_snow", "default:dirt_with_rainforest_litter"
 }
 
 -- check surrounding grass and change dirt to same colour

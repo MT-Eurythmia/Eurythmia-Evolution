@@ -12,7 +12,7 @@ ethereal.papyruswalk = true -- papyrus can be walked on
 ethereal.lilywalk = true -- waterlilies can be walked on
 ethereal.xcraft = true -- allow cheat crafts for cobble->gravel->dirt->sand, ice->snow, dry dirt->desert sand
 
--- Set following to 1 to enable biome or 0 to disable
+-- Set following to 1 to enable biome or false to disable
 ethereal.glacier   = 1 -- Ice glaciers with snow
 ethereal.bamboo    = 1 -- Bamboo with sprouts
 ethereal.mesa      = 1 -- Mesa red and orange clay with giant redwood

@@ -87,7 +87,7 @@ minetest.register_alias("ethereal:fencegate_pine_open", "doors:gate_pine_wood_op
 minetest.register_alias("ethereal:fencegate_pine_closed", "doors:gate_pine_wood_closed")
 
 -- sakura door
-doors.register_door("ethereal:sakura_door", {
+doors.register_door("ethereal:door_sakura", {
 		tiles = {
 			{name = "ethereal_sakura_door.png", backface_culling = true}
 		},
@@ -105,3 +105,7 @@ doors.register_door("ethereal:sakura_door", {
 			{"ethereal:sakura_wood", "ethereal:sakura_wood"}
 		}
 })
+
+minetest.register_alias("ethereal:sakura_door", "ethereal:door_sakura")
+minetest.register_alias("ethereal:sakura_door_a", "ethereal:door_sakura_a")
+minetest.register_alias("ethereal:sakura_door_b", "ethereal:door_sakura_b")

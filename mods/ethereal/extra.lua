@@ -1,10 +1,26 @@
 
 local S = ethereal.intllib
 
+-- Etherium Dust
+minetest.register_craftitem("ethereal:etherium_dust", {
+	description = S("Etherium Dust"),
+	inventory_image = "ethereal_etherium_dust.png",
+	wield_image = "ethereal_etherium_dust.png",
+})
+
+-- Ethereium Ore
+minetest.register_node("ethereal:etherium_ore", {
+	description = S("Etherium Ore"),
+	tiles = {"default_desert_stone.png^ethereal_etherium_ore.png"},
+	groups = {cracky = 3},
+	drop = "ethereal:etherium_dust",
+	sounds = default.node_sound_stone_defaults(),
+})
+
 -- Bamboo Flooring
 minetest.register_node("ethereal:bamboo_floor", {
 	description = S("Bamboo Floor"),
-	drawtype = 'nodebox',
+	drawtype = "nodebox",
 	tiles = { "bamboo_floor.png" },
 	wield_image = "bamboo_floor.png",
 	inventory_image = "bamboo_floor.png",

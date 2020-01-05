@@ -11,7 +11,7 @@
  -- DO NOT change settings below, use the settings.conf file instead
 ethereal = {
 
-	version = "1.25",
+	version = "1.27",
 	leaftype = 0, -- 0 for 2D plantlike, 1 for 3D allfaces
 	leafwalk = false, -- true for walkable leaves, false to fall through
 	cavedirt = true, -- caves chop through dirt when true

@@ -138,6 +138,7 @@ minetest.register_tool("ethereal:sword_crystal", {
 		},
 		damage_groups = {fleshy = 10},
 	},
+	groups = {sword = 1},
 	sound = {breaks = "default_tool_breaks"},
 })
 
@@ -167,24 +168,25 @@ minetest.register_tool("ethereal:axe_crystal", {
 		},
 		damage_groups = {fleshy = 7},
 	},
+	groups = {axe = 1},
 	sound = {breaks = "default_tool_breaks"},
 })
 
 minetest.register_craft({
-	output = 'ethereal:axe_crystal',
+	output = "ethereal:axe_crystal",
 	recipe = {
-		{'ethereal:crystal_ingot', 'ethereal:crystal_ingot'},
-		{'ethereal:crystal_ingot', 'default:steel_ingot'},
-		{'', 'default:steel_ingot'},
+		{"ethereal:crystal_ingot", "ethereal:crystal_ingot"},
+		{"ethereal:crystal_ingot", "default:steel_ingot"},
+		{"", "default:steel_ingot"},
 	}
 })
 
 minetest.register_craft({
-	output = 'ethereal:axe_crystal',
+	output = "ethereal:axe_crystal",
 	recipe = {
-		{'ethereal:crystal_ingot', 'ethereal:crystal_ingot'},
-		{'default:steel_ingot', 'ethereal:crystal_ingot'},
-		{'default:steel_ingot', ''},
+		{"ethereal:crystal_ingot", "ethereal:crystal_ingot"},
+		{"default:steel_ingot", "ethereal:crystal_ingot"},
+		{"default:steel_ingot", ""},
 	}
 })
 
@@ -205,6 +207,7 @@ minetest.register_tool("ethereal:pick_crystal", {
 		},
 		damage_groups = {fleshy = 6},
 	},
+	groups = {pickaxe = 1},
 	sound = {breaks = "default_tool_breaks"},
 })
 
@@ -246,8 +249,9 @@ minetest.register_tool("ethereal:shovel_crystal", {
 		groupcaps={
 			crumbly = {times={[1]=1.10, [2]=0.50, [3]=0.30}, uses=30, maxlevel=3},
 		},
-		damage_groups = {fleshy=4},
+		damage_groups = {fleshy = 4},
 	},
+	groups = {shovel = 1},
 	sound = {breaks = "default_tool_breaks"},
 })
 
@@ -286,23 +290,18 @@ minetest.register_craft({
 -- Add [toolranks] mod support if found
 if minetest.get_modpath("toolranks") then
 
-minetest.override_item("ethereal:pick_crystal", {
-	original_description = "Crystal Pickaxe",
-	description = toolranks.create_description("Crystal Pickaxe", 0, 1),
-	after_use = toolranks.new_afteruse})
+	-- Helper function
+	local function add_tool(name, desc, afteruse)
 
-minetest.override_item("ethereal:axe_crystal", {
-	original_description = "Crystal Axe",
-	description = toolranks.create_description("Crystal Axe", 0, 1),
-	after_use = toolranks.new_afteruse})
+		minetest.override_item(name, {
+			original_description = desc,
+			description = toolranks.create_description(desc, 0, 1),
+			after_use = afteruse and toolranks.new_afteruse
+		})
+	end
 
-minetest.override_item("ethereal:shovel_crystal", {
-	original_description = "Crystal Shovel",
-	description = toolranks.create_description("Crystal Shovel", 0, 1),
-	after_use = toolranks.new_afteruse})
-
-minetest.override_item("ethereal:sword_crystal", {
-	original_description = "Crystal Sword",
-	description = toolranks.create_description("Crystal Sword", 0, 1),
-	after_use = toolranks.new_afteruse})
+	add_tool("ethereal:pick_crystal", "Crystal Pickaxe", true)
+	add_tool("ethereal:axe_crystal", "Crystal Axe", true)
+	add_tool("ethereal:shovel_crystal", "Crystal Shovel", true)
+	add_tool("ethereal:sword_crystal", "Crystal Sword", true)
 end

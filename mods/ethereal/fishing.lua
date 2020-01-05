@@ -37,7 +37,7 @@ minetest.register_craftitem("ethereal:sashimi", {
 minetest.register_craft({
 	output = "ethereal:sashimi 2",
 	recipe = {
-		{'group:food_seaweed','group:food_fish_raw','group:food_seaweed'},
+		{"group:food_seaweed", "group:food_fish_raw", "group:food_seaweed"},
 	}
 })
 
