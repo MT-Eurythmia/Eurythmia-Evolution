@@ -130,7 +130,7 @@ self.saddle = nil
 self.saddle = nil
 
 			-- attach player to horse
-			elseif (not self.driver
+			elseif (not self.driver and not self.child
 			and clicker:get_wielded_item():get_name() == "mobs:saddle")
 			or self.saddle then
 
