@@ -6,7 +6,7 @@
 [subrepo]
 	remote = git://repo.or.cz/minetest_hbarmor.git
 	branch = master
-	commit = e513aeb9cbfad2ddb1714f7808d1a977666d9430
-	parent = fc1f9e9aa5871d9b94816e5b89575f6813cd9a53
+	commit = 93d994cbad6a16f985919add5776b568d7a5d6d3
+	parent = 40cd78812ffe656287a1411854badbecbbde282a
 	method = rebase
 	cmdver = 0.4.0
