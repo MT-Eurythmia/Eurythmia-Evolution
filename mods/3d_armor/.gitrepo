@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/stujones11/minetest-3d_armor.git
 	branch = master
-	commit = 1d22612664b141222cef848e57c490d6ca079bdb
+	commit = 47ecef46f75c977a3d256ac4bab2874c24b785af
 	parent = bb665a5e3a8b9f313b1418ef222cb8517cb313b7
 	cmdver = 0.4.0
 	method = merge
