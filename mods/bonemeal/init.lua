@@ -265,11 +265,17 @@ local function check_soil(pos, nodename, strength)
 		pos2.y = pos2.y + 1
 
 		if math.random(1, 5) == 5 then
-			-- place random decoration (rare)
-			nod = decor[math.random(1, #decor)] or ""
+			if decor and #decor > 0 then
+				-- place random decoration (rare)
+				local dnum = #decor or 1
+				nod = decor[math.random(1, dnum)] or ""
+			end
 		else
-			-- place random grass (common)
-			nod = #grass > 0 and grass[math.random(1, #grass)] or ""
+			if grass and #grass > 0 then
+				-- place random grass (common)
+				local dgra = #grass or 1
+				nod = #grass > 0 and grass[math.random(1, dgra)] or ""
+			end
 		end
 
 		if nod and nod ~= "" then
