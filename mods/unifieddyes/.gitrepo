@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://gitlab.com/VanessaE/unifieddyes.git
 	branch = master
-	commit = f59c8affc19af2ad4c14d4d757dde99b13b74986
-	parent = 2f4f5c6c63b56b0edc9ce40aa2eefa1f8e44bc7a
+	commit = c6883a8300f0e61b6be6b5a9708292aa47d2668c
+	parent = ad00b0d9485088c225fad7fee714e41962fc2bc9
 	method = merge
 	cmdver = 0.4.0
