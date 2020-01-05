@@ -60,7 +60,7 @@ minetest.register_chatcommand("set_owner", {
 
 		local id = areas:add(ownerName, areaName, pos1, pos2, nil)
 		areas:save()
-	
+
 		minetest.chat_send_player(ownerName,
 				"You have been granted control over area #"..
 				id..". Type /list_areas to show your areas.")
@@ -286,6 +286,30 @@ minetest.register_chatcommand("area_open", {
 })
 
 
+if areas.factions_available then
+	minetest.register_chatcommand("area_faction_open", {
+		params = "<ID>",
+		description = "Toggle an area open/closed for members in your faction.",
+		func = function(name, param)
+			local id = tonumber(param)
+			if not id then
+				return false, "Invalid usage, see /help area_faction_open."
+			end
+			
+			if not areas:isAreaOwner(id, name) then
+				return false, "Area "..id.." does not exist"
+						.." or is not owned by you."
+			end
+			local open = not areas.areas[id].faction_open
+			-- Save false as nil to avoid inflating the DB.
+			areas.areas[id].faction_open = open or nil
+			areas:save()
+			return true, ("Area %s for faction members."):format(open and "opened" or "closed")
+		end
+	})
+end
+
+
 minetest.register_chatcommand("move_area", {
 	params = "<ID>",
 	description = "Move (or resize) an area to the current positions.",
@@ -383,10 +407,10 @@ minetest.register_chatcommand("area_info", {
 			table.insert(lines, ("%s spanning up to %dx%dx%d.")
 				:format(str, size.x, size.y, size.z))
 		end
-		local function priv_limit_info(priv, max_count, max_size)
+		local function priv_limit_info(lpriv, lmax_count, lmax_size)
 			size_info(("Players with the %q privilege"..
 				" can protect up to %d areas"):format(
-					priv, max_count), max_size)
+					lpriv, lmax_count), lmax_size)
 		end
 		if self_prot then
 			if privs.areas then
