@@ -294,6 +294,8 @@ local function calculate_damage_multiplier(object)
 	end
 	if ag.radiation then
 		return 0.01 * ag.radiation
+	elseif armor_enabled then
+		return 0
 	end
 	if ag.fleshy then
 		return math.sqrt(0.01 * ag.fleshy)
@@ -309,7 +311,7 @@ local function calculate_object_center(object)
 end
 
 local function dmg_object(pos, object, strength)
-	local obj_pos = vector.add(object:getpos(), calculate_object_center(object))
+	local obj_pos = vector.add(object:get_pos(), calculate_object_center(object))
 	local mul
 	if armor_enabled or entity_damage then
 		-- we need to check may the object be damaged even if armor is disabled
@@ -338,7 +340,7 @@ local function dmg_abm(pos, node)
 	local max_dist = strength * rad_dmg_mult_sqrt
 	for _, o in pairs(minetest.get_objects_inside_radius(pos,
 			max_dist + abdomen_offset)) do
-		if entity_damage or o:is_player() then
+		if (entity_damage or o:is_player()) and o:get_hp() > 0 then
 			dmg_object(pos, o, strength)
 		end
 	end
@@ -513,4 +515,3 @@ if griefing then
 		end,
 	})
 end
-
