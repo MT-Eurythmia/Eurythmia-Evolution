@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/xban2.git
 	branch = master
-	commit = 3b700453651e7119c2c48c62d009ed2edf336c93
-	parent = 7e5779a947c92f17e386eb21dbe3bcd94351e9eb
+	commit = 37cdbf014e7ae37a5ef5266deeafc560f700cacf
+	parent = fff0ddf7ad571ba12a9dff14b180ec458130adce
 	method = merge
 	cmdver = 0.4.0
