@@ -431,14 +431,14 @@ if minetest.get_modpath("unified_inventory") then
 		if def.name == "home_gui_set" then
 			def.type = "image"
 			def.image = "ui_gohome_icon.png"
-			def.tooltip = unified_inventory.gettext("My Homes")
+			def.tooltip = "My Homes"
 			def.action = function(player)
 				h2omes.show_formspec_home(player:get_player_name())
 			end
 		elseif def.name == "home_gui_go" then
 			def.type = "image"
 			def.image = "ui_gohome_icon.png"
-			def.tooltip = unified_inventory.gettext("Go Home")
+			def.tooltip = "Go Home"
 			def.action = function(player)
 				h2omes.to_home(player:get_player_name(), player:get_player_name(), "home")
 			end
