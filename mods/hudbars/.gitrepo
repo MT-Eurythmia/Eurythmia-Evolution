@@ -6,7 +6,7 @@
 [subrepo]
 	remote = git://repo.or.cz/minetest_hudbars.git
 	branch = master
-	commit = ba21f47489ddecd691943ce5505db5d25d49ae07
-	parent = 78da3dafef552895d2087f6b390cc88fad716f12
+	commit = 99ebd71da74124ff1a32e65fabe859d3b189fbaf
+	parent = 8be7cb2a2cd45951d72b0dd16b3b7c3e9782942d
 	method = rebase
 	cmdver = 0.4.0
