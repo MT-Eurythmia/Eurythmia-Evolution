@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/MT-Eurythmia/pvpplus.git
 	branch = master
-	commit = b67fe9ea0dc478c222273e3c8f03a9e621c970d4
-	parent = 23a5060825525690ee3e0d5d67b076b4d76ae02f
+	commit = 06fd54342e93dfff3f7d877e7c67cdad222ef54f
+	parent = fb58db1c63cb582a0bb68e586e234dcd360b80d2
 	method = merge
 	cmdver = 0.4.0
