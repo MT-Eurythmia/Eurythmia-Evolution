@@ -25,7 +25,10 @@ stds.minetest = {
 }
 
 read_globals = {
+	"carts",
 	"farming",
+	"frame",
 	"intllib",
 	"mg",
+	"toolranks",
 }

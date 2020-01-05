@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/moreores.git
 	branch = master
-	commit = 564cb11ba6ae33f7df6fae33330eb81932c2906f
-	parent = 8d2d2469e3ccc76aec177bd841c751e853762b26
+	commit = 96ff162f51a1ccdeec75b1e134cd8ee45a886e7c
+	parent = 01d5a60d446e46b37198cc57f7f0f93f5745f4ca
 	method = merge
 	cmdver = 0.4.0
