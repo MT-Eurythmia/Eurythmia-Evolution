@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/throwing_arrows.git
 	branch = master
-	commit = 9e177d2712d9186c2989cb49de010675fe236354
-	parent = 1d359a0d3fe80d67a9c7a9395ad35530e6e15d69
+	commit = cdf173859658688a0093f993b768cf7c2d86d60d
+	parent = 11830e812f6ac3aa6ce1ffd0629787c858c2b9e1
 	method = merge
 	cmdver = 0.4.0

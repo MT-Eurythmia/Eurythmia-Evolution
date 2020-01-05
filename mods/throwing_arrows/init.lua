@@ -50,6 +50,25 @@ local function get_setting(name)
 	end
 end
 
+local last_punch_times = {}
+
+local function arrow_punch(object, hitter, caps)
+	local time_from_last_punch = caps.full_punch_interval or 1
+	local hitter_name = hitter:get_player_name()
+	local player_name = object:get_player_name()
+	if last_punch_times[hitter_name] then
+		if last_punch_times[hitter_name][player_name] then
+			time_from_last_punch = os.difftime(os.time(), last_punch_times[hitter_name][player_name])
+		end
+	else
+		last_punch_times[hitter_name] = {}
+	end
+	if time_from_last_punch >= (caps.full_punch_interval or 1) then
+		last_punch_times[hitter_name][player_name] = os.time()
+	end
+	object:punch(hitter, time_from_last_punch, caps)
+end
+
 if get_setting("arrow") then
 	throwing.register_arrow("throwing:arrow", {
 		itemcraft = "default:steel_ingot",
@@ -61,8 +80,9 @@ if get_setting("arrow") then
 		on_hit_sound = "throwing_arrow",
 		on_hit = function(self, pos, _, node, object, hitter)
 			if object then
-				object:punch(hitter, 1, {
-					full_punch_interval = 1,
+				arrow_punch(object, hitter, {
+					full_punch_interval = 0.7,
+					max_drop_level = 1,
 					damage_groups = {fleshy = 3}
 				})
 			elseif node then
@@ -84,9 +104,29 @@ if get_setting("golden_arrow") then
 		allow_protected = true,
 		on_hit_sound = "throwing_arrow",
 		on_hit = function(self, pos, _, _, object, hitter)
-			object:punch(hitter, 1, {
-				full_punch_interval = 1,
+			arrow_punch(object, hitter, {
+				full_punch_interval = 0.6,
+				max_drop_level = 1,
 				damage_groups = {fleshy = 5}
+			})
+		end
+	})
+end
+
+if get_setting("diamond_arrow") then
+	throwing.register_arrow("throwing:arrow_diamond", {
+		itemcraft = "default:diamond",
+		craft_quantity = 4,
+		description = "Diamond Arrow",
+		tiles = {"throwing_arrow_diamond.png", "throwing_arrow_diamond.png", "throwing_arrow_diamond_back.png", "throwing_arrow_diamond_front.png", "throwing_arrow_diamond_2.png", "throwing_arrow_diamond.png"},
+		target = throwing.target_object,
+		allow_protected = true,
+		on_hit_sound = "throwing_arrow",
+		on_hit = function(self, pos, _, _, object, hitter)
+			arrow_punch(object, hitter, {
+				full_punch_interval = 0.5,
+				max_drop_level = 1,
+				damage_groups = {fleshy = 7}
 			})
 		end
 	})
@@ -119,7 +159,7 @@ end
 
 if get_setting("teleport_arrow") then
 	throwing.register_arrow("throwing:arrow_teleport", {
-		itemcraft = "default:diamond",
+		itemcraft = "default:mese_crystal",
 		description = "Teleport Arrow",
 		tiles = {"throwing_arrow_teleport.png", "throwing_arrow_teleport.png", "throwing_arrow_teleport_back.png", "throwing_arrow_teleport_front.png", "throwing_arrow_teleport_2.png", "throwing_arrow_teleport.png"},
 		allow_protected = true,
@@ -130,11 +170,11 @@ if get_setting("teleport_arrow") then
 				return
 			end
 
-			if minetest.setting_getbool("throwing.allow_teleport_in_protected") == false then
+			if minetest.settings:get_bool("throwing.allow_teleport_in_protected") == false then
 				return false
 			end
 
-			hitter:moveto(last_pos)
+			hitter:move_to(last_pos)
 		end
 	})
 end
@@ -216,7 +256,7 @@ if get_setting("drop_arrow") then
 			minetest.item_drop(ItemStack(data.itemstack), hitter, last_pos)
 		end,
 		on_hit_fails = function(self, _, thrower, data)
-			if not minetest.setting_getbool("creative_mode") then
+			if not minetest.settings:get_bool("creative_mode") then
 				thrower:get_inventory():set_stack("main", data.index, data.itemstack)
 			end
 		end
