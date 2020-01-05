@@ -1,4 +1,4 @@
-local load_time_start = minetest.get_us_time()
+local path = minetest.get_modpath"vector_extras"
 
 local funcs = {}
 
@@ -398,6 +398,66 @@ end
 function funcs.from_number(i)
 	return {x=i, y=i, z=i}
 end
+
+local adammil_fill = dofile(path .. "/adammil_flood_fill.lua")
+function funcs.search_2d(go_test, x0, y0, allow_revisit, give_map)
+	marked_places = adammil_fill(go_test, x0, y0, allow_revisit)
+	if give_map then
+		return marked_places
+	end
+	local l = {}
+	for vi in pairs(marked_places) do
+		local x = (vi % 65536) - 32768
+		local y = (math.floor(x / 65536) % 65536) - 32768
+		l[#l+1] = {x, y}
+	end
+	return l
+end
+
+local fallings_search = dofile(path .. "/fill_3d.lua")
+local moves_touch = {
+	{x = -1, y = 0, z = 0},
+	{x = 0, y = 0, z = 0},
+	{x = 1, y = 0, z = 0},
+	{x = 0, y = -1, z = 0},
+	{x = 0, y = 1, z = 0},
+	{x = 0, y = 0, z = -1},
+	{x = 0, y = 0, z = 1},
+}
+local moves_near = {}
+for z = -1,1 do
+	for y = -1,1 do
+		for x = -1,1 do
+			moves_near[#moves_near+1] = {x = x, y = y, z = z}
+		end
+	end
+end
+
+function funcs.search_3d(can_go, startpos, apply_move, moves)
+	local visited = {}
+	local found = {}
+	local function on_visit(pos)
+		local vi = minetest.hash_node_position(pos)
+		if visited[vi] then
+			return false
+		end
+		visited[vi] = true
+		local valid_pos = can_go(pos)
+		if valid_pos then
+			found[#found+1] = pos
+		end
+		return valid_pos
+	end
+	if apply_move == "touch" then
+		apply_move = vector.add
+		moves = moves_touch
+	elseif apply_move == "near" then
+		apply_move = vector.add
+		moves = moves_near
+	end
+	fallings_search(on_visit, startpos, apply_move, moves)
+end
+
 
 local explosion_tables = {}
 function funcs.explosion_table(r)
@@ -961,7 +1021,6 @@ end
 
 vector_extras_functions = funcs
 
-local path = minetest.get_modpath"vector_extras"
 dofile(path .. "/legacy.lua")
 --dofile(minetest.get_modpath("vector_extras").."/vector_meta.lua")
 
@@ -975,13 +1034,4 @@ for name,func in pairs(funcs) do
 	else
 		vector[name] = func
 	end
-end
-
-
-local time = (minetest.get_us_time() - load_time_start) / 1000000
-local msg = "[vector_extras] loaded after ca. " .. time .. " seconds."
-if time > 0.01 then
-	print(msg)
-else
-	minetest.log("info", msg)
 end

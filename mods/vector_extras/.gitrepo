@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/HybridDog/vector_extras.git
 	branch = master
-	commit = 8d78f3cb9bcc24595817c054d721c32b3a0471bd
-	parent = 851e55d40525cd643a6e9f7e6d8ebe97a91981eb
+	commit = 9c6e53dd0a553a26fd451a88ec800cb23431243a
+	parent = 8ab5286c9573466c20f8f69c621a531b16944f4d
 	method = merge
 	cmdver = 0.4.0
