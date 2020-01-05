@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/moreblocks
 	branch = master
-	commit = b934d8ad4d6c4040afb469ee0977f81ee49b717f
-	parent = 00f408b773ab0f17b95be614020c9a6d61a80677
+	commit = bbfd7823002a3f464b53b5e4f7a422b8bc24529b
+	parent = 033cdc2e2e4dcc6dfcd4eacbc30afc13b182d1ec
 	method = merge
 	cmdver = 0.4.0
