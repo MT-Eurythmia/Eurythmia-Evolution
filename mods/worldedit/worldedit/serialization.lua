@@ -24,7 +24,7 @@ Serialization version history:
 -- @return Extra header fields as a list of strings, or nil if not supported.
 -- @return Content (data after header).
 function worldedit.read_header(value)
-	if value:find("^[0-9]+[%-:]") then
+	if value:find("^[0-9]+[,:]") then
 		local header_end = value:find(":", 1, true)
 		local header = value:sub(1, header_end - 1):split(",")
 		local version = tonumber(header[1])
@@ -196,7 +196,7 @@ end
 -- @return The number of nodes.
 function worldedit.allocate(origin_pos, value)
 	local nodes = load_schematic(value)
-	if not nodes then return nil end
+	if not nodes or #nodes == 0 then return nil end
 	return worldedit.allocate_with_nodes(origin_pos, nodes)
 end
 
@@ -227,6 +227,7 @@ end
 function worldedit.deserialize(origin_pos, value)
 	local nodes = load_schematic(value)
 	if not nodes then return nil end
+	if #nodes == 0 then return #nodes end
 
 	local pos1, pos2 = worldedit.allocate_with_nodes(origin_pos, nodes)
 	worldedit.keep_loaded(pos1, pos2)
