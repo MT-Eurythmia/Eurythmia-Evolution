@@ -35,6 +35,7 @@ functions needed for the mob to work properly which contains the following:
                    otherwise they amble onwards.
    'walk_velocity' is the speed that your mob can walk around.
    'run_velocity'  is the speed your mob can run with, usually when attacking.
+   'stand_chance'  has a 0-100 chance value your mob will stand from walking.
    'walk_chance'   has a 0-100 chance value your mob will walk from standing,
                    set to 0 for jumping mobs only.
    'jump'          when true allows your mob to jump updwards.
@@ -157,6 +158,11 @@ functions needed for the mob to work properly which contains the following:
       'min'    minimum number of items dropped, set to 0 for rare drops.
       'max'    maximum number of items dropped.
    Note: If weapon has {fire=1} damage group set then cooked items will drop.
+   Note2: A function can now be passed which can also return drops table, e.g.
+      drops = function(pos)
+         -- do something
+         return { {name = "farming:bread"}, {name = "default:dirt", chance = 2} }
+      end
 
    'visual'            holds the look of the mob you wish to create:
       'cube'           looks like a normal node
@@ -575,7 +581,7 @@ Certain variables need to be set before using the above functions:
    'self.driver_scale'      sets driver scale for mobs larger than {x=1, y=1}
 
 
-mobs:line_of_sight(self, pos1, pos2, stepsize)
+mobs:line_of_sight(self, pos1, pos2, stepsize) [DEPRECATED]
 
 This function is for use within the mobs definition for special use cases and
 returns true if a mob can see the player or victim.
@@ -584,6 +590,10 @@ returns true if a mob can see the player or victim.
    'pos1' position of mob
    'pos2' position of vistim or player
    'stepsize' usually set to 1
+
+Use this instead:
+
+    mob_class:line_of_sight(pos1, pos2, stepsize)
 
 
 External Settings for "minetest.conf"
@@ -619,8 +629,14 @@ Players can override the spawn chance for each mob registered by adding a line
 to their minetest.conf file with a new value, the lower the value the more each
 mob will spawn e.g.
 
-mobs_animal:sheep_chance 11000
-mobs_monster:sand_monster_chance 100
+mobs_animal:sheep 11000
+mobs_monster:sand_monster 100
+
+...you can also change how many of a certain mob appear in an active mapblock by
+adding a comma and then a new value e.g.
+
+mobs_animal:cow 8000,4            <-- 4 cows per mapblock at 8000 spawn chance
+mobs_monster:dirt_monster ,20     <-- 20 dirt monsters per mapblock
 
 
 Rideable Horse Example Mob
@@ -632,7 +648,7 @@ mobs:register_mob("mob_horse:horse", {
 	visual_size = {x = 1.20, y = 1.20},
 	mesh = "mobs_horse.x",
 	collisionbox = {-0.4, -0.01, -0.4, 0.4, 1.25, 0.4},
-	animation = { 
+	animation = {
 		speed_normal = 15,
 		speed_run = 30,
 		stand_start = 25,
