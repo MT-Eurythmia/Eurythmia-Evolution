@@ -209,10 +209,45 @@ for i in ipairs(moretrees.treelist) do
 
 			end
 		end
+
+		if moretrees.enable_fences then
+			local planks_name = "moretrees:" .. treename .. "_planks"
+			local planks_tile = "moretrees_" .. treename .. "_wood.png"
+			default.register_fence("moretrees:" .. treename .. "_fence", {
+				description = S(treedesc.." Fence"),
+				texture = planks_tile,
+				inventory_image = "default_fence_overlay.png^" .. planks_tile ..
+										"^default_fence_overlay.png^[makealpha:255,126,126",
+				wield_image = "default_fence_overlay.png^" .. planks_tile ..
+										"^default_fence_overlay.png^[makealpha:255,126,126",
+				material = planks_name,
+				groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+				sounds = default.node_sound_wood_defaults()
+			})
+			default.register_fence_rail("moretrees:" .. treename .. "_fence_rail", {
+				description = S(treedesc.." Fence Rail"),
+				texture = planks_tile,
+				inventory_image = "default_fence_rail_overlay.png^" .. planks_tile ..
+										"^default_fence_rail_overlay.png^[makealpha:255,126,126",
+				wield_image = "default_fence_rail_overlay.png^" .. planks_tile ..
+										"^default_fence_rail_overlay.png^[makealpha:255,126,126",
+				material = planks_name,
+				groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+				sounds = default.node_sound_wood_defaults()
+			})
+			if minetest.global_exists("doors") then
+				doors.register_fencegate("moretrees:" .. treename .. "_gate", {
+					description = S(treedesc .. " Fence Gate"),
+					texture = planks_tile,
+					material = planks_name,
+					groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2}
+				})
+			end
+		end
 	end
 
 	minetest.register_node("moretrees:"..treename.."_sapling_ongen", {
-		description = S(treedesc.." Sapling (on-generated)"),
+		description = S(treedesc.." Sapling (fast growth)"),
 		drawtype = "plantlike",
 		tiles = {saptex},
 		inventory_image = saptex,
@@ -224,7 +259,7 @@ for i in ipairs(moretrees.treelist) do
 			type = "fixed",
 			fixed = {-0.3, -0.5, -0.3, 0.3, 0.35, 0.3}
 		},
-		groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1,not_in_creative_inventory=1,sapling=1},
+		groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1,sapling=1},
 		sounds = default.node_sound_defaults(),
 		drop = "moretrees:"..treename.."_sapling"
 	})
@@ -360,6 +395,7 @@ end
 -- we need our own copy of that node, which moretrees will match against.
 
 local jungle_tree = table.copy(minetest.registered_nodes["default:jungletree"])
+jungle_tree.drop = "default:jungletree"
 minetest.register_node("moretrees:jungletree_trunk", jungle_tree)
 
 default.register_leafdecay({
@@ -404,7 +440,7 @@ default.register_leafdecay({
 
 
 if moretrees.enable_redefine_apple then
-	local appledef = moretrees.clone_node("default:apple")
+	local appledef = table.copy(minetest.registered_nodes["default:apple"])
 	appledef.groups.attached_node = 1
 	minetest.register_node(":default:apple", appledef)
 end
