@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/HybridDog/treecapitator.git
 	branch = master
-	commit = bf93f8c08d47bbf3ae8553355a207b2494160067
-	parent = 914df7f531e2e1738397a398a5a562dc5dec9f65
+	commit = 388b16b409c58e1c67c5c8b534a5d4daf16b86c9
+	parent = 9c98e1810e19072843d91aafb5c0064cfb1ce3ec
 	method = merge
 	cmdver = 0.4.0
