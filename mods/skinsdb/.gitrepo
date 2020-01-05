@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/skinsdb.git
 	branch = master
-	commit = a945db9de33e803489ba0243d7da50b5112f8c4a
-	parent = 64f994da3aac825fe125dec9397037efb1622eaa
+	commit = 8054293c2c7617c503fc1c15005f74f063e0e71f
+	parent = 7dd306866da00b18704652f05feebb3dd8a8cc77
 	method = merge
 	cmdver = 0.4.0
