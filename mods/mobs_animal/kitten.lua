@@ -13,6 +13,7 @@ attack_type = "dogfight",
 attack_animals = true, -- so it can attack rat
 attack_players = false,
 reach = 1,
+stepheight = 1.1,
 	passive = false,
 	hp_min = 5,
 	hp_max = 10,

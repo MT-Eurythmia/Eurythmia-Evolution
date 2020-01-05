@@ -1,7 +1,7 @@
 
 local S = mobs.intllib
 
--- Bee by KrupnoPavel
+-- Bee by KrupnoPavel (.b3d model by sirrobzeroone)
 
 mobs:register_mob("mobs_animal:bee", {
 	type = "animal",
@@ -11,7 +11,7 @@ mobs:register_mob("mobs_animal:bee", {
 	armor = 200,
 	collisionbox = {-0.2, -0.01, -0.2, 0.2, 0.5, 0.2},
 	visual = "mesh",
-	mesh = "mobs_bee.x",
+	mesh = "mobs_bee.b3d",
 	textures = {
 		{"mobs_bee.png"},
 	},
@@ -20,7 +20,7 @@ mobs:register_mob("mobs_animal:bee", {
 	makes_footstep_sound = false,
 	sounds = {
 		random = "mobs_bee",
-	},	
+	},
 	walk_velocity = 1,
 	jump = true,
 	drops = {
@@ -57,7 +57,7 @@ mobs:spawn({
 	day_toggle = true,
 })
 
-mobs:register_egg("mobs_animal:bee", S("Bee"), "mobs_bee_inv.png", 0)
+mobs:register_egg("mobs_animal:bee", S("Bee"), "mobs_bee_inv.png")
 
 -- compatibility
 mobs:alias_mob("mobs:bee", "mobs_animal:bee")
