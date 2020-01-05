@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://gitlab.com/VanessaE/biome_lib
+	branch = master
+	commit = a96f015ce9bcbed39f23dfe03e85ac2e9b3b31b4
+	parent = c6edab469cb2fbdec147ad1e35d4a7eb97116220
+	method = merge
+	cmdver = 0.4.0
