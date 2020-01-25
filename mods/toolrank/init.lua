@@ -37,18 +37,26 @@ function toolranks.create_description(name, uses, level)
 end
 
 function toolranks.get_level(uses)
-  if uses <= 200 then
+  if uses <= 250 then
     return 1
-  elseif uses < 400 then
+  elseif uses < 500 then
     return 2
   elseif uses < 1000 then
     return 3
-  elseif uses < 2000 then
+  elseif uses < 2500 then
     return 4
-  elseif uses < 3200 then
+  elseif uses < 5000 then
     return 5
-  else
+  elseif uses < 10000 then
     return 6
+  elseif uses < 25000 then
+    return 7
+  elseif uses < 50000 then
+    return 8
+  elseif uses < 100000 then
+    return 9
+  else
+    return 10
   end
 end
 
@@ -61,7 +69,7 @@ function toolranks.new_afteruse(itemstack, user, node, digparams)
                                                                     -- on the last dig
   local most_digs = mod_storage:get_int("most_digs") or 0
   local most_digs_user = mod_storage:get_string("most_digs_user") or 0
-  
+
   -- Only count nodes that spend the tool
   if(digparams.wear > 0) then
    dugnodes = dugnodes + 1
@@ -71,7 +79,7 @@ function toolranks.new_afteruse(itemstack, user, node, digparams)
     most_digs = dugnodes
     if(most_digs_user ~= user:get_player_name()) then -- Avoid spam.
       most_digs_user = user:get_player_name()
-      minetest.chat_send_all("Most used tool is now a " .. toolranks.colors.green .. itemdesc 
+      minetest.chat_send_all("Most used tool is now a " .. toolranks.colors.green .. itemdesc
                              .. toolranks.colors.white .. " owned by " .. user:get_player_name()
                              .. " with " .. dugnodes .. " uses.")
     end
