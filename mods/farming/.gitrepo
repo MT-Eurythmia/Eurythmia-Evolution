@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://notabug.org/TenPlus1/farming.git
+	branch = master
+	commit = 02d10c376e593053a6f7dd837b4b48b04e6a3231
+	parent = a00b4a7b860fee5b4edc5456fba4d17fd10b12c7
+	method = merge
+	cmdver = 0.4.0
