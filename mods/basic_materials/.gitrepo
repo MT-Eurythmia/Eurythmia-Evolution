@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://gitlab.com/VanessaE/basic_materials.git
 	branch = master
-	commit = 78d8cfc942cbb0fc35ba1ae023fd03661fcdde20
-	parent = d5dd067a0f33492dd1ff216a56039bf0e9fc3970
+	commit = 78a9b38f556a42260de3095f259b1b69a57cdbad
+	parent = 2b463d1719905210847bb792444dbdcea9857e33
 	method = merge
 	cmdver = 0.4.0
