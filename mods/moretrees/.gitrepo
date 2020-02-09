@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://gitlab.com/VanessaE/moretrees.git
 	branch = master
-	commit = 6fd37296697069e01f2b05d8eecfbb53a0a6d0e0
-	parent = f7a0b0a85b2cc50f2f27b3ad042bbbfa84d888b0
+	commit = d335eceecc79615764178914e001287b02e5327d
+	parent = ef52fde10065b6139297598942027f0827feb322
 	method = merge
 	cmdver = 0.4.0
