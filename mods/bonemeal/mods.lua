@@ -5,7 +5,7 @@ if minetest.get_modpath("animalmaterials") then
 	minetest.register_craft({
 		type = "shapeless",
 		output = "bonemeal:bonemeal 2",
-		recipe = {"animalmaterials:bone"},
+		recipe = {"animalmaterials:bone"}
 	})
 end
 
@@ -38,7 +38,7 @@ if farming and farming.mod and farming.mod == "redo" then
 		{"farming:beetroot_", 5},
 		{"farming:rye_", 8},
 		{"farming:oat_", 8},
-		{"farming:rice_", 8},
+		{"farming:rice_", 8}
 	})
 end
 
@@ -47,7 +47,7 @@ if minetest.get_modpath("ethereal") then
 
 	bonemeal:add_crop({
 		{"ethereal:strawberry_", 8},
-		{"ethereal:onion_", 5},
+		{"ethereal:onion_", 5}
 	})
 
 	bonemeal:add_sapling({
@@ -63,7 +63,7 @@ if minetest.get_modpath("ethereal") then
 		{"ethereal:orange_tree_sapling", ethereal.grow_orange_tree, "soil"},
 		{"ethereal:bamboo_sprout", ethereal.grow_bamboo_tree, "soil"},
 		{"ethereal:birch_sapling", ethereal.grow_birch_tree, "soil"},
-		{"ethereal:sakura_sapling", ethereal.grow_sakura_tree, "soil"},
+		{"ethereal:sakura_sapling", ethereal.grow_sakura_tree, "soil"}
 	})
 
 	local grass = {"default:grass_3", "default:grass_4", "default:grass_5", ""}
@@ -79,7 +79,7 @@ if minetest.get_modpath("ethereal") then
 		{"ethereal:mushroom_dirt", {}, {"flowers:mushroom_red", "flowers:mushroom_brown", "", "", ""}},
 		{"ethereal:jungle_dirt", grass, {"default:junglegrass", "", "", ""}},
 		{"ethereal:grove_dirt", grass, {"ethereal:fern", "", "", ""}},
-		{"ethereal:bamboo_dirt", grass, {}},
+		{"ethereal:bamboo_dirt", grass, {}}
 	})
 end
 
@@ -115,13 +115,13 @@ if minetest.get_modpath("moretrees") then
 		{"moretrees:poplar_sapling", moretrees.spawn_poplar_object, "soil"},
 		{"moretrees:willow_sapling", moretrees.spawn_willow_object, "soil"},
 		{"moretrees:rubber_tree_sapling", moretrees.spawn_rubber_tree_object, "soil"},
-		{"moretrees:fir_sapling", fir_grow, "soil"},
+		{"moretrees:fir_sapling", fir_grow, "soil"}
 	})
 
 elseif minetest.get_modpath("technic_worldgen") then
 
 	bonemeal:add_sapling({
-		{"moretrees:rubber_tree_sapling", technic.rubber_tree_model, "soil"},
+		{"moretrees:rubber_tree_sapling", technic.rubber_tree_model, "soil"}
 	})
 end
 
@@ -138,6 +138,6 @@ if minetest.get_modpath("caverealms") then
 	end
 
 	bonemeal:add_sapling({
-		{"caverealms:mushroom_sapling", add_shroom, "soil"},
+		{"caverealms:mushroom_sapling", add_shroom, "soil"}
 	})
 end

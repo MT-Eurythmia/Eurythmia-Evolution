@@ -1,9 +1,13 @@
 
 bonemeal = {}
 
+local path = minetest.get_modpath("bonemeal")
+local table_insert = table.insert
+local min, max, random = math.min, math.max, math.random
+
+
 -- Load support for intllib.
-local MP = minetest.get_modpath(minetest.get_current_modname())
-local S, NS = dofile(MP .. "/intllib.lua")
+local S, NS = dofile(path .. "/intllib.lua")
 
 
 -- creative check
@@ -16,7 +20,7 @@ end
 -- default crops
 local crops = {
 	{"farming:cotton_", 8, "farming:seed_cotton"},
-	{"farming:wheat_", 8, "farming:seed_wheat"},
+	{"farming:wheat_", 8, "farming:seed_wheat"}
 }
 
 
@@ -45,7 +49,7 @@ local saplings = {
 	{"default:acacia_bush_sapling", default.grow_acacia_bush, "soil"},
 	{"default:large_cactus_seedling", default.grow_large_cactus, "sand"},
 	{"default:blueberry_bush_sapling", default.grow_blueberry_bush, "soil"},
-	{"default:pine_bush_sapling", default.grow_pine_bush, "soil"},
+	{"default:pine_bush_sapling", default.grow_pine_bush, "soil"}
 }
 
 -- helper tables ( "" denotes a blank item )
@@ -59,15 +63,14 @@ local dry_grass = {
 	"default:dry_grass_5", "", ""
 }
 
-local flowers = {
-	"flowers:dandelion_white", "flowers:dandelion_yellow", "flowers:geranium",
-	"flowers:rose", "flowers:tulip", "flowers:viola", ""
-}
+-- add all in-game flowers except waterlily
+local flowers = {}
 
--- 5.0 flower check
-if minetest.registered_nodes["flowers:tulip_black"] then
-	flowers[#flowers + 1] = "flowers:tulip_black"
-	flowers[#flowers + 1] = "flowers:chrysanthemum_green"
+for node, def in pairs(minetest.registered_nodes) do
+
+	if def.groups.flower and not node:find("waterlily") then
+		flowers[#flowers + 1] = node
+	end
 end
 
 -- add additional bakedclay flowers if enabled
@@ -107,7 +110,7 @@ local function particle_effect(pos)
 		maxexptime = 1,
 		minsize = 1,
 		maxsize = 3,
-		texture = "bonemeal_particle.png",
+		texture = "bonemeal_particle.png"
 	})
 end
 
@@ -191,7 +194,7 @@ local function check_crops(pos, nodename, strength)
 	-- grow registered crops
 	for n = 1, #crops do
 
-		if string.find(nodename, crops[n][1])
+		if nodename:find(crops[n][1])
 		or nodename == crops[n][3] then
 
 			-- separate mod and node name
@@ -200,7 +203,7 @@ local function check_crops(pos, nodename, strength)
 
 			-- get stage number or set to 0 for seed
 			stage = tonumber( crop:split("_")[2] ) or 0
-			stage = math.min(stage + strength, crops[n][2])
+			stage = min(stage + strength, crops[n][2])
 
 			-- check for place_param setting
 			nod = crops[n][1] .. stage
@@ -222,7 +225,7 @@ local function check_soil(pos, nodename, strength)
 
 	-- set radius according to strength
 	local side = strength - 1
-	local tall = math.max(strength - 2, 0)
+	local tall = max(strength - 2, 0)
 	local floor
 	local groups = minetest.registered_items[nodename]
 		and minetest.registered_items[nodename].groups or {}
@@ -264,17 +267,17 @@ local function check_soil(pos, nodename, strength)
 
 		pos2.y = pos2.y + 1
 
-		if math.random(1, 5) == 5 then
+		if random(5) == 5 then
 			if decor and #decor > 0 then
 				-- place random decoration (rare)
 				local dnum = #decor or 1
-				nod = decor[math.random(1, dnum)] or ""
+				nod = decor[random(dnum)] or ""
 			end
 		else
 			if grass and #grass > 0 then
 				-- place random grass (common)
 				local dgra = #grass or 1
-				nod = #grass > 0 and grass[math.random(1, dgra)] or ""
+				nod = #grass > 0 and grass[random(dgra)] or ""
 			end
 		end
 
@@ -299,7 +302,7 @@ end
 function bonemeal:add_sapling(list)
 
 	for n = 1, #list do
-		table.insert(saplings, list[n])
+		table_insert(saplings, list[n])
 	end
 end
 
@@ -310,7 +313,7 @@ end
 function bonemeal:add_crop(list)
 
 	for n = 1, #list do
-		table.insert(crops, list[n])
+		table_insert(crops, list[n])
 	end
 end
 
@@ -330,11 +333,11 @@ function bonemeal:add_deco(list)
 			if list[l][1] == deco[n][1] then
 
 				-- adding grass types
-				for _,extra in ipairs(list[l][2]) do
+				for _,extra in pairs(list[l][2]) do
 
 					if extra ~= "" then
 
-						for __,entry in ipairs(deco[n][2]) do
+						for _,entry in pairs(deco[n][2]) do
 
 							if extra == entry then
 								extra = false
@@ -344,7 +347,7 @@ function bonemeal:add_deco(list)
 					end
 
 					if extra then
-						table.insert(deco[n][2], extra)
+						table_insert(deco[n][2], extra)
 					end
 				end
 
@@ -353,7 +356,7 @@ function bonemeal:add_deco(list)
 
 					if extra ~= "" then
 
-						for __,entry in ipairs(deco[n][3]) do
+						for __,entry in pairs(deco[n][3]) do
 
 							if extra == entry then
 								extra = false
@@ -363,7 +366,7 @@ function bonemeal:add_deco(list)
 					end
 
 					if extra then
-						table.insert(deco[n][3], extra)
+						table_insert(deco[n][3], extra)
 					end
 				end
 
@@ -373,7 +376,7 @@ function bonemeal:add_deco(list)
 		end
 
 		if list[l] then
-			table.insert(deco, list[l])
+			table_insert(deco, list[l])
 		end
 	end
 end
@@ -397,7 +400,7 @@ function bonemeal:set_deco(list)
 		end
 
 		if list[l] then
-			table.insert(deco, list[l])
+			table_insert(deco, list[l])
 		end
 	end
 end
@@ -416,8 +419,8 @@ function bonemeal:on_use(pos, strength, node)
 
 	-- make sure strength is between 1 and 4
 	strength = strength or 1
-	strength = math.max(strength, 1)
-	strength = math.min(strength, 4)
+	strength = max(strength, 1)
+	strength = min(strength, 4)
 
 	-- papyrus and cactus
 	if node.name == "default:papyrus" then
@@ -448,7 +451,7 @@ function bonemeal:on_use(pos, strength, node)
 
 	-- check for tree growth if pointing at sapling
 --	if minetest.get_item_group(node.name, "sapling") > 0
-	if math.random(1, (5 - strength)) == 1 then
+	if random(5 - strength) == 1 then
 		check_sapling(pos, node.name)
 		return
 	end
@@ -487,7 +490,7 @@ minetest.register_craftitem("bonemeal:mulch", {
 		bonemeal:on_use(pointed_thing.under, 1)
 
 		return itemstack
-	end,
+	end
 })
 
 
@@ -517,7 +520,7 @@ minetest.register_craftitem("bonemeal:bonemeal", {
 		bonemeal:on_use(pointed_thing.under, 2)
 
 		return itemstack
-	end,
+	end
 })
 
 
@@ -547,21 +550,21 @@ minetest.register_craftitem("bonemeal:fertiliser", {
 		bonemeal:on_use(pointed_thing.under, 3)
 
 		return itemstack
-	end,
+	end
 })
 
 
 -- bone
 minetest.register_craftitem("bonemeal:bone", {
 	description = S("Bone"),
-	inventory_image = "bonemeal_bone.png",
+	inventory_image = "bonemeal_bone.png"
 })
 
 -- gelatin powder
 minetest.register_craftitem("bonemeal:gelatin_powder", {
 	description = S("Gelatin Powder"),
 	inventory_image = "bonemeal_gelatin_powder.png",
-	groups = {food_gelatin = 1, flammable = 2},
+	groups = {food_gelatin = 1, flammable = 2}
 })
 
 
@@ -577,28 +580,28 @@ minetest.register_craft({
 	},
 	replacements = {
 		{"bucket:bucket_water", "bucket:bucket_empty 5"},
-	},
+	}
 })
 
 -- bonemeal (from bone)
 minetest.register_craft({
 	type = "shapeless",
 	output = "bonemeal:bonemeal 2",
-	recipe = {"bonemeal:bone"},
+	recipe = {"bonemeal:bone"}
 })
 
 -- bonemeal (from player bones)
 minetest.register_craft({
 	type = "shapeless",
 	output = "bonemeal:bonemeal 4",
-	recipe = {"bones:bones"},
+	recipe = {"bones:bones"}
 })
 
 -- bonemeal (from coral skeleton)
 minetest.register_craft({
 	type = "shapeless",
 	output = "bonemeal:bonemeal 2",
-	recipe = {"default:coral_skeleton"},
+	recipe = {"default:coral_skeleton"}
 })
 
 -- mulch
@@ -609,14 +612,14 @@ minetest.register_craft({
 		"group:tree", "group:leaves", "group:leaves",
 		"group:leaves", "group:leaves", "group:leaves",
 		"group:leaves", "group:leaves", "group:leaves"
-	},
+	}
 })
 
 -- fertiliser
 minetest.register_craft({
 	type = "shapeless",
 	output = "bonemeal:fertiliser 2",
-	recipe = {"bonemeal:bonemeal", "bonemeal:mulch"},
+	recipe = {"bonemeal:bonemeal", "bonemeal:mulch"}
 })
 
 
@@ -627,10 +630,10 @@ minetest.override_item("default:dirt", {
 		items = {
 			{
 				items = {"bonemeal:bone"},
-				rarity = 30,
+				rarity = 30
 			},
 			{
-				items = {"default:dirt"},
+				items = {"default:dirt"}
 			}
 		}
 	},
@@ -638,8 +641,6 @@ minetest.override_item("default:dirt", {
 
 
 -- add support for other mods
-local path = minetest.get_modpath("bonemeal")
-
 dofile(path .. "/mods.lua")
 dofile(path .. "/lucky_block.lua")
 
