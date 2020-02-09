@@ -14,6 +14,8 @@ dofile(MP.."/label.lua")
 dofile(MP.."/border.lua")
 dofile(MP.."/legacy.lua")
 dofile(MP.."/privs.lua")
+dofile(MP.."/show_waypoint.lua")
+dofile(MP.."/search.lua")
 
 
 -- optional mapserver-bridge stuff below
@@ -52,6 +54,10 @@ if http then
 	print("[Mapserver] starting mapserver-bridge with endpoint: " .. mapserver_url)
 	dofile(MP .. "/bridge/init.lua")
 
+	-- enable ingame map-search
+	mapserver.search_init(http, mapserver_url)
+
+	-- initialize bridge
 	mapserver.bridge_init(http, mapserver_url, mapserver_key)
 
 else
