@@ -6,7 +6,7 @@ local use_cmi = minetest.global_exists("cmi")
 
 mobs = {
 	mod = "redo",
-	version = "20191116",
+	version = "20200207",
 	intllib = S,
 	invis = minetest.global_exists("invisibility") and invisibility or {}
 }
@@ -230,10 +230,11 @@ function mob_class:set_velocity(v)
 
 	local yaw = (self.object:get_yaw() or 0) + self.rotate
 
+	-- set velocity with hard limit of 10
 	self.object:set_velocity({
-		x = (sin(yaw) * -v) + c_x,
-		y = self.object:get_velocity().y,
-		z = (cos(yaw) * v) + c_y
+		x = max(-10, min((sin(yaw) * -v) + c_x, 10)),
+		y = max(-10, min(self.object:get_velocity().y, 10)),
+		z = max(-10, min((cos(yaw) * v) + c_y, 10))
 	})
 end
 
@@ -1338,17 +1339,22 @@ function mob_class:replace(pos)
 
 -- print ("replace node = ".. minetest.get_node(pos).name, pos.y)
 
-		local oldnode = {name = what}
-		local newnode = {name = with}
-		local on_replace_return
-
 		if self.on_replace then
-			on_replace_return = self:on_replace(pos, oldnode, newnode)
+
+			local oldnode = what
+			local newnode = with
+
+			-- convert any group: replacements to actual node name
+			if oldnode:find("group:") then
+				oldnode = minetest.get_node(pos).name
+			end
+
+			if self:on_replace(pos, oldnode, newnode) == false then
+				return
+			end
 		end
 
-		if on_replace_return ~= false then
-			minetest.set_node(pos, {name = with})
-		end
+		minetest.set_node(pos, {name = with})
 	end
 end
 
@@ -3290,6 +3296,7 @@ minetest.register_entity(name, setmetatable({
 	jump_height = def.jump_height,
 	drawtype = def.drawtype, -- DEPRECATED, use rotate instead
 	rotate = math.rad(def.rotate or 0), --  0=front, 90=side, 180=back, 270=side2
+	glow = def.glow,
 	lifetimer = def.lifetimer,
 	hp_min = max(1, (def.hp_min or 5) * difficulty),
 	hp_max = max(1, (def.hp_max or 10) * difficulty),
@@ -4261,13 +4268,17 @@ function mobs:alias_mob(old_name, new_name)
 
 		physical = false,
 
-		on_activate = function(self)
+		on_activate = function(self, staticdata)
 
 			if minetest.registered_entities[new_name] then
-				minetest.add_entity(self.object:get_pos(), new_name)
+				minetest.add_entity(self.object:get_pos(), new_name, staticdata)
 			end
 
 			self.object:remove()
+		end,
+
+		get_staticdata = function(self)
+			return self
 		end
 	})
 end
