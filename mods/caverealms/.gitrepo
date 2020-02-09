@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/HeroOfTheWinds/minetest-caverealms.git
+	branch = master
+	commit = 9ab6487c553e87a8873cc44c632e51c712e591f5
+	parent = 66ce47a0b0b3abf54bcb3309f5b4a8aef2d53bda
+	method = merge
+	cmdver = 0.4.0
