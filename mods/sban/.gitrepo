@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/shivajiva101/sban.git
 	branch = master
-	commit = ca8a38bdf0526946fee559f6198e69d810cfb048
-	parent = cc30f6b2f59bff60597950e353f6b6959e1863aa
+	commit = e034f17c5f092f51a38fc2cd15a245f20f95c21f
+	parent = dc3fbccb9aeee9b489951fbb1a025d0a28040f1d
 	method = merge
 	cmdver = 0.4.0
