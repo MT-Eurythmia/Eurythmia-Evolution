@@ -629,3 +629,8 @@ minetest.register_on_joinplayer(function(player)
 		height = 150
 	})
 end)
+
+--[[
+Xdecor chess
+]]
+dofile(minetest.get_modpath("misc").."/chess.lua")
