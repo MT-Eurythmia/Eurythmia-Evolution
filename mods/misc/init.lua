@@ -634,3 +634,15 @@ end)
 Xdecor chess
 ]]
 dofile(minetest.get_modpath("misc").."/chess.lua")
+
+--[[
+Make salt craftable
+]]
+if minetest.get_modpath("farming") then
+	minetest.clear_craft({output = "bucket:bucket_river_water"})
+	minetest.register_craft({
+		type = "shapeless",
+		output = "bucket:bucket_river_water",
+		recipe = {"bucket:bucket_water"}
+	})
+end
