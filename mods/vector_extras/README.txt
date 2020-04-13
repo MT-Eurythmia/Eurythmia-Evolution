@@ -1,2 +1,5 @@
 TODO:
-— maybe make the explosion table function return a perlin explosion table
+* maybe make the explosion table function return a perlin explosion table
+* Figure out and implement 3D scanline search
+* Add vector.hollowsphere, less positions than WorldEdit hollowsphere
+* Add unit tests
