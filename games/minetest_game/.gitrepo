@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest/minetest_game.git
 	branch = stable-5
-	commit = 0a9e24622fe35a233e96ca2dfbce09def321d424
-	parent = 92cf9e5ded0a194211aef1772c7fe40cb39fbe3a
+	commit = dcb3df0a38be9599b32538f24e383e5d6ef81606
+	parent = d5c132a9353b512b315d35981972c420bd27e87e
 	method = rebase
-	cmdver = 0.4.0
+	cmdver = 0.4.1
