@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://notabug.org/TenPlus1/ethereal.git
 	branch = master
-	commit = 4a19552fe42d76c1a01be743a15014c303da2bcf
+	commit = 94f52e9fd7cd138938c1e7d742f523ed3c7abc50
 	parent = 4b73f3cec464a202bb5132d7a4165adbff30ebbb
 	method = rebase
-	cmdver = 0.4.0
+	cmdver = 0.4.1
