@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/Uberi/Minetest-WorldEdit.git
 	branch = master
-	commit = da51c688d28be0cf53a03d263bc3f17c56cc74ae
-	parent = f82a0af9b01dc220c7fa1a343f6194cd88d51523
+	commit = 0f5dcc790d4eedf6a730c47aaf755b7a699be667
+	parent = 5ce481474703f4756625daa448a9f7f14468c84d
 	method = merge
-	cmdver = 0.4.0
+	cmdver = 0.4.1

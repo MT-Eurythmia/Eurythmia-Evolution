@@ -3,7 +3,7 @@ worldedit.marker2 = {}
 worldedit.marker_region = {}
 
 --marks worldedit region position 1
-worldedit.mark_pos1 = function(name)
+worldedit.mark_pos1 = function(name, region_too)
 	local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
 
 	if pos1 ~= nil then
@@ -22,11 +22,13 @@ worldedit.mark_pos1 = function(name)
 			worldedit.marker1[name]:get_luaentity().player_name = name
 		end
 	end
-	worldedit.mark_region(name)
+	if region_too == nil or region_too then
+		worldedit.mark_region(name)
+	end
 end
 
 --marks worldedit region position 2
-worldedit.mark_pos2 = function(name)
+worldedit.mark_pos2 = function(name, region_too)
 	local pos1, pos2 = worldedit.pos1[name], worldedit.pos2[name]
 
 	if pos2 ~= nil then
@@ -45,7 +47,9 @@ worldedit.mark_pos2 = function(name)
 			worldedit.marker2[name]:get_luaentity().player_name = name
 		end
 	end
-	worldedit.mark_region(name)
+	if region_too == nil or region_too then
+		worldedit.mark_region(name)
+	end
 end
 
 worldedit.mark_region = function(name)
@@ -111,6 +115,13 @@ worldedit.mark_region = function(name)
 	end
 end
 
+--convenience function that calls everything
+worldedit.marker_update = function(name)
+	worldedit.mark_pos1(name, false)
+	worldedit.mark_pos2(name, false)
+	worldedit.mark_region(name)
+end
+
 minetest.register_entity(":worldedit:pos1", {
 	initial_properties = {
 		visual = "cube",
@@ -129,6 +140,9 @@ minetest.register_entity(":worldedit:pos1", {
 	on_punch = function(self, hitter)
 		self.object:remove()
 		worldedit.marker1[self.player_name] = nil
+	end,
+	on_blast = function(self, damage)
+		return false, false, {} -- don't damage or knockback
 	end,
 })
 
@@ -150,6 +164,9 @@ minetest.register_entity(":worldedit:pos2", {
 	on_punch = function(self, hitter)
 		self.object:remove()
 		worldedit.marker2[self.player_name] = nil
+	end,
+	on_blast = function(self, damage)
+		return false, false, {} -- don't damage or knockback
 	end,
 })
 
@@ -175,6 +192,9 @@ minetest.register_entity(":worldedit:region_cube", {
 			entity:remove()
 		end
 		worldedit.marker_region[self.player_name] = nil
+	end,
+	on_blast = function(self, damage)
+		return false, false, {} -- don't damage or knockback
 	end,
 })
 
