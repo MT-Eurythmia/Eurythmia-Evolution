@@ -6,7 +6,7 @@ local use_cmi = minetest.global_exists("cmi")
 
 mobs = {
 	mod = "redo",
-	version = "20200207",
+	version = "20200412",
 	intllib = S,
 	invis = minetest.global_exists("invisibility") and invisibility or {}
 }
@@ -230,10 +230,15 @@ function mob_class:set_velocity(v)
 
 	local yaw = (self.object:get_yaw() or 0) + self.rotate
 
+	-- nil check for velocity
+	v = v or 0
+
 	-- set velocity with hard limit of 10
+	local vel = self.object:get_velocity()
+
 	self.object:set_velocity({
 		x = max(-10, min((sin(yaw) * -v) + c_x, 10)),
-		y = max(-10, min(self.object:get_velocity().y, 10)),
+		y = max(-10, min((vel and vel.y or 0), 10)),
 		z = max(-10, min((cos(yaw) * v) + c_y, 10))
 	})
 end
@@ -248,6 +253,8 @@ end
 function mob_class:get_velocity()
 
 	local v = self.object:get_velocity()
+
+	if not v then return 0 end
 
 	return (v.x * v.x + v.z * v.z) ^ 0.5
 end
@@ -456,9 +463,9 @@ local ray_line_of_sight = function(self, pos1, pos2)
 
 	while thing do
 
-		if thing.type == "object"
-		and thing.ref ~= self.object
-		and not thing.ref:is_player() then return false end
+--		if thing.type == "object"
+--		and thing.ref ~= self.object
+--		and not thing.ref:is_player() then return false end
 
 		if thing.type == "node" then
 
@@ -475,7 +482,7 @@ local ray_line_of_sight = function(self, pos1, pos2)
 end
 
 -- detect if using minetest 5.0 by searching for permafrost node
-local is_50 = nil -- minetest.registered_nodes["default:permafrost"]
+local is_50 = minetest.registered_nodes["default:permafrost"]
 
 function mob_class:line_of_sight(pos1, pos2, stepsize)
 
@@ -732,7 +739,7 @@ function mob_class:check_for_death(cmi_cause)
 
 	-- has health actually changed?
 	if self.health == self.old_health and self.health > 0 then
-		return
+		return false
 	end
 
 	self.old_health = self.health
@@ -835,6 +842,11 @@ function mob_class:is_at_cliff()
 		return false
 	end
 
+	-- if object no longer exists then return
+	if not self.object:get_luaentity() then
+		return false
+	end
+
 	local yaw = self.object:get_yaw()
 	local dir_x = -sin(yaw) * (self.collisionbox[4] + 0.5)
 	local dir_z = cos(yaw) * (self.collisionbox[4] + 0.5)
@@ -891,7 +903,7 @@ function mob_class:do_env_damage()
 	-- remove mob if standing inside ignore node
 	if self.standing_in == "ignore" then
 		self.object:remove()
-		return
+		return true
 	end
 
 	-- is mob light sensative, or scared of the dark :P
@@ -906,7 +918,7 @@ function mob_class:do_env_damage()
 
 			effect(pos, 5, "tnt_smoke.png")
 
-			if self:check_for_death({type = "light"}) then return end
+			if self:check_for_death({type = "light"}) then return true end
 		end
 	end
 
@@ -925,7 +937,7 @@ function mob_class:do_env_damage()
 			effect(pos, 5, "bubble.png", nil, nil, 1, nil)
 
 			if self:check_for_death({type = "environment",
-					pos = pos, node = self.standing_in}) then return end
+					pos = pos, node = self.standing_in}) then return true end
 		end
 
 	-- lava or fire or ignition source
@@ -941,8 +953,8 @@ function mob_class:do_env_damage()
 
 			effect(pos, 5, "fire_basic_flame.png", nil, nil, 1, nil)
 
-			if self:check_for_death({type = "environment",
-					pos = pos, node = self.standing_in, hot = true}) then return end
+			if self:check_for_death({type = "environment", pos = pos,
+					node = self.standing_in, hot = true}) then return true end
 		end
 
 	-- damage_per_second node check
@@ -953,7 +965,7 @@ function mob_class:do_env_damage()
 		effect(pos, 5, "tnt_smoke.png")
 
 		if self:check_for_death({type = "environment",
-				pos = pos, node = self.standing_in}) then return end
+				pos = pos, node = self.standing_in}) then return true end
 	end
 --[[
 	--- suffocation inside solid node
@@ -965,10 +977,10 @@ function mob_class:do_env_damage()
 		self.health = self.health - self.suffocation
 
 		if self:check_for_death({type = "environment",
-				pos = pos, node = self.standing_in}) then return end
+				pos = pos, node = self.standing_in}) then return true end
 	end
 ]]
-	self:check_for_death({type = "unknown"})
+	return self:check_for_death({type = "unknown"})
 end
 
 
@@ -994,6 +1006,9 @@ function mob_class:do_jump()
 
 	local pos = self.object:get_pos()
 	local yaw = self.object:get_yaw()
+
+	-- sanity check
+	if not yaw then return false end
 
 	-- what is mob standing on?
 	pos.y = pos.y + self.collisionbox[2] - 0.2
@@ -2523,6 +2538,9 @@ function mob_class:falling(pos)
 	-- floating in water (or falling)
 	local v = self.object:get_velocity()
 
+	-- sanity check
+	if not v then return end
+
 	if v.y > 0 then
 
 		-- apply gravity when moving up
@@ -2765,6 +2783,10 @@ function mob_class:on_punch(hitter, tflp, tool_capabilities, dir)
 	and tflp >= punch_interval then
 
 		local v = self.object:get_velocity()
+
+		-- sanity check
+		if not v then return end
+
 		local kb = damage or 1
 		local up = 2
 
@@ -3105,7 +3127,10 @@ function mob_class:on_step(dtime)
 	end
 
 	local pos = self.object:get_pos()
-	local yaw = 0
+	local yaw = self.object:get_yaw()
+
+	-- early warning check, if no yaw then no entity, skip rest of function
+	if not yaw then return end
 
 	-- get node at foot level every quarter second
 	self.node_timer = (self.node_timer or 0) + dtime
@@ -3153,8 +3178,6 @@ function mob_class:on_step(dtime)
 	-- smooth rotation by ThomasMonroe314
 
 	if self.delay and self.delay > 0 then
-
-		local yaw = self.object:get_yaw()
 
 		if self.delay == 1 then
 			yaw = self.target_yaw
@@ -3238,7 +3261,7 @@ function mob_class:on_step(dtime)
 		self.env_damage_timer = 0
 
 		-- check for environmental damage (water, fire, lava etc.)
-		self:do_env_damage()
+		if self:do_env_damage() then return end
 
 		-- node replace check (cow eats grass etc.)
 		self:replace(pos)
@@ -3270,7 +3293,8 @@ function mob_class:on_blast(damage)
 		damage_groups = {fleshy = damage},
 	}, nil)
 
-	return false, true, {}
+	-- return no damage, no knockback, no item drops, mob api handles all
+	return false, false, {}
 end
 
 
@@ -3829,6 +3853,8 @@ function mobs:register_egg(mob, desc, background, addegg, no_creative)
 				local mob = minetest.add_entity(pos, mob, data)
 				local ent = mob:get_luaentity()
 
+				if not ent then return end -- sanity check
+
 				-- set owner if not a monster
 				if ent.type ~= "monster" then
 					ent.owner = placer:get_player_name()
@@ -3873,6 +3899,8 @@ function mobs:register_egg(mob, desc, background, addegg, no_creative)
 
 				local mob = minetest.add_entity(pos, mob)
 				local ent = mob:get_luaentity()
+
+				if not ent then return end -- sanity check
 
 				-- don't set owner if monster or sneak pressed
 				if ent.type ~= "monster"
