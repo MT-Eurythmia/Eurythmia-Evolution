@@ -40,9 +40,11 @@ TODO:
 * more precise neighbour detection for moretrees (cedar), fix moretree
 	jungletree ignoring default jungletrees' leaves
 * technic chainsaw
-* proper documentation
 * Test if pine trees are different on v6 and non-v6 mapgen
 * Add a priority and priority condition to allow handling cone pine trees
 	differently
 * Get rid of the cutting_leaves arguments because the problem is fixed in
 	minetest
+* consider neighbour tree's stem and not only head during neighbour detection
+* add dfs head search (and a parameter to enable it)
+* continue the documentation
