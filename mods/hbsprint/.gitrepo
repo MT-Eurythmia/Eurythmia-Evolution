@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/minetest-mods/hbsprint.git
+	branch = master
+	commit = b5867bdaa17ee44e92f1ded2334cac8d4364b159
+	parent = 69225ed96d2526252ffaa06df55ec0f287f33a46
+	method = merge
+	cmdver = 0.4.1
