@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://gitlab.com/VanessaE/homedecor_modpack.git
 	branch = master
-	commit = ed41161554f087fbc5f5f26773590ea8e148b0d7
-	parent = 1c50561faad57e4d2de09ea462da9f5ee43ef64c
+	commit = 43333687bd18f5717b4ae603dfa7eac30c5601d8
+	parent = 154150dabe173885c7b43f53e1a2943e215f603a
 	method = rebase
-	cmdver = 0.4.0
+	cmdver = 0.4.1
