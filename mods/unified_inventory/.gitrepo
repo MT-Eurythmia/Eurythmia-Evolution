@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/unified_inventory.git
 	branch = master
-	commit = a89245c41be24e9b11960797c39fae01e62d3809
-	parent = 9954a7654746e31e9ac08e0140a7e20ec1ca9d0d
+	commit = 606ba6a1a3ad6c425e8834975fe47203f8d9fa67
+	parent = 680d0984fcb11faff310d927b9ab4cec52622dde
 	method = merge
-	cmdver = 0.4.0
+	cmdver = 0.4.1
