@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://gitlab.com/VanessaE/plantlife_modpack.git
 	branch = master
-	commit = 31e00662385c5ee9196eaf9dd7a0497609e769f4
+	commit = 686dd21b9d9a06202ef339947499efdbae1ea219
 	parent = 7138c90a8c52d0f6fef600571aea3df6f70eb36e
 	method = merge
-	cmdver = 0.4.0
+	cmdver = 0.4.1
