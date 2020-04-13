@@ -9,7 +9,7 @@ Horses can be tamed with 10x wheat or apples which then allows the player to pic
 
 ---
 ### Horseshoes
-Horseshoes can be crafted using steel, bronze, mese and diamond (4x ingots - 2 down either side with 1x block top middle) and placed on a horse by punching with the item.  These can make horses run faster or jump higher depending on tier.
+Horseshoes can be crafted using steel, bronze, mese and diamond (4x ingots - 2 down either side with 1x block top middle) and placed on a horse by right clicking with the item.  These can make horses run faster or jump higher while riding depending on tier.
 
 ---
 ### Dead Horse
