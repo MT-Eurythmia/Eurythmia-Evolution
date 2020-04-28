@@ -1,8 +1,12 @@
 local storage = minetest.get_mod_storage()
 
-local mood_players = minetest.deserialize(storage:get_string("mood_players")) or {}
+mood = {}
+mood.permanent_mood_players = minetest.deserialize(storage:get_string("mood_players")) or {}
+
+local mood_players = table.copy(mood.permanent_mood_players)
+
 local function update_storage()
-	storage:set_string("mood_players", minetest.serialize(mood_players))
+	storage:set_string("mood_players", minetest.serialize(mood.permanent_mood_players))
 end
 
 local skies = {
@@ -211,10 +215,13 @@ end)
 minetest.register_on_leaveplayer(function(player)
 	local name = player:get_player_name()
 	daylight_players[name] = nil
+	if not mood.permanent_mood_players[name] then
+		mood_players[name] = nil
+	end
 end)
 
 minetest.register_chatcommand("sky", {
-	params = "",
+	params = "[save]",
 	description = "Toggle Beautiful Sky",
 	privs = {},
 	func = function(name, param)
@@ -222,16 +229,26 @@ minetest.register_chatcommand("sky", {
 		if not player then
 			return false
 		end
+		if param == "save" then
+			mood_players[name] = true
+			update_full_sky(player)
+			mood.permanent_mood_players[name] = true
+			update_storage()
+			return true, "Permanently enabled beautiful sky. Type /sky to disable."
+		end
+
 		if mood_players[name] then
 			mood_players[name] = nil
-			update_storage()
+			if mood.permanent_mood_players[name] then
+				mood.permanent_mood_players[name] = nil
+				update_storage()
+			end
 			clear_sky(player)
 			return true, "Disabled beautiful sky."
 		else
 			mood_players[name] = true
-			update_storage()
 			update_full_sky(player)
-			return true, "Enabled beautiful sky."
+			return true, "Temporarily enabled beautiful sky. Type `/sky save` to make the setting persistent."
 		end
 	end
 })
