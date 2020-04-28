@@ -299,7 +299,7 @@ minetest.register_chatcommand("skybox", {
 		if not index or not skies[index] then
 			return false, "Could not find skybox " .. param
 		end
-		current_skybox = skies[index]
+		current_sky = skies[index]
 		sky_override = true
 		return true, "Set skybox override. Use /time 23000 and /time 5000 to force the change."
 	end
