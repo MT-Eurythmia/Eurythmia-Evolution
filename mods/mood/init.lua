@@ -1,3 +1,10 @@
+local storage = minetest.get_mod_storage()
+
+local mood_players = minetest.deserialize(storage:get_string("mood_players")) or {}
+local function update_storage()
+	storage:set_string("mood_players", minetest.serialize(mood_players))
+end
+
 local skies = {
 	{"DarkStormy", "#1f2226", 0.5, { density = 0.5, color = "#aaaaaae0", ambient = "#000000",
 		height = 64, thickness = 32, speed = {x = 6, y = -6},}},
@@ -112,8 +119,6 @@ local function clear_sky(player)
 	})
 end
 
-local mood_players = {}
-
 local function run_every_player(func, ...)
 	for name, _ in pairs(mood_players) do
 		local player = minetest.get_player_by_name(name)
@@ -180,27 +185,29 @@ local function update_sun(player)
 	})
 end
 
-minetest.register_on_joinplayer(function(player)
-	--[[
-	if night then
-		set_sky(player, nightsky)
+local function update_full_sky(player)
+	if mood_players[player:get_player_name()] then
+		if night then
+			set_sky(player, nightsky)
+		else
+			set_sky(player, current_sky)
+		end
+
+		update_sun(player)
+
+		if max_light then
+			player:override_day_night_ratio(current_sky[3])
+		end
 	else
-		set_sky(player, current_sky)
+		clear_sky(player)
 	end
+end
 
-	update_sun(player)
-
-	if max_light then
-		player:override_day_night_ratio(current_sky[3])
-	end
-	]]
-	clear_sky(player)
-end)
+minetest.register_on_joinplayer(update_full_sky)
 
 minetest.register_on_leaveplayer(function(player)
 	local name = player:get_player_name()
 	daylight_players[name] = nil
-	mood_players[name] = nil
 end)
 
 minetest.register_chatcommand("sky", {
@@ -214,16 +221,13 @@ minetest.register_chatcommand("sky", {
 		end
 		if mood_players[name] then
 			mood_players[name] = nil
+			update_storage()
 			clear_sky(player)
 			return true, "Disabled beautiful sky."
 		else
 			mood_players[name] = true
-			if night then
-				set_sky(player, nightsky)
-			else
-				set_sky(player, current_sky)
-			end
-			update_sun(player)
+			update_storage()
+			update_full_sky(player)
 			return true, "Enabled beautiful sky."
 		end
 	end
