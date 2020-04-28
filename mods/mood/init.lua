@@ -20,6 +20,10 @@ minetest.register_privilege("daylight", {
 	description = "Can set Perma Time"
 })
 
+minetest.register_privilege("sky_admin", {
+	description = "Sky administrator"
+})
+
 local function tod_to_daynight_ratio(tod)
 	-- Minetest engine: src/daynighratio.h
 	if tod > .5 then
@@ -58,6 +62,13 @@ local function tod_to_daynight_ratio(tod)
 	end
 end
 
+local show = {
+	sun = false,
+	moon = false,
+	sunrise = false,
+	stars = false
+}
+
 local function set_sky(player, sky)
 	player:set_sky({
 		base_color = sky[2],
@@ -71,16 +82,7 @@ local function set_sky(player, sky)
 			sky[1] .. "Right.jpg",
 		}
 	})
-	player:set_sun({
-		visible = false,
-		sunrise_visible = false
-	})
-	player:set_moon({
-		visible = false
-	})
-	player:set_stars({
-		visible = false
-	})
+
 	player:set_clouds(sky[4])
 end
 
@@ -95,6 +97,7 @@ local randomgen = PcgRandom(os.clock())
 
 local night = true
 local max_light = false
+local sky_override = false
 local current_sky = skies[randomgen:next(1, #skies)]
 
 local time_acc = 0
@@ -112,8 +115,10 @@ minetest.register_globalstep(function(dtime)
 		if not night and tod >= 1 - 4625/24000 then
 			night = true
 			run_every_player(set_sky, nightsky)
-			local choice = randomgen:next(1, #skies)
-			current_sky = skies[choice]
+			if not sky_override then
+				local choice = randomgen:next(1, #skies)
+				current_sky = skies[choice]
+			end
 		end
 		if not max_light and tod_ratio >= current_sky[3] then
 			max_light = true
@@ -132,12 +137,28 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
+local function update_sun(player)
+	player:set_sun({
+		visible = show.sun,
+		sunrise_visible = show.sunrise
+	})
+	player:set_moon({
+		visible = show.moon
+	})
+	player:set_stars({
+		visible = show.stars
+	})
+end
+
 minetest.register_on_joinplayer(function(player)
 	if night then
 		set_sky(player, nightsky)
 	else
 		set_sky(player, current_sky)
 	end
+
+	update_sun(player)
+
 	if max_light then
 		player:override_day_night_ratio(current_sky[3])
 	end
@@ -167,6 +188,48 @@ minetest.register_chatcommand("daylight", {
 			player:override_day_night_ratio(current_sky[3])
 			return true, "Enabled daylight."
 		end
+	end
+})
+
+minetest.register_chatcommand("toggle_sun", {
+	params = "[sun, sunrise, moon, stars]",
+	description = "Toggle sun, moon, stars and sunrise visibility",
+	privs = {sky_admin = true},
+	func = function(name, param)
+		if param == "" then
+			show = {
+				sun = not show.sun,
+				sunrise = not show.sunrise,
+				moon = not show.moon,
+				stars = not show.stars
+			}
+		elseif show[param] ~= nil then
+			show[param] = not show[param]
+		else
+			return false, "Invalid param: " .. param
+		end
+
+		run_every_player(update_sun)
+		return true
+	end
+})
+
+minetest.register_chatcommand("skybox", {
+	params = "<off, 1 .. 4>",
+	description = "Set next day skybox",
+	privs = {sky_admin = true},
+	func = function(name, param)
+		if param == "off" then
+			sky_override = false
+			return true, "Disabled skybox override."
+		end
+		local index = tonumber(param)
+		if not index or not skies[index] then
+			return false, "Could not find skybox " .. param
+		end
+		current_skybox = skies[index]
+		sky_override = true
+		return true, "Set skybox override. Use /time 23000 and /time 5000 to force the change."
 	end
 })
 
