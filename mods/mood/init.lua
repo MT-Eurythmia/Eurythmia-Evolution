@@ -76,6 +76,19 @@ local show = {
 	stars = false
 }
 
+local function update_sun(player)
+	player:set_sun({
+		visible = show.sun,
+		sunrise_visible = show.sunrise
+	})
+	player:set_moon({
+		visible = show.moon
+	})
+	player:set_stars({
+		visible = show.stars
+	})
+end
+
 local function set_sky(player, sky)
 	player:set_sky({
 		base_color = sky[2],
@@ -135,6 +148,20 @@ local max_light = false
 local sky_override = false
 local current_sky = skies[randomgen:next(1, #skies)]
 
+local function update_full_sky(player)
+	if night then
+		set_sky(player, nightsky)
+	else
+		set_sky(player, current_sky)
+	end
+
+	update_sun(player)
+
+	if max_light then
+		player:override_day_night_ratio(current_sky[3])
+	end
+end
+
 local time_acc = 0
 minetest.register_globalstep(function(dtime)
 	time_acc = time_acc + dtime
@@ -172,38 +199,14 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
-local function update_sun(player)
-	player:set_sun({
-		visible = show.sun,
-		sunrise_visible = show.sunrise
-	})
-	player:set_moon({
-		visible = show.moon
-	})
-	player:set_stars({
-		visible = show.stars
-	})
-end
-
-local function update_full_sky(player)
-	if mood_players[player:get_player_name()] then
-		if night then
-			set_sky(player, nightsky)
-		else
-			set_sky(player, current_sky)
-		end
-
-		update_sun(player)
-
-		if max_light then
-			player:override_day_night_ratio(current_sky[3])
-		end
+minetest.register_on_joinplayer(function(player)
+	local name = player:get_player_name()
+	if mood_players[name] then
+		update_full_sky(player)
 	else
 		clear_sky(player)
 	end
-end
-
-minetest.register_on_joinplayer(update_full_sky)
+end)
 
 minetest.register_on_leaveplayer(function(player)
 	local name = player:get_player_name()
