@@ -12,7 +12,13 @@ local skies = {
 }
 
 local nightsky = {"FullMoon", "#24292c", 0.2, { density = 0.25, color = "#ffffff80", ambient = "#404040",
-		height = 140, thickness = 8, speed = {x = -2, y = 2}}}
+		height = 140, thickness = 8,speed = {x = -2, y = 2}}}
+
+local daylight_players = {}
+
+minetest.register_privilege("daylight", {
+	description = "Can set Perma Time"
+})
 
 local function tod_to_daynight_ratio(tod)
 	-- Minetest engine: src/daynighratio.h
@@ -53,14 +59,28 @@ local function tod_to_daynight_ratio(tod)
 end
 
 local function set_sky(player, sky)
-	player:set_sky(sky[2], "skybox", {
-		sky[1] .. "Up.jpg",
-		sky[1] .. "Down.jpg",
-		sky[1] .. "Front.jpg",
-		sky[1] .. "Back.jpg",
-		sky[1] .. "Left.jpg",
-		sky[1] .. "Right.jpg",
-	}, true)
+	player:set_sky({
+		base_color = sky[2],
+		type = "skybox",
+		textures = {
+			sky[1] .. "Up.jpg",
+			sky[1] .. "Down.jpg",
+			sky[1] .. "Front.jpg",
+			sky[1] .. "Back.jpg",
+			sky[1] .. "Left.jpg",
+			sky[1] .. "Right.jpg",
+		}
+	})
+	player:set_sun({
+		visible = false,
+		sunrise_visible = false
+	})
+	player:set_moon({
+		visible = false
+	})
+	player:set_stars({
+		visible = false
+	})
 	player:set_clouds(sky[4])
 end
 
@@ -104,7 +124,9 @@ minetest.register_globalstep(function(dtime)
 		if max_light and tod_ratio <= current_sky[3] then
 			max_light = false
 			run_every_player(function(player)
-				player:override_day_night_ratio(nil)
+				if not daylight_players[player:get_player_name()] then
+					player:override_day_night_ratio(nil)
+				end
 			end)
 		end
 	end
@@ -121,6 +143,32 @@ minetest.register_on_joinplayer(function(player)
 	end
 end)
 
+minetest.register_on_leaveplayer(function(player)
+	daylight_players[player:get_player_name()] = nil
+end)
+
+minetest.register_chatcommand("daylight", {
+	params = "",
+	description = "Toggle daylight",
+	privs = {daylight = true},
+	func = function(name, param)
+		local player = minetest.get_player_by_name(name)
+		if not player then
+			return
+		end
+		if daylight_players[name] then
+			daylight_players[name] = nil
+			if not max_light then
+				player:override_day_night_ratio(nil)
+			end
+			return true, "Disabled daylight."
+		else
+			daylight_players[name] = true
+			player:override_day_night_ratio(current_sky[3])
+			return true, "Enabled daylight."
+		end
+	end
+})
 
 -- Start with a nice morning!
 minetest.after(0, function()
