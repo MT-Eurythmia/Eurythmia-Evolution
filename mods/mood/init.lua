@@ -86,10 +86,40 @@ local function set_sky(player, sky)
 	player:set_clouds(sky[4])
 end
 
+local function clear_sky(player)
+	player:override_day_night_ratio(nil)
+	player:set_sky({
+		base_color = "white",
+		type = "regular"
+	})
+	player:set_clouds({
+		density = 0.4,
+		color = "#fff0f0e5",
+		ambient = "#000000",
+		height = 150,
+		thickness = 16,
+		speed = {x = 0, y = -2},
+	})
+	player:set_sun({
+		visible = true,
+		sunrise_visible = true
+	})
+	player:set_moon({
+		visible = true
+	})
+	player:set_stars({
+		visible = true
+	})
+end
+
+local mood_players = {}
+
 local function run_every_player(func, ...)
-	local players = minetest.get_connected_players()
-	for _, player in ipairs(players) do
-		func(player, ...)
+	for name, _ in pairs(mood_players) do
+		local player = minetest.get_player_by_name(name)
+		if player then
+			func(player, ...)
+		end
 	end
 end
 
@@ -151,6 +181,7 @@ local function update_sun(player)
 end
 
 minetest.register_on_joinplayer(function(player)
+	--[[
 	if night then
 		set_sky(player, nightsky)
 	else
@@ -162,11 +193,41 @@ minetest.register_on_joinplayer(function(player)
 	if max_light then
 		player:override_day_night_ratio(current_sky[3])
 	end
+	]]
+	clear_sky(player)
 end)
 
 minetest.register_on_leaveplayer(function(player)
-	daylight_players[player:get_player_name()] = nil
+	local name = player:get_player_name()
+	daylight_players[name] = nil
+	mood_players[name] = nil
 end)
+
+minetest.register_chatcommand("sky", {
+	params = "",
+	description = "Toggle Beautiful Sky",
+	privs = {},
+	func = function(name, param)
+		local player = minetest.get_player_by_name(name)
+		if not player then
+			return false
+		end
+		if mood_players[name] then
+			mood_players[name] = nil
+			clear_sky(player)
+			return true, "Disabled beautiful sky."
+		else
+			mood_players[name] = true
+			if night then
+				set_sky(player, nightsky)
+			else
+				set_sky(player, current_sky)
+			end
+			update_sun(player)
+			return true, "Enabled beautiful sky."
+		end
+	end
+})
 
 minetest.register_chatcommand("daylight", {
 	params = "",
@@ -175,7 +236,7 @@ minetest.register_chatcommand("daylight", {
 	func = function(name, param)
 		local player = minetest.get_player_by_name(name)
 		if not player then
-			return
+			return false
 		end
 		if daylight_players[name] then
 			daylight_players[name] = nil
@@ -185,7 +246,11 @@ minetest.register_chatcommand("daylight", {
 			return true, "Disabled daylight."
 		else
 			daylight_players[name] = true
-			player:override_day_night_ratio(current_sky[3])
+			if mood_players[name] then
+				player:override_day_night_ratio(current_sky[3])
+			else
+				player:override_day_night_ratio(1)
+			end
 			return true, "Enabled daylight."
 		end
 	end
