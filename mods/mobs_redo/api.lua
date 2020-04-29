@@ -6,7 +6,7 @@ local use_cmi = minetest.global_exists("cmi")
 
 mobs = {
 	mod = "redo",
-	version = "20200412",
+	version = "20200427",
 	intllib = S,
 	invis = minetest.global_exists("invisibility") and invisibility or {}
 }
@@ -835,6 +835,42 @@ function mob_class:check_for_death(cmi_cause)
 end
 
 
+-- get node but use fallback for nil or unknown
+local node_ok = function(pos, fallback)
+
+	fallback = fallback or mobs.fallback_node
+
+	local node = minetest.get_node_or_nil(pos)
+
+	if node and minetest.registered_nodes[node.name] then
+		return node
+	end
+
+	return minetest.registered_nodes[fallback]
+end
+
+
+-- Returns true is node can deal damage to self
+local is_node_dangerous = function(self, nodename)
+
+	if self.water_damage > 0
+	and minetest.get_item_group(nodename, "water") ~= 0 then
+		return true
+	end
+
+	if self.lava_damage > 0
+	and minetest.get_item_group(nodename, "igniter") ~= 0 then
+		return true
+	end
+
+	if minetest.registered_nodes[nodename].damage_per_second > 0 then
+		return true
+	end
+
+	return false
+end
+
+
 -- is mob facing a cliff
 function mob_class:is_at_cliff()
 
@@ -853,29 +889,26 @@ function mob_class:is_at_cliff()
 	local pos = self.object:get_pos()
 	local ypos = pos.y + self.collisionbox[2] -- just above floor
 
-	if minetest.line_of_sight(
+	local free_fall, blocker = minetest.line_of_sight(
 		{x = pos.x + dir_x, y = ypos, z = pos.z + dir_z},
-		{x = pos.x + dir_x, y = ypos - self.fear_height, z = pos.z + dir_z}, 1) then
+		{x = pos.x + dir_x, y = ypos - self.fear_height, z = pos.z + dir_z})
 
+	-- check for straight drop, drop onto danger or walkable node
+	if free_fall then
 		return true
+	else
+		local bnode = node_ok(blocker)
+
+		if is_node_dangerous(self, bnode.name) then
+			return true
+		else
+			local def = minetest.registered_nodes[bnode.name]
+
+			return (not def and def.walkable)
+		end
 	end
 
 	return false
-end
-
-
--- get node but use fallback for nil or unknown
-local node_ok = function(pos, fallback)
-
-	fallback = fallback or mobs.fallback_node
-
-	local node = minetest.get_node_or_nil(pos)
-
-	if node and minetest.registered_nodes[node.name] then
-		return node
-	end
-
-	return minetest.registered_nodes[fallback]
 end
 
 
@@ -1032,6 +1065,18 @@ function mob_class:do_jump()
 		z = pos.z + dir_z
 	})
 
+	-- what is above and in front?
+	local nodt = node_ok({
+		x = pos.x + dir_x,
+		y = pos.y + 1.5,
+		z = pos.z + dir_z
+	})
+
+	-- is there space to jump up?
+	if minetest.registered_nodes[nodt.name].walkable == true then
+		return false
+	end
+
 	-- thin blocks that do not need to be jumped
 	if nod.name == node_snow then
 		return false
@@ -1043,7 +1088,8 @@ function mob_class:do_jump()
 	or minetest.registered_items[nod.name].walkable then
 
 		if not nod.name:find("fence")
-		and not nod.name:find("gate") then
+		and not nod.name:find("gate")
+		and not nod.name:find("wall") then
 
 			local v = self.object:get_velocity()
 
@@ -1071,6 +1117,8 @@ function mob_class:do_jump()
 			end
 		else
 			self.facing_fence = true
+
+			return false
 		end
 
 		-- if we jumped against a block/wall 4 times then turn
@@ -1671,6 +1719,7 @@ function mob_class:general_attack()
 
 	-- return if already attacking, passive or docile during day
 	if self.passive
+	or self.state == "runaway"
 	or self.state == "attack"
 	or self:day_docile() then
 		return
@@ -2059,7 +2108,7 @@ function mob_class:do_states(dtime)
 		if self.water_damage > 0
 		and self.lava_damage > 0 then
 
-			lp = minetest.find_node_near(s, 1, {"group:water", "group:lava"})
+			lp = minetest.find_node_near(s, 1, {"group:water", "group:igniter"})
 
 		elseif self.water_damage > 0 then
 
@@ -2067,16 +2116,13 @@ function mob_class:do_states(dtime)
 
 		elseif self.lava_damage > 0 then
 
-			lp = minetest.find_node_near(s, 1, {"group:lava"})
+			lp = minetest.find_node_near(s, 1, {"group:igniter"})
 		end
 
 		if lp then
 
-			-- if mob in water or lava then look for land
-			if (self.lava_damage
-				and minetest.registered_nodes[self.standing_in].groups.lava)
-			or (self.water_damage
-				and minetest.registered_nodes[self.standing_in].groups.water) then
+			-- if mob in dangerous node then look for land
+			if is_node_dangerous(self, self.standing_in) then
 
 				lp = minetest.find_node_near(s, 5, {"group:soil", "group:stone",
 					"group:sand", node_ice, node_snowblock})
@@ -2590,7 +2636,7 @@ function mob_class:falling(pos)
 				effect(pos, 5, "tnt_smoke.png", 1, 2, 2, nil)
 
 				if self:check_for_death({type = "fall"}) then
-					return
+					return true
 				end
 			end
 
@@ -3172,8 +3218,10 @@ function mob_class:on_step(dtime)
 		self:mob_expire(pos, 0.25)
 	end
 
-	-- check if falling, flying, floating
-	self:falling(pos)
+	-- check if falling, flying, floating and return if player died
+	if self:falling(pos) then
+		return
+	end
 
 	-- smooth rotation by ThomasMonroe314
 
