@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/MoreMesecons.git
 	branch = master
-	commit = 54030d1620a1ab8dd59fb1a76a10a0f4f5f4cd5e
-	parent = 17545eade1f9b3cfa417c3743dfd7264f887a548
+	commit = 0000cfb474cbf9e10ee3234a469be78acb4f6b5a
+	parent = 9b599f7d7127201ac162f577c84bc180641557ec
 	method = merge
 	cmdver = 0.4.1
