@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://notabug.org/TenPlus1/mobs_water.git
+	branch = master
+	commit = e76369215e6bc785eb9b34a6428520583cbaa748
+	parent = 6cc8a3fe854edd895d41957d4d5e8a22410cb2a6
+	method = merge
+	cmdver = 0.4.1
