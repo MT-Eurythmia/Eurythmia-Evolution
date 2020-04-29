@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mapserver/mapserver_mod.git
 	branch = master
-	commit = 821bf1af7dda17aff6afa35186f73a48341665e0
-	parent = 956cd7e1e0e78f62c636cb0207e079ab694c2730
+	commit = f6f3cd4ff5cf3900bb2b73370e936eb41ea46f6c
+	parent = 4c75aa89a7a4b1151b1f0979495d9b9a9f408214
 	method = merge
 	cmdver = 0.4.1

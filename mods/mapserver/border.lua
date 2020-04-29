@@ -30,7 +30,7 @@ minetest.register_node("mapserver:border", {
 		"mapserver_border.png"
 	},
 	groups = {cracky=3,oddly_breakable_by_hand=3},
-	sounds = default.node_sound_glass_defaults(),
+	sounds = moditems.sound_glass(),
 	can_dig = mapserver.can_interact,
 	after_place_node = mapserver.after_place_node,
 
@@ -69,13 +69,13 @@ minetest.register_node("mapserver:border", {
 	end
 })
 
-if mapserver.enable_crafting and minetest.get_modpath("default") then
+if mapserver.enable_crafting then
 	minetest.register_craft({
 	    output = 'mapserver:border',
 	    recipe = {
-				{"", "default:steelblock", ""},
-				{"default:paper", "default:goldblock", "default:paper"},
-				{"", "default:glass", ""}
+				{"", moditems.steelblock, ""},
+				{moditems.paper, moditems.goldblock, moditems.paper},
+				{"", moditems.glass, ""}
 			}
 	})
 end

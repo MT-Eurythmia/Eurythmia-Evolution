@@ -1,3 +1,25 @@
+local default_path = minetest.get_modpath("default") and default
+local mineclone_path = minetest.get_modpath("mcl_core") and mcl_core
+
+moditems = {}
+
+if mineclone_path then
+	moditems.sound_glass = mcl_sounds.node_sound_glass_defaults
+	moditems.goldblock = "mcl_core:goldblock"
+	moditems.steelblock = "mcl_core:ironblock"
+	moditems.steel_ingot = "mcl_core:iron_ingot"
+	moditems.paper = "mcl_core:paper"
+	moditems.glass = "mcl_core:glass"
+	moditems.dye = "mcl_dye:"
+elseif default_path then
+	moditems.sound_glass = default.node_sound_glass_defaults
+	moditems.goldblock = "default:goldblock"
+	moditems.steelblock = "default:steelblock"
+	moditems.steel_ingot = "default:steel_ingot"
+	moditems.paper = "default:paper"
+	moditems.glass = "default:glass"
+	moditems.dye = "dye:"
+end
 
 mapserver = {
 	enable_crafting = minetest.settings:get("mapserver.enable_crafting") == "true",
@@ -16,6 +38,10 @@ dofile(MP.."/legacy.lua")
 dofile(MP.."/privs.lua")
 dofile(MP.."/show_waypoint.lua")
 dofile(MP.."/search.lua")
+
+if minetest.get_modpath("bones") then
+	dofile(MP.."/bones.lua")
+end
 
 
 -- optional mapserver-bridge stuff below
@@ -67,3 +93,7 @@ end
 
 
 print("[OK] Mapserver")
+
+if minetest.settings:get_bool("enable_mapserver_integration_test") then
+        dofile(MP.."/integration_test.lua")
+end

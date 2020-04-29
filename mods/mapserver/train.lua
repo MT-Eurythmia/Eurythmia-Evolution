@@ -33,7 +33,7 @@ minetest.register_node("mapserver:train", {
 		"mapserver_train.png"
 	},
 	groups = {cracky=3,oddly_breakable_by_hand=3},
-	sounds = default.node_sound_glass_defaults(),
+	sounds = moditems.sound_glass(),
 	can_dig = mapserver.can_interact,
 	after_place_node = mapserver.after_place_node,
 
@@ -74,13 +74,13 @@ minetest.register_node("mapserver:train", {
 	end
 })
 
-if mapserver.enable_crafting and minetest.get_modpath("default") then
+if mapserver.enable_crafting then
 	minetest.register_craft({
 	    output = 'mapserver:train',
 	    recipe = {
-				{"", "default:steel_ingot", ""},
-				{"default:paper", "default:goldblock", "default:paper"},
-				{"", "default:glass", ""}
+				{"", moditems.steel_ingot, ""},
+				{moditems.paper, moditems.goldblock, moditems.paper},
+				{"", moditems.glass, ""}
 			}
 	})
 end

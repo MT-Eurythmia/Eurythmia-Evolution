@@ -47,7 +47,7 @@ local register_poi = function(color, dye)
 			"[combine:16x16:0,0=mapserver_gold_block.png:3,2=mapserver_poi_" .. color .. ".png"
 		},
 		groups = {cracky=3,oddly_breakable_by_hand=3},
-		sounds = default.node_sound_glass_defaults(),
+		sounds = moditems.sound_glass(),
 		can_dig = mapserver.can_interact,
 		after_place_node = mapserver.after_place_node,
 
@@ -65,13 +65,13 @@ local register_poi = function(color, dye)
 	})
 
 
-	if mapserver.enable_crafting and minetest.get_modpath("dye") then
+	if mapserver.enable_crafting and (minetest.get_modpath("dye") or minetest.get_modpath("mcl_core")) then
 		minetest.register_craft({
 		    output = 'mapserver:poi_' .. color,
 		    recipe = {
-					{"", "dye:" .. dye, ""},
-					{"default:paper", "default:goldblock", "default:paper"},
-					{"", "default:glass", ""}
+					{"", moditems.dye .. dye, ""},
+					{moditems.paper, moditems.goldblock, moditems.paper},
+					{"", moditems.glass, ""}
 				}
 		})
 	end
