@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://notabug.org/TenPlus1/mobs_sky.git
+	branch = master
+	commit = da5b3eb212a47c9ccc61ac8b61e34a29409abe30
+	parent = c90cd5441db18668ef35b5827e962196ff9bd400
+	method = merge
+	cmdver = 0.4.1
