@@ -5,7 +5,7 @@ local privs = {}
 
 -- broomstick file
 users_file = minetest.get_worldpath() .. "/broomstick_users.txt"
---load broomstick  file 
+-- load broomstick  file
 local file = io.open(users_file, "r")
 if file then
 	had_fly_privilege = minetest.deserialize(file:read("*all"))
@@ -15,11 +15,11 @@ if file then
 		had_fly_privilege = {}
 	end
 else
-	minetest.log("error", "[broomstick] Can not open broomstick_users.txt file !")
+	minetest.log("error", "[broomstick] Can not open broomstick_users.txt file!")
 end
 
 
--- funtion save broomstick  file
+-- save broomstick file
 local function save()
 	local input = io.open(users_file, "w")
 	if input then
@@ -44,7 +44,7 @@ end)
 
 -- Broomstick timer
 local function say_warning(playername)
-	minetest.chat_send_player(playername, "WARNING ! You'll fall in 10 seconds !")
+	minetest.chat_send_player(playername, "WARNING! You'll fall in 10 seconds!")
 	minetest.after(10, function(playername)
 		-- Send a message...
 		minetest.chat_send_player(playername, "End of broomstick. I hope you're not falling down...")
@@ -92,7 +92,7 @@ minetest.register_craftitem("broomstick:broomstick", {
 			end
 			-- Send a message...
 			minetest.chat_send_player(playername, "You can now fly during " .. tostring(broomstick_time) .. " seconds.")
-			minetest.log("action", "Player " .. playername .. " has use a broomstick.")
+			minetest.log("action", "Player " .. playername .. " has activated a broomstick.")
 			-- Insert player in the list.
 			table.insert(broomstick_actual_users, playername)
 			-- And add the function in queue
@@ -100,7 +100,7 @@ minetest.register_craftitem("broomstick:broomstick", {
 			-- Remove broomstick.
 			return ItemStack("")
 		else
-			minetest.chat_send_player(playername, "You already have a broomstick ! Please wait until the end of your actual broomstick.")
+			minetest.chat_send_player(playername, "You already have a broomstick! Please wait until the end of your current broomstick.")
 		end
 	end,
 })
@@ -112,6 +112,3 @@ minetest.register_craft({
 		{"default:stick", "default:stick", "farming:wheat"},
 		{"", "", "default:mese"}}
 })
-
-
-minetest.log("info", "[OK] broomstick")
