@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/throwing.git
 	branch = master
-	commit = 49f3f36bdf3910a664eefee5bcb7f0893380b806
-	parent = 2e4bcc3df6bfc85449006b74fdb8c2d064d3477b
+	commit = 2d2368529f7adb9c2147ac3b849f91e4638c0470
+	parent = cae6b5f6baea4fbcae57073f5f1bd089e21ed1f3
 	method = merge
 	cmdver = 0.4.1
