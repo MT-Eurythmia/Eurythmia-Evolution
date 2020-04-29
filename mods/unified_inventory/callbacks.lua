@@ -29,6 +29,7 @@ minetest.register_on_joinplayer(function(player)
 	local refill = minetest.create_detached_inventory(player_name.."refill", {
 		allow_put = function(inv, listname, index, stack, player)
 			if unified_inventory.is_creative(player_name) then
+				minetest.log("action", string.format("Player %s refilled item %s.", player_name, stack:get_name()))
 				return stack:get_count()
 			else
 				return 0
@@ -153,6 +154,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			local stack = ItemStack(clicked_item)
 			stack:set_count(stack:get_stack_max())
 			if inv:room_for_item("main", stack) then
+				minetest.log("action", string.format("Player %s gave themslves item %s using Unified Inventory.", player_name, stack:get_name()))
 				inv:add_item("main", stack)
 			end
 		end
