@@ -13,8 +13,8 @@ function chars(str)
 end
 
 minetest.register_on_chat_message(function(name, message)
-	-- Message has to be longer than 1/DECAPITALZE_RATIO chars
-	if message:len() <= 1/DECAPITALIZE_RATIO then
+	-- Message has to be longer than 3 chars
+	if message:len() <= 3 then
 		return false
 	end
 
