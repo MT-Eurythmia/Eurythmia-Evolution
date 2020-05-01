@@ -1,0 +1,4 @@
+*~
+*.autosave
+#*
+.dir-locals.el

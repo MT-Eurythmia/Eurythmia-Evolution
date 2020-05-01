@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/sys4-fr/cherry_tree.git
+	branch = master
+	commit = 47c296847378096f20ab040f68ea78d3d3882052
+	parent = 4c27a473d00844ba3192f2fdf00e88c7f3f8b3f0
+	method = merge
+	cmdver = 0.4.1
