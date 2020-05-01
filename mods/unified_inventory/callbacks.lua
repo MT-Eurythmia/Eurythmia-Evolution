@@ -150,12 +150,16 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			unified_inventory.set_inventory_formspec(player, "craftguide")
 		elseif player_creative then
 			-- Creative page: Add entire stack to inventory
-			local inv = player:get_inventory()
-			local stack = ItemStack(clicked_item)
-			stack:set_count(stack:get_stack_max())
-			if inv:room_for_item("main", stack) then
-				minetest.log("action", string.format("Player %s gave themslves item %s using Unified Inventory.", player_name, stack:get_name()))
-				inv:add_item("main", stack)
+			if not unified_inventory.crafts_for.recipe[clicked_item] then
+				minetest.log("action", string.format("Player %s tried to give themselves uncraftable item %s using Unified Inventory.", player_name, clicked_item))
+			else
+				local inv = player:get_inventory()
+				local stack = ItemStack(clicked_item)
+				stack:set_count(stack:get_stack_max())
+				if inv:room_for_item("main", stack) then
+					minetest.log("action", string.format("Player %s gave themselves item %s using Unified Inventory.", player_name, clicked_item))
+					inv:add_item("main", stack)
+				end
 			end
 		end
 	end
