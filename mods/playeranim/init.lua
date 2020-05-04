@@ -302,6 +302,9 @@ end
 local minetest_get_connected_players = minetest.get_connected_players
 minetest.register_globalstep(function(dtime)
 	for _, player in ipairs(minetest_get_connected_players()) do
+		if not players_animation_data[player] then
+			players_animation_data:init_player(player)
+		end
 		animate_player(player, dtime)
 	end
 end)
