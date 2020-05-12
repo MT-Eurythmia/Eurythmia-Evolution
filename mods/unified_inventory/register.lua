@@ -436,6 +436,11 @@ local function craftguide_giveme(player, formname, fields)
 	local output = unified_inventory.current_item[player_name]
 	if (not output) or (output == "") then return end
 
+	if not unified_inventory.crafts_for.recipe[output] and not unified_inventory.crafts_for.usage[outputt] then
+		minetest.log("action", string.format("Player %s tried to give themselves uncraftable item %s using Unified Inventory.", player_name, output))
+		return
+	end
+
 	local player_inv = player:get_inventory()
 
 	player_inv:add_item("main", {name = output, count = amount})
