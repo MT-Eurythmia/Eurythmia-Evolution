@@ -53,12 +53,14 @@ local function getRandomCode()
 	--first chars are numbers
 	local array = {}
 	for i = 1, 3 do
-		array[i] = string.char(math.random(49, 57)) -- Do not include 48 (0), too close to O
+		repeat
+			array[i] = string.char(math.random(49, 57)) -- Do not include 48 (0), too close to O
+		until array[i] ~= "5" and array[i] ~= "2"
 	end
 	--last char is an alphabet capital letter
 	repeat
 		array[4] = string.char(math.random(65, 90))
-	until array[4] ~= "O" and array[4] ~= "I" and array[4] ~= "Z" -- Avoid generating O, too close to 0, and I, too close to l, nor Z, too close to 2
+	until array[4] ~= "O" and array[4] ~= "I" and array[4] ~= "Z" and array[4] ~= "S" -- Avoid generating O, too close to 0, and I, too close to l, nor Z, too close to 2
 	return table.concat(array)
 end
 
