@@ -79,7 +79,7 @@ minetest.register_node(":mobs:beehive", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable = true,
-	groups = {oddly_breakable_by_hand = 3, flammable = 1},
+	groups = {oddly_breakable_by_hand = 3, flammable = 1, disable_suffocation = 1},
 	sounds = default.node_sound_defaults(),
 
 	on_construct = function(pos)

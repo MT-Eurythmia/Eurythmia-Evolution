@@ -65,6 +65,7 @@ mobs:register_mob("mobs_animal:cow", {
 		{"group:grass", "air", 0},
 		{"default:dirt_with_grass", "default:dirt", -1}
 	},
+--	stay_near = {{"farming:straw", "group:grass"}, 10},
 	fear_height = 2,
 	on_rightclick = function(self, clicker)
 

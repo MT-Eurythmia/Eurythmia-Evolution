@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://notabug.org/TenPlus1/mobs_animal.git
 	branch = master
-	commit = 914c37a0aef8883adc383a97812f8440cc861fa2
-	parent = 86dbbba6f044e63b9adf571207ed6b4eea84dcf8
+	commit = 59d5dbab8595642e31d7d2afc428fd0ff345fb0c
+	parent = ba6bd36f5638295454ad02e2c5d32eb23580cb31
 	method = rebase
 	cmdver = 0.4.1
