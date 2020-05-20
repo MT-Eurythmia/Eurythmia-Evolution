@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/castle_gates.git
 	branch = master
-	commit = 81756a6207721cc0918ee245fdd6e980e54b2da2
-	parent = ce32f834c1013b32e2befdd660f0bc483898a3f7
+	commit = c64128beae9b4a8a000ee032adeb400321df4150
+	parent = 1ef7adc0355ae51ff22e4ed9e9357f52eeb203c4
 	method = merge
-	cmdver = 0.4.0
+	cmdver = 0.4.1
