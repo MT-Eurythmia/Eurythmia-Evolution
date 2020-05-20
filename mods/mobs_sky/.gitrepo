@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://notabug.org/TenPlus1/mobs_sky.git
 	branch = master
-	commit = da5b3eb212a47c9ccc61ac8b61e34a29409abe30
-	parent = c90cd5441db18668ef35b5827e962196ff9bd400
+	commit = acfdf6af7797e0a836e3f95955437fe9f39e4e3f
+	parent = 8cd972779ce5fcb56eb8f5d791c07ca22c0991b3
 	method = merge
 	cmdver = 0.4.1
