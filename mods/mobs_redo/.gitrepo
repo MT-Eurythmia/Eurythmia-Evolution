@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://notabug.org/TenPlus1/mobs_redo.git
 	branch = master
-	commit = a934d80631b6580fc8b1dd5379d9186d5162bbfb
-	parent = 8f4010c3f1d3cdbf9ad28ed1d2b24f33f1dbe9a9
+	commit = 351fce8ee82c328d977fa07b7f4218b4ff0f8c43
+	parent = 68472fd3aa178aa2b88e9438958daea833792252
 	method = rebase
 	cmdver = 0.4.1
