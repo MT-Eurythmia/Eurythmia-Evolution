@@ -122,7 +122,7 @@ minetest.register_abm({
 		or node.name == "default:dry_dirt" then
 			minetest.swap_node(pos, {name = "default:dirt"})
 		else
-			minetest.swap_node(pos, {name = "default:dirt_with_grass"})
+			minetest.swap_node(pos, {name = "default:dirt_with_dry_grass"})
 		end
 	end,
 })
