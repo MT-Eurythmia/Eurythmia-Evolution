@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://notabug.org/TenPlus1/farming.git
 	branch = master
-	commit = eb0255f026b423072d8a6cf613a5ccd420b2cbe6
-	parent = 262da3f747e9add9fcea3ef734d3d566c02de901
+	commit = ca0876c6d8c0ba3792481d85823a5fd600659d05
+	parent = dae2c232288f4bb765385908633ac8f4f028b355
 	method = merge
 	cmdver = 0.4.1
