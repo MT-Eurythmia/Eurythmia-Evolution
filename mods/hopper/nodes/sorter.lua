@@ -15,7 +15,7 @@ end
 
 local function get_sorter_formspec(pos)
 	local spos = hopper.get_string_pos(pos)
-	
+
 	local filter_all = minetest.get_meta(pos):get_string("filter_all") == "true"
 	local y_displace = 0
 	local filter_button_text, filter_button_tooltip, filter_body
@@ -29,11 +29,11 @@ local function get_sorter_formspec(pos)
 		filter_button_tooltip = S("This sorter is currently set to only send items listed\nin the filter list in the direction of the arrow.\nClick this button to set it to try sending all\nitems that way first.")
 		y_displace = 1.6
 	end
-	
+
 	local formspec =
 		"size[8," .. 7 + y_displace .. "]"
 		.. hopper.formspec_bg
-		.. filter_body		
+		.. filter_body
 		.. "list[nodemeta:" .. spos .. ";main;3,".. tostring(0.3 + y_displace) .. ";2,2;]"
 		.. "button_exit[7,".. tostring(0.8 + y_displace) .. ";1,1;filter_all;".. filter_button_text .. "]tooltip[filter_all;" .. filter_button_tooltip.. "]"
 		.. hopper.get_eject_button_texts(pos, 6, 0.8 + y_displace)
@@ -70,14 +70,14 @@ minetest.register_node("hopper:sorter", {
 			{-0.2, -0.3, -0.2, 0.2, -0.7, 0.2},
 		},
 	},
-	
+
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 		inv:set_size("main", 2*2)
 		inv:set_size("filter", 8)
 	end,
-	
+
 	on_place = function(itemstack, placer, pointed_thing, node_name)
 		local pos  = pointed_thing.under
 		local pos2 = pointed_thing.above
@@ -91,13 +91,13 @@ minetest.register_node("hopper:sorter", {
 		end
 		return returned_stack
 	end,
-	
+
 	can_dig = function(pos,player)
 		local meta = minetest.get_meta(pos);
 		local inv = meta:get_inventory()
 		return inv:is_empty("main")
 	end,
-	
+
 	on_rightclick = function(pos, node, clicker, itemstack)
 		if minetest.is_protected(pos, clicker:get_player_name()) and not minetest.check_player_privs(clicker, "protection_bypass") then
 			return
@@ -105,7 +105,7 @@ minetest.register_node("hopper:sorter", {
 		minetest.show_formspec(clicker:get_player_name(),
 			"hopper_formspec:"..minetest.pos_to_string(pos), get_sorter_formspec(pos))
 	end,
-	
+
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		if listname == "filter" then
 			local inv = minetest.get_inventory({type="node", pos=pos})
@@ -114,7 +114,7 @@ minetest.register_node("hopper:sorter", {
 		end
 		return stack:get_count()
 	end,
-	
+
 	allow_metadata_inventory_take = function(pos, listname, index, stack, player)
 		if listname == "filter" then
 			local inv = minetest.get_inventory({type="node", pos=pos})
@@ -123,7 +123,7 @@ minetest.register_node("hopper:sorter", {
 		end
 		return stack:get_count()
 	end,
-	
+
 	allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 		if to_list == "filter" then
 			local inv = minetest.get_inventory({type="node", pos=pos})
@@ -133,27 +133,29 @@ minetest.register_node("hopper:sorter", {
 		elseif from_list == "filter" then
 			local inv = minetest.get_inventory({type="node", pos=pos})
 			inv:set_stack(from_list, from_index, ItemStack(""))
-			return 0			
+			return 0
 		end
 		return count
 	end,
-	
+
 	on_metadata_inventory_put = function(pos, listname, index, stack, player)
+		--[[
 		minetest.log("action", S("@1 moves stuff to sorter at @2",
 			player:get_player_name(), minetest.pos_to_string(pos)))
+		]]
 
 		local timer = minetest.get_node_timer(pos)
 		if not timer:is_started() then
 			timer:start(1)
-		end		
+		end
 	end,
-	
+
 	on_timer = function(pos, elapsed)
 		local meta = minetest.get_meta(pos);
 		local inv = meta:get_inventory()
 
 		-- build a filter list
-		local filter_items = nil		
+		local filter_items = nil
 		if meta:get_string("filter_all") ~= "true" then
 			filter_items = {}
 			local filter_inv_size = inv:get_size("filter")
@@ -165,7 +167,7 @@ minetest.register_node("hopper:sorter", {
 				end
 			end
 		end
-		
+
 		local node = minetest.get_node(pos)
 		local dir = minetest.facedir_to_dir(node.param2)
 		local default_destination_pos = vector.add(pos, dir)
@@ -182,7 +184,7 @@ minetest.register_node("hopper:sorter", {
 		end
 
 		local success = false
-		
+
 		local filter_destination_node = minetest.get_node(filter_destination_pos)
 		local registered_inventories = hopper.get_registered_inventories_for(filter_destination_node.name)
 		if registered_inventories ~= nil then
@@ -194,7 +196,7 @@ minetest.register_node("hopper:sorter", {
 		else
 			success = hopper.send_item_to(pos, filter_destination_pos, filter_destination_node, nil, filter_items)
 		end
-		
+
 		if not success then -- weren't able to put something in the filter destination, for whatever reason. Now we can start moving stuff forward to the default.
 			local default_destination_node = minetest.get_node(default_destination_pos)
 			local registered_inventories = hopper.get_registered_inventories_for(default_destination_node.name)
@@ -208,7 +210,7 @@ minetest.register_node("hopper:sorter", {
 				hopper.send_item_to(pos, default_destination_pos, default_destination_node)
 			end
 		end
-		
+
 		if not inv:is_empty("main") then
 			minetest.get_node_timer(pos):start(1)
 		end

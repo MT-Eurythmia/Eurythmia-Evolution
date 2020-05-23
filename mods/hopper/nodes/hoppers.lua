@@ -39,7 +39,7 @@ local hopper_on_place = function(itemstack, placer, pointed_thing, node_name)
 		end
 		returned_stack, success = minetest.item_place_node(ItemStack(node_name), placer, pointed_thing)
 	end
-	
+
 	if success then
 		local meta = minetest.get_meta(pos2)
 		meta:set_string("placer", placer:get_player_name())
@@ -116,6 +116,7 @@ minetest.register_node("hopper:hopper", {
 			"hopper_formspec:"..minetest.pos_to_string(pos), get_hopper_formspec(pos))
 	end,
 
+	--[[
 	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 		minetest.log("action", S("@1 moves stuff in hopper at @2",
 			player:get_player_name(), minetest.pos_to_string(pos)))
@@ -130,6 +131,7 @@ minetest.register_node("hopper:hopper", {
 		minetest.log("action", S("@1 moves stuff from hopper at @2",
 			player:get_player_name(), minetest.pos_to_string(pos)))
 	end,
+	]]
 })
 
 local hopper_side_drop
@@ -185,7 +187,7 @@ minetest.register_node("hopper:hopper_side", {
 			{-0.7, -0.3, -0.15, 0.15, 0.0, 0.15},
 		},
 	},
-	
+
 	on_construct = function(pos)
 		local inv = minetest.get_meta(pos):get_inventory()
 		inv:set_size("main", 4*4)
@@ -194,7 +196,7 @@ minetest.register_node("hopper:hopper_side", {
 	on_place = function(itemstack, placer, pointed_thing)
 		return hopper_on_place(itemstack, placer, pointed_thing, "hopper:hopper_side")
 	end,
-	
+
 	can_dig = function(pos,player)
 		local inv = minetest.get_meta(pos):get_inventory()
 		return inv:is_empty("main")
@@ -208,6 +210,7 @@ minetest.register_node("hopper:hopper_side", {
 			"hopper_formspec:"..minetest.pos_to_string(pos), get_hopper_formspec(pos))
 	end,
 
+	--[[
 	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 		minetest.log("action", S("@1 moves stuff in hopper at @2",
 			player:get_player_name(), minetest.pos_to_string(pos)))
@@ -222,4 +225,5 @@ minetest.register_node("hopper:hopper_side", {
 		minetest.log("action", S("@1 moves stuff from hopper at @2",
 			player:get_player_name(), minetest.pos_to_string(pos)))
 	end,
+	]]
 })
