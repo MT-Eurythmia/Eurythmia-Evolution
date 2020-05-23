@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/minetest-mods/hopper.git
+	branch = master
+	commit = 6525e577fb580657eaeb247cd0ed290b0c296bc0
+	parent = 333a359f89b67570b6b326b60da9a765cf1a11d0
+	method = merge
+	cmdver = 0.4.1
