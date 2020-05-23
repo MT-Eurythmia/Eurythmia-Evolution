@@ -44,6 +44,10 @@ gravelsieve = {
 
 dofile(minetest.get_modpath("gravelsieve") .. "/hammer.lua")
 
+gravelsieve.blacklisted_ores = {
+	["default:stone_with_gold"] = true,
+}
+
 local settings_get
 if minetest.setting_get then
 	settings_get = minetest.setting_get
@@ -94,7 +98,7 @@ end
 -- collect all registered ores and calculate the probability
 local function add_ores()
 	for _,item in  pairs(minetest.registered_ores) do
-		if minetest.registered_nodes[item.ore] then
+		if minetest.registered_nodes[item.ore] and not gravelsieve.blacklisted_ores[item.ore] then
 			local drop = minetest.registered_nodes[item.ore].drop
 			if type(drop) == "string"
 			and drop ~= item.ore
