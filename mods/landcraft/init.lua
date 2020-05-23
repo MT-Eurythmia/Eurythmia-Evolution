@@ -1,10 +1,14 @@
 -- cobble -> gravel -> sand
+
+-- Thanks to the gravelsieve, the gravel craft is no longer necessary
+--[[
 minetest.register_craft({
 	output = "default:gravel",
 	recipe = {
 		{"default:cobble"},
 	}
 })
+]]
 minetest.register_craft({
 	output = "default:sand",
 	recipe = {
