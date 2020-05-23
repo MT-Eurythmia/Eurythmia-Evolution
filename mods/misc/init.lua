@@ -637,3 +637,13 @@ if minetest.get_modpath("farming") then
 		recipe = {"bucket:bucket_water"}
 	})
 end
+
+--[[
+Hopper: add shared chests compability
+]]
+if minetest.get_modpath("hopper") then
+	hopper:add_container({
+		{"bottom", "chesttools:shared_chest", "main"},
+		{"side", "chesttools:shared_chest", "main"},
+	})
+end
