@@ -379,7 +379,7 @@ if pipeworks.enable_node_breaker then
 	minetest.register_craft({
 		output = "pw_like:nodebreaker_off",
 		recipe = {
-			{ "group:wood", "group:wood",   "group:wood"    },
+			{ "group:wood", "default:pick_mese",   "group:wood"    },
 			{ "default:stone", "mesecons:piston",   "default:stone" },
 			{ "group:wood",    "mesecons:mesecon",  "group:wood" },
 		}
