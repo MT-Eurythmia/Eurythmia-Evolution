@@ -73,7 +73,7 @@ local getarea = function (pos,radius)
 	-- nearer the centre, greater chance of capturing a node
 	-- at the edges, minimal chance
 	-- for y, y-1 and y+1
-	
+
 	local nodeset = {}
 	for dy=-1,1 do
 	  for dx=-radius,radius do
@@ -265,7 +265,7 @@ minetest.register_tool("staffmagic:staff_clone", {
 			endpos,
                         {"air","default:water_source","default:lava_source","default:river_water_source"}
 		)
-		
+
 		vivarium:bomf({x = (playerpos.x+pos.x)/2 , y = (playerpos.y+pos.y)/2 , z = (playerpos.z+pos.z)/2},4)
 
                 for _,fpos in pairs(airnodes) do
@@ -299,7 +299,7 @@ minetest.register_tool("staffmagic:staff_sending",{
 				if distance > 30 then -- TODO this should be function of powerups
 					distance = 30
 				end
-				
+
 				local count = 10
 				while (vector.distance(playerpos,newpos) < distance/2) and count > 0 do
 					local airnodes = minetest.find_nodes_in_area(
@@ -434,82 +434,6 @@ minetest.register_tool("staffmagic:staff_boom", {
 
 	end,
 })
-
--- quick and dirty tool to repair carnage caused by NSSM ice mobs
-minetest.register_tool("staffmagic:staff_melt", {
-	description = "Staff of Melting (Fix Ice Mobs damage)",
-	inventory_image = "staffmagic_staff.png^[colorize:blue:90",
-	wield_image = "staffmagic_staff.png^[colorize:blue:90",
-	range = 12,
-	stack_max = 1,
-	on_use = function(itemstack, user, pointed_thing)
-
-		if pointed_thing.type ~= "node" then
-			return
-		end
-
-		local pos = pointed_thing.under
-		local pname = user:get_player_name()
-
-		if minetest.is_protected(pos, pname) then
-			minetest.record_protection_violation(pos, pname)
-			return
-		end
-
-
-		local breadth = 2 -- full square is 2*breadth+1 on side
-                local frostarea = minetest.find_nodes_in_area(
-                        {x = pos.x - breadth, y = pos.y, z = pos.z - breadth},
-                        {x = pos.x + breadth, y = pos.y, z = pos.z + breadth},
-                        {"default:ice"}
-		)
-
-		vivarium:bomf(pos,breadth*2)
-
-                for _,fpos in pairs(frostarea) do
-			local oldmeta = minetest.get_meta(fpos)
-			if oldmeta and oldmeta:get_string("nssm") ~= "" then
-				minetest.swap_node(fpos, {name = oldmeta:get_string("nssm") }) -- the meta data is otherwise already there
-			else -- node saving not enabled
-				local targetnode = minetest.get_node({x=fpos.x,y=fpos.y-1,z=fpos.z})
-				local replname = targetnode.name
-				if replname == "default:ice" or replname == "default:snowblock" then
-					local newreplname = minetest.get_node({x=fpos.x,y=fpos.y+1,z=fpos.z}).name
-					if newreplname ~= "air" then --  don't dig down so much
-						-- TODO if replname == air, then get average node around  that is not air, use that
-						replname = newreplname
-					end
-				end
-				local sealevel = tonumber(minetest.setting_get("water_level") ) or 0
-				if fpos.y > 0 and replname == "default:water_source" then -- don't bother with water above sea level
-					replname = "air"
-				end
-				--minetest.chat_send_all("Replicating "..replname)
-				if staffmagic:isforbidden(replname) then
-					staffmagic:hurtplayer(user)
-					return
-				end
-				minetest.swap_node(fpos, {name = replname })
-			end
-		end
-
-		itemstack = staffmagic:wearitem(itemstack,50)
-		return itemstack
-
-	end,
-})
-
-
-minetest.register_craft(
-{
-	output = "staffmagic:staff_melt",
-	recipe = {
-		{"default:mese_crystal_fragment","bucket:bucket_water","default:mese_crystal_fragment"},
-		{"","default:obsidian_shard",""},
-		{"","default:obsidian_shard",""},
-	}
-}
-)
 
 minetest.register_craft(
 {
