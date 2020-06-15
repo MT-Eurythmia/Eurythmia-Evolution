@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://gitlab.com/VanessaE/basic_signs.git
 	branch = master
-	commit = 896a1935a6ca4a36737d49d335c53b8f53356718
-	parent = d46171d105e29969a52445012b06b097a51e8956
+	commit = 29c8051b96dbb04896fe9a40e0c745f9e31245a8
+	parent = d6da2dd3d6224cda1383c9da1b432bdaa539c031
 	method = merge
-	cmdver = 0.4.0
+	cmdver = 0.4.1
