@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://notabug.org/TenPlus1/bakedclay.git
 	branch = master
-	commit = b7b3b98003a7869c606c97e17683016177711ba0
-	parent = a9fcf04355589272091556cf68d0bca63d1bb563
+	commit = dd7749131cd4c5878c58dbae90df0a72f0dfba64
+	parent = e448f6f820b1275a32bcd6c38b08cb8855486af2
 	method = merge
 	cmdver = 0.4.1
