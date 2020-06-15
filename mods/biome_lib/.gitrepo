@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://gitlab.com/VanessaE/biome_lib
 	branch = master
-	commit = 5a910875af5b3f21ef5b51061e867e29e43529ee
-	parent = cbb3cd5af567ddca9b1e3bcdfb7005f7d6a32b01
+	commit = 10a108976778e1ef5640c241d625a056428ce689
+	parent = 4362fe7d21008cc6fad4f20456955c679c7204e2
 	method = merge
 	cmdver = 0.4.1
