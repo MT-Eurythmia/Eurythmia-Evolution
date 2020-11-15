@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://notabug.org/TenPlus1/mobs_water.git
 	branch = master
-	commit = a9a5fb521a8a0d5234130919ee7eca4dc59f9436
-	parent = cbdfd89be6a54609f44ca6d625f223c91d9df05c
+	commit = 6dc26b1f5f964c4d604be9d37abd563d3d500208
+	parent = e6a35be3368da1c23f84e372b9f4c0a2b51e20ce
 	method = merge
 	cmdver = 0.4.1
