@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/ShadowNinja/areas.git
 	branch = master
-	commit = 142a723eb247e91b0d702f4b6752c42b45bab2d8
-	parent = 38b4e9d26b6e1be60eef3d022b0b5b8163b0877c
+	commit = 4018c0d20450a106b3bda6627894b130595a7cd6
+	parent = 8ba7f5f3afc29e1e01821f6c27d36774a28d0ac7
 	cmdver = 0.4.1
 	method = merge
