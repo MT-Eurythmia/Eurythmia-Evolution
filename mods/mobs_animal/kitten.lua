@@ -52,7 +52,10 @@ stepheight = 1.1,
 		stoodup_start = 0,
 		stoodup_end = 0,
 	},
-	follow = {"mobs_animal:rat", "ethereal:fish_raw", "mobs_fish:clownfish", "mobs_fish:tropical"},
+	follow = {
+		"mobs_animal:rat", "ethereal:fish_raw", "mobs_fish:clownfish",
+		"mobs_fish:tropical", "xocean:fish_edible"
+	},
 	view_range = 8,
 
 	on_rightclick = function(self, clicker)
@@ -112,6 +115,7 @@ if minetest.get_modpath("ethereal") then
 	spawn_on = "ethereal:grove_dirt"
 end
 
+if not mobs.custom_spawn_animal then
 mobs:spawn({
 	name = "mobs_animal:kitten",
 	nodes = {spawn_on},
@@ -123,6 +127,7 @@ mobs:spawn({
 	max_height = 50,
 	day_toggle = true,
 })
+end
 
 
 mobs:register_egg("mobs_animal:kitten", S("Kitten"), "mobs_kitten_inv.png", 0)

@@ -46,6 +46,7 @@ mobs:register_mob("mobs_animal:bee", {
 --	end,
 })
 
+if not mobs.custom_spawn_animal then
 mobs:spawn({
 	name = "mobs_animal:bee",
 	nodes = {"group:flower"},
@@ -56,6 +57,7 @@ mobs:spawn({
 	max_height = 200,
 	day_toggle = true,
 })
+end
 
 mobs:register_egg("mobs_animal:bee", S("Bee"), "mobs_bee_inv.png")
 

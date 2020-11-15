@@ -63,15 +63,16 @@ local spawn_on = {"default:dirt_with_grass"}
 local spawn_by = {"group:grass"}
 
 if minetest.get_mapgen_setting("mg_name") ~= "v6" then
-	spawn_on = {"default:dirt_with_dry_grass"}
+	spawn_on = {"default:dirt_with_dry_grass", "default:dry_dirt_with_dry_grass"}
 	spawn_by = {"group:dry_grass"}
 end
 
 if minetest.get_modpath("ethereal") then
 	spawn_on = {"ethereal:mushroom_dirt"}
-	spawn_by = {"flowers:mushroom_brown", "flowers:mushroom_brown"}
+	spawn_by = {"flowers:mushroom_brown", "flowers:mushroom_red"}
 end
 
+if not mobs.custom_spawn_animal then
 mobs:spawn({
 	name = "mobs_animal:pumba",
 	nodes = spawn_on,
@@ -83,7 +84,7 @@ mobs:spawn({
 	max_height = 200,
 	day_toggle = true,
 })
-
+end
 
 mobs:register_egg("mobs_animal:pumba", S("Warthog"), "mobs_pumba_inv.png")
 
