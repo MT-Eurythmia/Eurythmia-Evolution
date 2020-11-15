@@ -59,6 +59,10 @@ sban = {}
 ### Settings ###
 ################
 ]]
+
+-- db
+db:busy_timeout(50)
+
 -- minetest.conf
 if minetest.settings then
 	expiry = minetest.settings:get("sban.ban_max")
@@ -855,6 +859,10 @@ local function create_ban_record(name, source, reason, expires)
 
 	-- kick all player names associated with the id
 	local r = name_records(id)
+	if #r < 1 then -- sanity check for timeout
+		r[1] = {name = name}
+		minetest.log('warning', db:errmsg())
+	end
 	for i, v in ipairs(r) do
 		player = minetest.get_player_by_name(v.name)
 		if player then
@@ -1190,7 +1198,7 @@ if importer then -- always true for first run
 		local dbi, err = load_xban(filename)
 		local id = ID
 		if err then
-			minetest.log("info", err)
+			minetest.log("warning", err)
 			return
 		end
 		-- reverse the contents
