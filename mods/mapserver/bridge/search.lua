@@ -39,14 +39,24 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 
 	if fields.teleport then
+		-- teleport player to selected item
 		if not minetest.check_player_privs(playername, "teleport") then
 			minetest.chat_send_player(playername, "Missing priv: 'teleport'")
 			return
 		end
 
-		local pos1 = vector.subtract(item.pos, {x=1, y=0, z=1})
-		local pos2 = vector.add(item.pos, {x=1, y=0, z=1})
+		-- flat destination coordinates per default
+		local pos1 = vector.subtract(item.pos, {x=2, y=0, z=2})
+		local pos2 = vector.add(item.pos, {x=2, y=0, z=2})
 
+		if item.type == "bones" then
+			-- search for air _above_ the bones
+			pos1 = vector.subtract(item.pos, {x=0, y=0, z=0})
+			pos2 = vector.add(item.pos, {x=0, y=10, z=0})
+		end
+
+		-- forceload target coordinates before searching for air
+		minetest.get_voxel_manip():read_from_map(pos1, pos2)
 		local nodes = minetest.find_nodes_in_area(pos1, pos2, "air")
 
 		if #nodes > 0 then
@@ -91,6 +101,7 @@ local function show_formspec(playername, data)
 		local coords = item.pos.x .. "/" .. item.pos.y .. "/" .. item.pos.z
 		local description = ""
 		local color = "#FFFFFF"
+		local add_to_list = true
 
 		-- don't trust any values in attributes, they might not be present
 		if item.type == "bones" then
@@ -102,23 +113,40 @@ local function show_formspec(playername, data)
 
 		elseif item.type == "shop" then
 			-- shop
-			description = minetest.formspec_escape("Shop, " ..
-				"trading " .. (item.attributes.out_count or "?") ..
-				"x " .. (item.attributes.out_item or "?") ..
-				" for " .. (item.attributes.in_count or "?") ..
-				"x " .. (item.attributes.in_item or "?") ..
-				" Stock: " .. (item.attributes.stock or "?")
-			)
 
 			if item.attributes.stock == "0" then
-				color = "#FF0000"
+				-- don't add empty vendors to the list
+				add_to_list = false
+			else
+				-- stocked shop
+				description = minetest.formspec_escape("Shop, " ..
+					"trading " .. (item.attributes.out_count or "?") ..
+					"x " .. (item.attributes.out_item or "?") ..
+					" for " .. (item.attributes.in_count or "?") ..
+					"x " .. (item.attributes.in_item or "?") ..
+					" Stock: " .. (item.attributes.stock or "?")
+				)
 			end
+
+		elseif item.type == "poi" then
+			-- point of interest
+			description = minetest.formspec_escape(
+				(item.attributes.name or "?") ..
+				" (owner: " .. (item.attributes.owner or "?") .. ")"
+			)
 		end
 
 		-- save description
 		item.description = description
 
-		list = list .. "," .. color .. "," .. distance .. "," .. (owner or "?") .. "," .. coords .. "," .. description
+		if add_to_list then
+			list = list .. "," ..
+				color .. "," ..
+				distance .. "," ..
+				(owner or "?") .. "," ..
+				coords .. "," ..
+				description
+		end
 
 	end
 
@@ -161,7 +189,7 @@ minetest.register_chatcommand("search", {
 
 		local _, _, type, query = string.find(param, "^([^%s]+)%s+([^%s]+)%s*$")
 		if type == nil or query == nil or not valid_types[type] then
-			minetest.chat_send_player(playername, "syntax: /search [bones|shop] [<query>|*]")
+			minetest.chat_send_player(playername, "syntax: /search [bones|shop|poi] [<query>|*]")
 			return
 		end
 
@@ -171,10 +199,21 @@ minetest.register_chatcommand("search", {
 		json = json .. '"pos2": {"x":2048, "y":2048, "z":2048},'
 		json = json .. '"type":"' .. type .. '"'
 
+		-- switch between types of queries
+		-- search for "out_item" if it is a shop or for "owner" if bones are wanted
+		local key_name = "unknown"
+		if type == "poi" then
+			key_name = "name"
+		elseif type == "bones" then
+			key_name = "owner"
+		elseif type == "shop" then
+			key_name = "out_item"
+		end
+
 		if query and query ~= "*" then
 			json = json .. ','
 			json = json .. '"attributelike":{'
-			json = json .. '"key":"out_item",'
+			json = json .. '"key":"' .. key_name .. '",'
 			json = json .. '"value":"%' .. query .. '%"'
 			json = json .. "}"
 		end
