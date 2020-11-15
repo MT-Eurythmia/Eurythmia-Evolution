@@ -7,7 +7,7 @@
 
 farming = {
 	mod = "redo",
-	version = "20200430",
+	version = "20200702",
 	path = minetest.get_modpath("farming"),
 	select = {
 		type = "fixed",
@@ -27,7 +27,9 @@ end
 local statistics = dofile(farming.path .. "/statistics.lua")
 
 -- Intllib
-local S = dofile(farming.path .. "/intllib.lua")
+local S = minetest.get_translator and minetest.get_translator("farming") or
+		dofile(farming.path .. "/intllib.lua")
+
 farming.intllib = S
 
 
@@ -80,7 +82,7 @@ end
 
 -- Growth Logic
 local STAGE_LENGTH_AVG = tonumber(
-		minetest.settings:get("farming_stage_length")) or 160
+		minetest.settings:get("farming_stage_length")) or 200 -- 160
 local STAGE_LENGTH_DEV = STAGE_LENGTH_AVG / 6
 
 
@@ -315,7 +317,7 @@ function farming.plant_growth_timer(pos, elapsed, node_name)
 
 	-- otherwise check for wet soil beneath crop
 	else
-		local under = minetest.get_node({ x = pos.x, y = pos.y - 1, z = pos.z })
+		local under = minetest.get_node({x = pos.x, y = pos.y - 1, z = pos.z})
 
 		if minetest.get_item_group(under.name, "soil") < 3 then
 			return true
@@ -582,7 +584,7 @@ farming.register_plant = function(name, def)
 			sounds = default.node_sound_leaves_defaults(),
 			minlight = def.minlight,
 			maxlight = def.maxlight,
-			next_plant = next_plant,
+			next_plant = next_plant
 		})
 	end
 
@@ -624,6 +626,8 @@ farming.pepper = 0.002
 farming.pineapple = 0.001
 farming.peas = 0.001
 farming.beetroot = 0.001
+farming.mint = 0.005
+farming.cabbage = 0.001
 farming.grains = true
 farming.rarety = 0.002
 
@@ -688,8 +692,10 @@ ddoo("peas.lua", farming.peas)
 ddoo("beetroot.lua", farming.beetroot)
 ddoo("chili.lua", farming.chili)
 ddoo("ryeoatrice.lua", farming.grains)
+ddoo("mint.lua", farming.mint)
+ddoo("cabbage.lua", farming.cabbage)
 
-dofile(farming.path.."/food.lua")
-dofile(farming.path.."/mapgen.lua")
-dofile(farming.path.."/compatibility.lua") -- Farming Plus compatibility
-dofile(farming.path.."/lucky_block.lua")
+dofile(farming.path .. "/food.lua")
+dofile(farming.path .. "/mapgen.lua")
+dofile(farming.path .. "/compatibility.lua") -- Farming Plus compatibility
+dofile(farming.path .. "/lucky_block.lua")
