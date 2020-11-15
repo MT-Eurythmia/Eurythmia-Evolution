@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://notabug.org/TenPlus1/bonemeal.git
 	branch = master
-	commit = bf7d9d6652724196fbb463eca2dc4ba809b0e286
-	parent = 328682153793cfc60fc64ba8bfe04bf627821f52
+	commit = 77c02f1b7a75568b921adea42be5386f83ec0fe1
+	parent = f113bd038ad6c8f1c07efd7354c95bbb81dd64f8
 	method = merge
 	cmdver = 0.4.1

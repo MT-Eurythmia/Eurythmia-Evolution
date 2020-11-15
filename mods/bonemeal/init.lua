@@ -6,12 +6,13 @@ local min, max, random = math.min, math.max, math.random
 
 
 -- Load support for intllib.
-local S, NS = dofile(path .. "/intllib.lua")
+local S = minetest.get_translator and minetest.get_translator("bonemeal") or
+		dofile(path .. "/intllib.lua")
 
 
 -- creative check
 local creative_mode_cache = minetest.settings:get_bool("creative_mode")
-function is_creative(name)
+function bonemeal.is_creative(name)
 	return creative_mode_cache or minetest.check_player_privs(name, {creative = true})
 end
 
@@ -494,7 +495,7 @@ minetest.register_craftitem("bonemeal:mulch", {
 		end
 
 		-- take item if not in creative
-		if not is_creative(user:get_player_name()) then
+		if not bonemeal.is_creative(user:get_player_name()) then
 			itemstack:take_item()
 		end
 
@@ -524,7 +525,7 @@ minetest.register_craftitem("bonemeal:bonemeal", {
 		end
 
 		-- take item if not in creative
-		if not is_creative(user:get_player_name()) then
+		if not bonemeal.is_creative(user:get_player_name()) then
 			itemstack:take_item()
 		end
 
@@ -554,7 +555,7 @@ minetest.register_craftitem("bonemeal:fertiliser", {
 		end
 
 		-- take item if not in creative
-		if not is_creative(user:get_player_name()) then
+		if not bonemeal.is_creative(user:get_player_name()) then
 			itemstack:take_item()
 		end
 
@@ -628,6 +629,16 @@ minetest.register_craft({
 		"group:tree", "group:leaves", "group:leaves",
 		"group:leaves", "group:leaves", "group:leaves",
 		"group:leaves", "group:leaves", "group:leaves"
+	}
+})
+
+minetest.register_craft({
+	type = "shapeless",
+	output = "bonemeal:mulch",
+	recipe = {
+		"group:seed", "group:seed", "group:seed",
+		"group:seed", "group:seed", "group:seed",
+		"group:seed", "group:seed", "group:seed"
 	}
 })
 
