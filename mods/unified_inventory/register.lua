@@ -76,9 +76,9 @@ unified_inventory.register_button("home_gui_go", {
 	action = function(player)
 		local player_name = player:get_player_name()
 		if minetest.check_player_privs(player_name, {home=true}) then
-			minetest.sound_play("teleport",
-				{to_player=player:get_player_name(), gain = 1.0})
-			unified_inventory.go_home(player)
+			if unified_inventory.go_home(player) then
+				minetest.sound_play("teleport", {to_player = player_name})
+			end
 		else
 			minetest.chat_send_player(player_name,
 				S("You don't have the \"home\" privilege!"))
@@ -386,7 +386,7 @@ unified_inventory.register_page("craftguide", {
 		else
 			-- Error
 			fs[#fs + 1] = string.format("label[2,%f;%s]",
-				formspecy, F(S("This recipe is too\nlarge to be displayed.")))
+				formspecy, F(S("This recipe is too@nlarge to be displayed.")))
 		end
 
 		if craft_type.uses_crafting_grid and display_size.width <= 3 then
