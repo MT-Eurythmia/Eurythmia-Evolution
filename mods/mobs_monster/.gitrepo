@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://notabug.org/TenPlus1/mobs_monster.git
 	branch = master
-	commit = 674afa91e577f240d29cce2f7d0256a46d8548ca
-	parent = 80fb4554934a3b63c9e6dabb9bfa25eb3478cf12
+	commit = 4018a5c8e83b26ff8a54d8ecf779e28011a384a7
+	parent = 193bf4411550983eee8d5f7a93d7ae0f4f22db84
 	method = rebase
 	cmdver = 0.4.1
