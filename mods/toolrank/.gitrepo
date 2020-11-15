@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/lisacvuk/minetest-toolranks.git
+	branch = master
+	commit = 12af618f9b66951b6da407be36c02b8e76c7f553
+	parent = e87b3fed9b99e65b6250b934b7f5c305ef4ad5df
+	method = merge
+	cmdver = 0.4.1
