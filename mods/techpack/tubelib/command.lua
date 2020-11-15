@@ -64,13 +64,16 @@ local Version = minetest.deserialize(storage:get_string("Version")) or 1
 
 local Number2Pos
 local Number2Data
+local TemporaryRemovedNodes
 if Version == 2 then -- legacy data base
 	Number2Pos = minetest.deserialize(storage:get_string("Number2Pos")) or {}
 	Number2Data = extract_data(Number2Pos)
+	TemporaryRemovedNodes = {}
 	Version = 3
 else
 	Number2Pos = deserialize(storage:get_string("Number2Pos"))
 	Number2Data = minetest.deserialize(storage:get_string("Number2Data")) or {}
+	TemporaryRemovedNodes = minetest.deserialize(storage:get_string("TemporaryRemovedNodes")) or {}
 end
 
 
@@ -82,6 +85,7 @@ local function update_mod_storage()
 	storage:set_string("Version", minetest.serialize(Version))
 	storage:set_string("Number2Pos", serialize(Number2Pos))
 	storage:set_string("Number2Data", minetest.serialize(Number2Data))
+	storage:set_string("TemporaryRemovedNodes", minetest.serialize(TemporaryRemovedNodes))
 	-- store data each hour
 	minetest.after(60*59, update_mod_storage)
 	t = minetest.get_us_time() - t
@@ -96,7 +100,7 @@ end)
 minetest.after(60*59, update_mod_storage)
 
 -- Key2Number will be generated at runtine
-local Key2Number = {} 
+local Key2Number = {}
 
 local Name2Name = {}		-- translation table
 
@@ -206,11 +210,12 @@ local function get_dest_node(pos, side)
 	local _,node = Tube:get_node(pos)
 	local dir = side_to_dir(side, node.param2)
 	local spos, sdir = Tube:get_connected_node_pos(pos, dir)
+	if not (spos and sdir) then return end
 	_,node = Tube:get_node(spos)
 	local out_side = dir_to_side(tubelib2.Turn180Deg[sdir], node.param2)
-	return spos, out_side, Name2Name[node.name] or node.name 
+	return spos, out_side, Name2Name[node.name] or node.name
 end
-	
+
 local function item_handling_node(name)
 	local node_def = name and tubelib_NodeDef[name]
 	if node_def then
@@ -221,7 +226,7 @@ end
 -------------------------------------------------------------------
 -- API helper functions
 -------------------------------------------------------------------
-	
+
 -- Check the given list of numbers.
 -- Returns true if number(s) is/are valid and point to real nodes.
 function tubelib.check_numbers(numbers)
@@ -234,7 +239,7 @@ function tubelib.check_numbers(numbers)
 		return true
 	end
 	return false
-end	
+end
 
 -- Function returns { pos, name } for the node on the given position number.
 function tubelib.get_node_info(dest_num)
@@ -242,7 +247,7 @@ function tubelib.get_node_info(dest_num)
 		return Number2Pos[dest_num]
 	end
 	return nil
-end	
+end
 
 -- Function returns the node number from the given position or
 -- nil, if no node number for this position is assigned.
@@ -256,14 +261,14 @@ function tubelib.get_node_number(pos)
 		end
 	end
 	return nil
-end	
+end
 
 -- Function is used for available nodes with lost numbers, only.
 function tubelib.get_new_number(pos, name)
-	-- store position 
+	-- store position
 	local number = get_number(pos)
 	Number2Pos[number] = {
-		pos = pos, 
+		pos = pos,
 		name = name,
 	}
 	return number
@@ -275,7 +280,8 @@ end
 -- param name: name of the data (string)
 -- param data: any data (number, string, table)
 function tubelib.set_data(number, name, data)
-	if Number2Data[number] and type(name) == "string" then
+	Number2Data[number] = Number2Data[number] or {}
+	if type(name) == "string" then
 		Number2Data[number]["u_"..name] = data
 	end
 end
@@ -293,7 +299,7 @@ end
 -------------------------------------------------------------------
 -- Node construction/destruction functions
 -------------------------------------------------------------------
-	
+
 -- Add node to the tubelib lists.
 -- Function determines and returns the node position number,
 -- needed for message communication.
@@ -301,10 +307,10 @@ function tubelib.add_node(pos, name)
 	if item_handling_node(name) then
 		Tube:after_place_node(pos)
 	end
-	-- store position 
+	-- store position
 	local number = get_number(pos)
 	Number2Pos[number] = {
-		pos = pos, 
+		pos = pos,
 		name = name,
 	}
 	return number
@@ -317,7 +323,7 @@ function tubelib.remove_node(pos)
 	if Number2Pos[number] then
 		name = Number2Pos[number].name
 		Number2Pos[number] = {
-			pos = pos, 
+			pos = pos,
 			name = nil,
 			time = minetest.get_day_count() -- used for reservation timeout
 		}
@@ -352,11 +358,11 @@ function tubelib.register_node(name, add_names, node_definition)
 	for _,n in ipairs(add_names) do
 		Name2Name[n] = name
 	end
-	if node_definition.on_pull_item or node_definition.on_push_item or 
+	if node_definition.on_pull_item or node_definition.on_push_item or
 			node_definition.is_pusher then
 		Tube:add_secondary_node_names({name})
 		Tube:add_secondary_node_names(add_names)
-		
+
 		tubelib.KnownNodes[name] = true
 		for _,n in ipairs(add_names) do
 			tubelib.KnownNodes[n] = true
@@ -387,7 +393,7 @@ function tubelib.send_message(numbers, placer_name, clicker_name, topic, payload
 			end
 		end
 	end
-end		
+end
 
 function tubelib.send_request(number, topic, payload)
 	if Number2Pos[number] and Number2Pos[number].name then
@@ -397,7 +403,7 @@ function tubelib.send_request(number, topic, payload)
 		end
 	end
 	return false
-end		
+end
 
 -- for defect nodes
 function tubelib.repair_node(pos)
@@ -426,10 +432,10 @@ function tubelib.push_items(pos, side, items, player_name)
 	local npos, nside, name = get_dest_node(pos, side)
 	if npos == nil then return end
 	if tubelib_NodeDef[name] and tubelib_NodeDef[name].on_push_item then
-		return tubelib_NodeDef[name].on_push_item(npos, nside, items, player_name)	
+		return tubelib_NodeDef[name].on_push_item(npos, nside, items, player_name)
 	elseif name == "air" then
 		minetest.add_item(npos, items)
-		return true 
+		return true
 	end
 	return false
 end
@@ -442,7 +448,7 @@ function tubelib.unpull_items(pos, side, items, player_name)
 	end
 	return false
 end
-	
+
 function tubelib.pull_stack(pos, side, player_name)
 	local npos, nside, name = get_dest_node(pos, side)
 	if npos == nil then return end
@@ -493,7 +499,7 @@ function tubelib.get_this_item(meta, listname, list_number, num_items)
 	if inv:is_empty(listname) then
 		return nil
 	end
-	
+
 	if num_items == nil then num_items = 1 end
 	local items = inv:get_stack(listname, list_number)
 	if items:get_count() > 0 then
@@ -548,7 +554,7 @@ function tubelib.get_stack(meta, listname)
 		taken:set_count(taken:get_count() + 1)
 		return taken
 	end
-	return item 
+	return item
 end
 
 -- Return "full", "loaded", or "empty" depending
@@ -567,7 +573,7 @@ function tubelib.fuelstate(meta, listname, item)
 		return "loaded"
 	end
 end
-	
+
 -- Return "full", "loaded", or "empty" depending
 -- on the inventory load.
 -- Full is returned, when no empty stack is available.
@@ -590,6 +596,22 @@ function tubelib.get_inv_state(meta, listname)
     return state
 end
 
+-- Mainly used for door/gate nodes
+-- To delete an entry, provide nil as number. The stored data will be returned.
+function tubelib.temporary_remove_node(pos, number, name, add_data)
+	local key = get_key_str(pos)
+	if number then
+		add_data = add_data or {}
+		add_data.pos = pos
+		add_data.number = number
+		add_data.name = name
+		TemporaryRemovedNodes[key] = add_data
+	else
+		local data = table.copy(TemporaryRemovedNodes[key])
+		TemporaryRemovedNodes[key] = nil
+		return data
+	end
+end
 
 -------------------------------------------------------------------------------
 -- Data Maintenance
@@ -621,41 +643,6 @@ local function get_node_number(pos)
 	return 0
 end
 
-local NodesWithoutNumber = {
-	["tubelib_addons2:doorblock1"] = true,
-	["tubelib_addons2:doorblock2"] = true,
-	["tubelib_addons2:doorblock3"] = true,
-	["tubelib_addons2:doorblock4"] = true,
-	["tubelib_addons2:doorblock5"] = true,
-	["tubelib_addons2:doorblock6"] = true,
-	["tubelib_addons2:doorblock7"] = true,
-	["tubelib_addons2:doorblock8"] = true,
-	["tubelib_addons2:doorblock9"] = true,
-	["tubelib_addons2:doorblock10"] = true,
-	["tubelib_addons2:doorblock11"] = true,
-	["tubelib_addons2:doorblock12"] = true,
-	["tubelib_addons2:doorblock13"] = true,
-	["tubelib_addons2:doorblock14"] = true,
-	["tubelib_addons2:gateblock1"] = true,
-	["tubelib_addons2:gateblock2"] = true,
-	["tubelib_addons2:gateblock3"] = true,
-	["tubelib_addons2:gateblock4"] = true,
-	["tubelib_addons2:gateblock5"] = true,
-	["tubelib_addons2:gateblock6"] = true,
-	["tubelib_addons2:gateblock7"] = true,
-	["tubelib_addons2:gateblock8"] = true,
-	["tubelib_addons2:gateblock9"] = true,
-	["tubelib_addons2:gateblock10"] = true,
-	["tubelib_addons2:gateblock11"] = true,
-	["tubelib_addons2:gateblock12"] = true,
-	["tubelib_addons2:gateblock13"] = true,
-	["tubelib_addons2:gateblock14"] = true,
-	["tubelib_addons2:gateblock15"] = true,
-	["tubelib_addons2:gateblock16"] = true,
-	["tubelib_addons2:gateblock17"] = true,
-	["tubelib_addons2:gateblock18"] = true,
-}
-
 local function data_maintenance()
 	minetest.log("info", "[Tubelib] Data maintenance started")
 	
@@ -669,21 +656,35 @@ local function data_maintenance()
 		cnt1 = cnt1 + 1
 		-- Is there a tubelib node?
 		if tubelib_NodeDef[name] then
-			local nnum = get_node_number(item.pos)
 			-- Does the number match?
-			if nnum == num or NodesWithoutNumber[name] then
+			local nnum = get_node_number(item.pos)
+			if nnum == num then
 				cnt2 = cnt2 + 1
 				-- Store again
 				Number2Pos[num] = item
 				-- Add node names which are not stored as file
 				Number2Pos[num].name = name
+				--print("added", num, name)
+			else
+				--print("wrong number", num, name)
+			end
+		else
+			local key = get_key_str(item.pos)
+			local data = TemporaryRemovedNodes[key]
+			if data then
+				cnt2 = cnt2 + 1
+				-- Store again
+				Number2Pos[data.number] = data
+				--print("restored", data.number, data.name)
+			else
+				--print("no data", num)
 			end
 		end
 	end
 	minetest.log("info", "[Tubelib] Data base shrank from "..cnt1.." to "..cnt2.." nodes")
 	minetest.log("info", "[Tubelib] Data maintenance finished")
-end	
-	
+end
+
 generate_Key2Number()
 
 -- maintain data after 2 seconds

@@ -75,16 +75,6 @@ local function aging(pos, meta)
 	end
 end
 
-local function after_dig_node(pos, oldnode, oldmetadata, digger)
-	local inv = minetest.get_inventory({type="player", name=digger:get_player_name()})
-	local cnt = oldmetadata.fields.tubelib_aging and tonumber(oldmetadata.fields.tubelib_aging) or 0
-	local is_defect = cnt > AGING_LEVEL1 and math.random(AGING_LEVEL2 / cnt) == 1
-	if is_defect then
-		inv:add_item("main", ItemStack("tubelib_addons3:pushing_chest_defect"))
-	else
-		inv:add_item("main", ItemStack("tubelib_addons3:pushing_chest"))
-	end
-end
 
 local function set_state(meta, state)
 	local number = meta:get_string("number")
@@ -153,6 +143,37 @@ local function formspec()
 	"listring[current_player;main]"
 end
 
+-- necessary function for a quick bugfix, doubles some code from local function "aging"
+local function defect(pos, meta)
+	minetest.get_node_timer(pos):stop()
+	local node = minetest.get_node(pos)
+	node.name = "tubelib_addons3:pushing_chest_defect"
+	minetest.swap_node(pos, node)
+	return true
+end	
+
+-- code duplication of method "NodeStates:on_dig_node" (node_states.lua)
+-- (in contrast to (all?) other tubelib nodes that can go defect class "NodeStates" isn't applied here)
+function on_dig_node(pos, node, player)
+	local meta = minetest.get_meta(pos)
+	local cnt = tonumber(meta:get_string("tubelib_aging"))
+	if (not cnt or cnt < 1) then
+		cnt = 1
+	end
+	
+	local is_defect = (cnt > AGING_LEVEL1) and ( math.random(math.max(1, math.floor(AGING_LEVEL2 / cnt))) == 1 )
+	
+	if is_defect then
+		defect(pos, meta) -- replace node with defect one 
+		node = minetest.get_node(pos) 
+	end
+	
+	
+	minetest.node_dig(pos, node, player) -- default behaviour (this function is called automatically if on_dig() callback isn't set)
+
+end
+
+
 minetest.register_node("tubelib_addons3:pushing_chest", {
 	description = "HighPerf Pushing Chest",
 	tiles = {
@@ -200,8 +221,10 @@ minetest.register_node("tubelib_addons3:pushing_chest", {
 		return inv:is_empty("main") and inv:is_empty("shift")
 	end,
 
-	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		after_dig_node(pos, oldnode, oldmetadata, digger)
+
+
+	on_dig = function(pos, node, player)
+		on_dig_node(pos, node, player)
 		tubelib.remove_node(pos)
 	end,
 
@@ -212,7 +235,6 @@ minetest.register_node("tubelib_addons3:pushing_chest", {
 	on_timer = shift_items,
 	on_rotate = screwdriver.disallow,
 	
-	drop = "",
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",

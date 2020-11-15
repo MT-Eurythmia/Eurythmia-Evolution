@@ -9,10 +9,10 @@
 	See LICENSE.txt for more information
 
 	reformer.lua
-	
+
 	The Reformer converts 4 Bio Gas items into one Bio Fuel item,
 	needed by Harvester and Quarry.
-	
+
 ]]--
 
 -- for lazy programmers
@@ -91,7 +91,8 @@ local function place_top(pos, facedir, placer)
 		return false
 	end
 	local node = minetest.get_node(pos)
-	if node.name ~= "air" then
+	local def  = minetest.registered_nodes[node.name]
+	if not def or not def.buildable_to then
 		return false
 	end
 	minetest.add_node(pos, {name="tubelib_addons1:reformer_top", param2=facedir})
@@ -172,39 +173,44 @@ minetest.register_node("tubelib_addons1:reformer", {
 		type = "fixed",
 		fixed = { -8/16, -8/16, -8/16,   8/16, 24/16, 8/16 },
 	},
-	
+
 	on_construct = function(pos)
 		local meta = M(pos)
 		local inv = meta:get_inventory()
 		inv:set_size('src', 9)
 		inv:set_size('dst', 9)
 	end,
-	
+
 	after_place_node = function(pos, placer)
 		local facedir = minetest.dir_to_facedir(placer:get_look_dir(), false)
-		if place_top({x=pos.x, y=pos.y+1, z=pos.z}, facedir, placer) == false then
+		if place_top({x=pos.x, y=pos.y+1, z=pos.z}, facedir, placer) then
+			local number = tubelib.add_node(pos, "tubelib_addons1:reformer")
+			State:node_init(pos, number)
+		else
 			minetest.remove_node(pos)
+			minetest.chat_send_player(placer:get_player_name(), "Reformer will not fit there")
+			return true
+		end
+	end,
+
+	-- the reformer needs 'on_dig' to be able to remove the upper node
+	on_dig = function(pos, node, puncher)
+		local pos_above = vector.add(pos, vector.new(0, 1, 0))
+		local player_name = puncher:get_player_name()
+
+		if minetest.is_protected(pos, player_name) or minetest.is_protected(pos_above, player_name) then
 			return
 		end
-		local number = tubelib.add_node(pos, "tubelib_addons1:reformer")
-		State:node_init(pos, number)
-	end,
-	
-	-- the reformer needs 'on_dig' to be able to remove the upper node
-	on_dig = function(pos, node, puncher, pointed_thing)
+
 		local meta = M(pos)
 		local inv = meta:get_inventory()
 		if inv:is_empty("dst") and inv:is_empty("src") then
-			minetest.node_dig(pos, node, puncher, pointed_thing)
-			minetest.remove_node({x=pos.x, y=pos.y+1, z=pos.z})
+			State:on_dig_node(pos, node, puncher)
+			tubelib.remove_node(pos)
+			minetest.remove_node(pos_above)
 		end
 	end,
-	
-	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		tubelib.remove_node(pos)
-		State:after_dig_node(pos, oldnode, oldmetadata, digger)
-	end,
-	
+
 	on_rotate = screwdriver.disallow,
 	on_timer = keep_running,
 	on_receive_fields = on_receive_fields,
@@ -212,7 +218,6 @@ minetest.register_node("tubelib_addons1:reformer", {
 	allow_metadata_inventory_move = allow_metadata_inventory_move,
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
 
-	drop = "",
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
@@ -238,39 +243,48 @@ minetest.register_node("tubelib_addons1:reformer_defect", {
 		type = "fixed",
 		fixed = { -8/16, -8/16, -8/16,   8/16, 24/16, 8/16 },
 	},
-	
+
 	on_construct = function(pos)
 		local meta = M(pos)
 		local inv = meta:get_inventory()
 		inv:set_size('src', 9)
 		inv:set_size('dst', 9)
 	end,
-	
+
 	after_place_node = function(pos, placer)
 		local facedir = minetest.dir_to_facedir(placer:get_look_dir(), false)
-		if place_top({x=pos.x, y=pos.y+1, z=pos.z}, facedir, placer) == false then
+		if place_top({x=pos.x, y=pos.y+1, z=pos.z}, facedir, placer) then
+			local number = tubelib.add_node(pos, "tubelib_addons1:reformer")
+			State:node_init(pos, number)
+			State:defect(pos, M(pos))
+		else
 			minetest.remove_node(pos)
-			return
+			minetest.chat_send_player(placer:get_player_name(), "Reformer will not fit there")
+			return true
 		end
-		local number = tubelib.add_node(pos, "tubelib_addons1:reformer")
-		State:node_init(pos, number)
-		State:defect(pos, M(pos))
 	end,
 
 	-- the reformer needs 'on_dig' to be able to remove the upper node
 	on_dig = function(pos, node, puncher, pointed_thing)
+		local pos_above = vector.add(pos, vector.new(0, 1, 0))
+		local puncher_name = puncher:get_player_name()
+
+		if minetest.is_protected(pos, puncher_name) or minetest.is_protected(pos_above, puncher_name) then
+			return
+		end
+
 		local meta = M(pos)
 		local inv = meta:get_inventory()
 		if inv:is_empty("dst") and inv:is_empty("src") then
 			minetest.node_dig(pos, node, puncher, pointed_thing)
-			minetest.remove_node({x=pos.x, y=pos.y+1, z=pos.z})
+			minetest.remove_node(pos_above)
 		end
 	end,
-	
+
 	after_dig_node = function(pos, oldnode, oldmetadata, digger)
 		tubelib.remove_node(pos)
 	end,
-	
+
 	on_rotate = screwdriver.disallow,
 	allow_metadata_inventory_put = allow_metadata_inventory_put,
 	allow_metadata_inventory_move = allow_metadata_inventory_move,
@@ -351,4 +365,4 @@ tubelib.register_node("tubelib_addons1:reformer", {"tubelib_addons1:reformer_def
 	on_node_repair = function(pos)
 		return State:on_node_repair(pos)
 	end,
-})	
+})

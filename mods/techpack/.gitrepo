@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/joe7575/techpack.git
 	branch = master
-	commit = 82fcfad1477d98426ba7ee1ee5b0bbed77251b0c
+	commit = 51fdab3c8ae478946554fb5cab9c047401c3fdd5
 	parent = 70f5e8fbb93aab429cea9729670a73116fda4f60
 	method = merge
 	cmdver = 0.4.1
