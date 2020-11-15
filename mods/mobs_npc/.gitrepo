@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://notabug.org/TenPlus1/mobs_npc.git
 	branch = master
-	commit = 5a774b677628c9e3d362ac7ca9ef029814bb8c50
-	parent = 949776402d187a1b754a2a65ec1672c51b80fd74
+	commit = 22afd23d7b4c791167d5fce5fcd6afd0fd66b07e
+	parent = b2b8f9f00daf887dfd7be144f9e3dc4c335e3132
 	method = rebase
 	cmdver = 0.4.1
