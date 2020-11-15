@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/more_chests.git
 	branch = master
-	commit = 939c7ea73de4cb1c672edea299093da43e612632
-	parent = cbe4f142868e375949f47f117a1b23af46b9b7b4
+	commit = cac8cddc6629e511ec04210a84fb9369d987da5b
+	parent = 581ceaaa004614a5e42fdacd524590c20ec31bcc
 	method = merge
 	cmdver = 0.4.1
