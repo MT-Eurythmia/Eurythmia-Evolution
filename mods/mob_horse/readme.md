@@ -5,7 +5,7 @@ There are three different horse textures (white, brown, black) which will spawn 
 
 ---
 ### Taming
-Horses can be tamed with 10x wheat or apples which then allows the player to pick up the horse using a lasso and ride by right-clicking with a saddle.
+Horses can be tamed with 10x wheat, apple, barley, oats of corn which then allows the player to pick up the horse using a lasso and ride by right-clicking with a saddle.
 
 ---
 ### Horseshoes

@@ -1,8 +1,8 @@
 
--- intllib
+-- Load support for intllib.
 local MP = minetest.get_modpath(minetest.get_current_modname())
-local S, NS = dofile(MP .. "/intllib.lua")
-
+local S = minetest.get_translator and minetest.get_translator("mob_horse") or
+		dofile(MP .. "/intllib.lua")
 
 -- 0.4.17 or 5.0 check
 local y_off = 20
@@ -18,9 +18,7 @@ local shoes = {
 	["mobs:horseshoe_diamond"] = {10, 6, 6, "mobs_horseshoe_diamondo.png"}
 }
 
-
 -- rideable horse
-
 mobs:register_mob("mob_horse:horse", {
 	type = "animal",
 	visual = "mesh",
@@ -47,7 +45,9 @@ mobs:register_mob("mob_horse:horse", {
 	fly = false,
 	walk_chance = 60,
 	view_range = 5,
-	follow = {"farming:wheat", "default:apple"},
+	follow = {
+		"farming:wheat", "default:apple", "farming:oat",
+		"farming:barley", "farming:corn"},
 	passive = true,
 	hp_min = 12,
 	hp_max = 16,
@@ -179,12 +179,8 @@ mobs:register_mob("mob_horse:horse", {
 
 				-- apply horseshoe overlay to current horse texture
 				if overlay then
-
-					local ov = self.base_texture
-
-					ov[1] = ov[1] .. "^" .. overlay
-
-					self.object:set_properties({textures = ov})
+					self.texture_mods = "^" .. overlay
+					self.object:set_texture_mod(self.texture_mods)
 				end
 
 				-- show horse speed and jump stats with shoes fitted
