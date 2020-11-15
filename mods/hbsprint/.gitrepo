@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/hbsprint.git
 	branch = master
-	commit = c3e00a68ba22152fcbbf560c7ea6043fd7bc4677
-	parent = b1f000e92214e02c676be6b8c901cec29e974eef
+	commit = 1fe580a21073976051351b4df6c86667bb8b3d98
+	parent = e29a60a2e35918f61e50132813832decf1b7438c
 	method = merge
 	cmdver = 0.4.1
