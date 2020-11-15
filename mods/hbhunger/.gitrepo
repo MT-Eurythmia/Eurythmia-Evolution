@@ -6,7 +6,7 @@
 [subrepo]
 	remote = git://repo.or.cz/minetest_hbhunger.git
 	branch = master
-	commit = 91d6d3de5dafc5381d5b03ce73614308cc250b96
-	parent = f85404cece67925c275db27731e0b5ab52c61953
+	commit = a92747cabc6e3ea1f76e802a12211898ff7d3141
+	parent = 26913f4c2b6eb6d7c15b7adf1f3be5ef2e5cb795
 	method = rebase
-	cmdver = 0.4.0
+	cmdver = 0.4.1
