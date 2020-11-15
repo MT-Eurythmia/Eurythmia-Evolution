@@ -38,9 +38,9 @@ end
 function default.node_sound_sand_defaults(table)
 	table = table or {}
 	table.footstep = table.footstep or
-			{name = "default_sand_footstep", gain = 0.12}
+			{name = "default_sand_footstep", gain = 0.05}
 	table.dug = table.dug or
-			{name = "default_sand_footstep", gain = 0.24}
+			{name = "default_sand_footstep", gain = 0.15}
 	table.place = table.place or
 			{name = "default_place_node", gain = 1.0}
 	default.node_sound_defaults(table)
@@ -50,9 +50,11 @@ end
 function default.node_sound_gravel_defaults(table)
 	table = table or {}
 	table.footstep = table.footstep or
-			{name = "default_gravel_footstep", gain = 0.4}
+			{name = "default_gravel_footstep", gain = 0.1}
+	table.dig = table.dig or
+			{name = "default_gravel_dig", gain = 0.35}
 	table.dug = table.dug or
-			{name = "default_gravel_footstep", gain = 1.0}
+			{name = "default_gravel_dug", gain = 1.0}
 	table.place = table.place or
 			{name = "default_place_node", gain = 1.0}
 	default.node_sound_defaults(table)
@@ -89,6 +91,18 @@ function default.node_sound_glass_defaults(table)
 			{name = "default_glass_footstep", gain = 0.5}
 	table.dug = table.dug or
 			{name = "default_break_glass", gain = 1.0}
+	default.node_sound_defaults(table)
+	return table
+end
+
+function default.node_sound_ice_defaults(table)
+	table = table or {}
+	table.footstep = table.footstep or
+			{name = "default_ice_footstep", gain = 0.3}
+	table.dig = table.dig or
+			{name = "default_ice_dig", gain = 0.5}
+	table.dug = table.dug or
+			{name = "default_ice_dug", gain = 0.5}
 	default.node_sound_defaults(table)
 	return table
 end
@@ -210,7 +224,12 @@ end
 function default.grow_papyrus(pos, node)
 	pos.y = pos.y - 1
 	local name = minetest.get_node(pos).name
-	if name ~= "default:dirt_with_grass" and name ~= "default:dirt" then
+	if name ~= "default:dirt" and
+			name ~= "default:dirt_with_grass" and
+			name ~= "default:dirt_with_dry_grass" and
+			name ~= "default:dirt_with_rainforest_litter" and
+			name ~= "default:dry_dirt" and
+			name ~= "default:dry_dirt_with_dry_grass" then
 		return
 	end
 	if not minetest.find_node_near(pos, 3, {"group:water"}) then
@@ -247,7 +266,17 @@ minetest.register_abm({
 minetest.register_abm({
 	label = "Grow papyrus",
 	nodenames = {"default:papyrus"},
-	neighbors = {"default:dirt", "default:dirt_with_grass"},
+	-- Grows on the dirt and surface dirt nodes of the biomes papyrus appears in,
+	-- including the old savanna nodes.
+	-- 'default:dirt_with_grass' is here only because it was allowed before.
+	neighbors = {
+		"default:dirt",
+		"default:dirt_with_grass",
+		"default:dirt_with_dry_grass",
+		"default:dirt_with_rainforest_litter",
+		"default:dry_dirt",
+		"default:dry_dirt_with_dry_grass",
+	},
 	interval = 14,
 	chance = 71,
 	action = function(...)
@@ -406,6 +435,51 @@ function default.register_fence_rail(name, def)
 	minetest.register_node(name, def)
 end
 
+--
+-- Mese post registration helper
+--
+
+function default.register_mesepost(name, def)
+	minetest.register_craft({
+		output = name .. " 4",
+		recipe = {
+			{'', 'default:glass', ''},
+			{'default:mese_crystal', 'default:mese_crystal', 'default:mese_crystal'},
+			{'', def.material, ''},
+		}
+	})
+
+	local post_texture = def.texture .. "^default_mese_post_light_side.png^[makealpha:0,0,0"
+	local post_texture_dark = def.texture .. "^default_mese_post_light_side_dark.png^[makealpha:0,0,0"
+	-- Allow almost everything to be overridden
+	local default_fields = {
+		wield_image = post_texture,
+		drawtype = "nodebox",
+		node_box = {
+			type = "fixed",
+			fixed = {
+				{-2 / 16, -8 / 16, -2 / 16, 2 / 16, 8 / 16, 2 / 16},
+			},
+		},
+		paramtype = "light",
+		tiles = {def.texture, def.texture, post_texture_dark, post_texture_dark, post_texture, post_texture},
+		light_source = default.LIGHT_MAX,
+		sunlight_propagates = true,
+		is_ground_content = false,
+		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+		sounds = default.node_sound_wood_defaults(),
+	}
+	for k, v in pairs(default_fields) do
+		if def[k] == nil then
+			def[k] = v
+		end
+	end
+
+	def.texture = nil
+	def.material = nil
+
+	minetest.register_node(name, def)
+end
 
 --
 -- Leafdecay
@@ -501,7 +575,7 @@ end
 
 
 --
--- Convert dirt to something that fits the environment
+-- Convert default:dirt to something that fits the environment
 --
 
 minetest.register_abm({
@@ -510,6 +584,7 @@ minetest.register_abm({
 	neighbors = {
 		"air",
 		"group:grass",
+		"group:dry_grass",
 		"default:snow",
 	},
 	interval = 6,
@@ -538,6 +613,8 @@ minetest.register_abm({
 			minetest.set_node(pos, {name = "default:dirt_with_snow"})
 		elseif minetest.get_item_group(name, "grass") ~= 0 then
 			minetest.set_node(pos, {name = "default:dirt_with_grass"})
+		elseif minetest.get_item_group(name, "dry_grass") ~= 0 then
+			minetest.set_node(pos, {name = "default:dirt_with_dry_grass"})
 		end
 	end
 })

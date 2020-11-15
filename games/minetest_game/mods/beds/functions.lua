@@ -75,12 +75,27 @@ local function lay_down(player, pos, bed_pos, state, skip)
 		player:set_eye_offset({x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
 		player:set_look_horizontal(math.random(1, 180) / 100)
 		player_api.player_attached[name] = false
-		player:set_physics_override(1, 1, 1)
+		player:set_physics_override({speed = 1, jump = 1, gravity = 1})
 		hud_flags.wielditem = true
 		player_api.set_animation(player, "stand" , 30)
 
 	-- lay down
 	else
+
+		-- Check if bed is occupied
+		for _, other_pos in pairs(beds.bed_position) do
+			if vector.distance(bed_pos, other_pos) < 0.1 then
+				minetest.chat_send_player(name, S("This bed is already occupied!"))
+				return false
+			end
+		end
+
+		-- Check if player is moving
+		if vector.length(player:get_velocity()) > 0.001 then
+			minetest.chat_send_player(name, S("You have to stop moving before going to bed!"))
+			return false
+		end
+
 		beds.pos[name] = pos
 		beds.bed_position[name] = bed_pos
 		beds.player[name] = 1
@@ -97,7 +112,7 @@ local function lay_down(player, pos, bed_pos, state, skip)
 			y = bed_pos.y + 0.07,
 			z = bed_pos.z + dir.z / 2
 		}
-		player:set_physics_override(0, 0, 0)
+		player:set_physics_override({speed = 0, jump = 0, gravity = 0})
 		player:set_pos(p)
 		player_api.player_attached[name] = true
 		hud_flags.wielditem = false
@@ -227,6 +242,19 @@ minetest.register_on_leaveplayer(function(player)
 				beds.kick_players()
 			end
 		end)
+	end
+end)
+
+minetest.register_on_dieplayer(function(player)
+	local name = player:get_player_name()
+	local in_bed = beds.player
+	local pos = player:get_pos()
+	local yaw = get_look_yaw(pos)
+
+	if in_bed[name] then
+		lay_down(player, nil, pos, false)
+		player:set_look_horizontal(yaw)
+		player:set_pos(pos)
 	end
 end)
 
