@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/playeranim.git
 	branch = master
-	commit = 41f23cf799c492a74aab9e53b3a71bab36e952ea
+	commit = 9dab03f544cd97e022423df605695e48326bb660
 	parent = 9d12ba58f76dcbb975349912ad7490c14c50445d
 	method = merge
 	cmdver = 0.4.1

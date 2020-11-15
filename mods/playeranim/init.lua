@@ -20,6 +20,24 @@ if not get_animation then
 	error("player_api.get_animation or default.player_get_animation is not found")
 end
 
+-- stop player_api from messing stuff up (since 5.3)
+if minetest.global_exists("player_api") then
+	minetest.register_on_mods_loaded(function()
+		for _, model in pairs(player_api.registered_models) do
+			if model.animations then
+				for _, animation in pairs(model.animations) do
+					animation.x = 0
+					animation.y = 0
+				end
+			end
+		end
+	end)
+
+	minetest.register_on_joinplayer(function(player)
+		player:set_local_animation(nil, nil, nil, nil, 0)
+	end)
+end
+
 local function get_animation_speed(player)
 	if player:get_player_control().sneak then
 		return ANIMATION_SPEED_SNEAK
