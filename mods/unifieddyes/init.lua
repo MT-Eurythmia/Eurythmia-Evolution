@@ -161,7 +161,8 @@ minetest.register_on_placenode(
 
 		if not def
 		  or not def.palette
-		  or def.after_place_node then
+		  or def.after_place_node
+		  or not placer then
 			return false
 		end
 
@@ -192,6 +193,7 @@ minetest.register_on_placenode(
 -- The complementary function:  strip-off the color if the node being dug is still white/neutral
 
 local function move_item(item, pos, inv, digger)
+  if not (digger and digger:is_player()) then return end
 	local creative = creative_mode or minetest.check_player_privs(digger, "creative")
 	if inv:room_for_item("main", item)
 	  and (not creative or not inv:contains_item("main", item, true)) then
@@ -203,7 +205,7 @@ local function move_item(item, pos, inv, digger)
 end
 
 function unifieddyes.on_dig(pos, node, digger)
-
+	if not digger then return end
 	local playername = digger:get_player_name()
 	if minetest.is_protected(pos, playername) then 
 		minetest.record_protection_violation(pos, playername)
@@ -1145,10 +1147,11 @@ minetest.register_tool("unifieddyes:airbrush", {
 
 		unifieddyes.player_last_right_clicked[player_name] = {pos = pos, node = node, def = def}
 
-		if not keys.sneak then
+		if (not keys.sneak) and def.on_rightclick then
+			return def.on_rightclick(pos, node, placer, itemstack, pointed_thing)
+		elseif not keys.sneak then
 			unifieddyes.show_airbrush_form(placer)
 		elseif keys.sneak then
-
 			if not pos or not def then return end
 			local newcolor = unifieddyes.color_to_name(node.param2, def)
 
