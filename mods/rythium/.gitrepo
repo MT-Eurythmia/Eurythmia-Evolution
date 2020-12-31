@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/mega-gigaMynetest/rythium.git
+	branch = main
+	commit = fbf1b954618e8fd657a095d5f038fb76ed5481d9
+	parent = 929ea4e2701bbda2bb442d7bd35b32328d58c354
+	method = merge
+	cmdver = 0.4.3
