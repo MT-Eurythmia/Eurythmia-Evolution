@@ -28,11 +28,19 @@ minetest.register_on_joinplayer(function(player)
 	-- Refill slot
 	local refill = minetest.create_detached_inventory(player_name.."refill", {
 		allow_put = function(inv, listname, index, stack, player)
-			if unified_inventory.is_creative(player_name) then
+			local name = stack:get_name()
+			local player_name = player:get_player_name()
+			if not unified_inventory.is_creative(player_name) then
+				return 0
+			elseif not unified_inventory.crafts_for.recipe[name] and not unified_inventory.crafts_for.usage[name] then
+				minetest.log("action", string.format("Player %s tried to refill uncraftable item %s using Unified Inventory.", player_name, name))
+				return 0
+			elseif minetest.get_item_group(name, "prevent_creative") ~= 0 then
+				minetest.log("action", string.format("Player %s tried to refill creative-prevented item %s using Unified Inventory.", player_name, name))
+				return 0
+			else
 				minetest.log("action", string.format("Player %s refilled item %s.", player_name, stack:get_name()))
 				return stack:get_count()
-			else
-				return 0
 			end
 		end,
 		on_put = function(inv, listname, index, stack, player)
@@ -152,6 +160,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			-- Creative page: Add entire stack to inventory
 			if not unified_inventory.crafts_for.recipe[clicked_item] and not unified_inventory.crafts_for.usage[clicked_item] then
 				minetest.log("action", string.format("Player %s tried to give themselves uncraftable item %s using Unified Inventory.", player_name, clicked_item))
+			elseif minetest.get_item_group(clicked_item, "prevent_creative") ~= 0 then
+				minetest.log("action", string.format("Player %s tried to give themselves creative-prevented item %s using Unified Inventory.", player_name, clicked_item))
 			else
 				local inv = player:get_inventory()
 				local stack = ItemStack(clicked_item)

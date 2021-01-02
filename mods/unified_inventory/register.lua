@@ -436,8 +436,11 @@ local function craftguide_giveme(player, formname, fields)
 	local output = unified_inventory.current_item[player_name]
 	if (not output) or (output == "") then return end
 
-	if not unified_inventory.crafts_for.recipe[output] and not unified_inventory.crafts_for.usage[outputt] then
+	if not unified_inventory.crafts_for.recipe[output] and not unified_inventory.crafts_for.usage[output] then
 		minetest.log("action", string.format("Player %s tried to give themselves uncraftable item %s using Unified Inventory.", player_name, output))
+		return
+	elseif minetest.get_item_group(output, "prevent_creative") ~= 0 then
+		minetest.log("action", string.format("Player %s tried to give themselves creative-prevented item %s using Unified Inventory.", player_name, output))
 		return
 	end
 

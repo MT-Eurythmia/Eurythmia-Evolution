@@ -647,3 +647,17 @@ if minetest.get_modpath("hopper") then
 		{"side", "chesttools:shared_chest", "main"},
 	})
 end
+
+--[[
+Prevent creative for all rythium nodes
+]]
+if minetest.get_modpath("rythium") then
+	for name, def in pairs(minetest.registered_items) do
+		if string.sub(name, 1, 8) == "rythium:" then
+			if not def.groups then
+				def.groups = {}
+			end
+			def.groups.prevent_creative = 1
+		end
+	end
+end

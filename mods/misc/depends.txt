@@ -18,3 +18,4 @@ mobs_animal?
 3d_armor?
 moreblocks?
 caverealms?
+rythium?
