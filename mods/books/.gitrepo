@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/everamzah/books.git
+	branch = master
+	commit = fa9c5507f5b04f4949d831e0819b5519c2f20208
+	parent = 6d028c00d9b62125badfbc233fb4376863583643
+	method = merge
+	cmdver = 0.4.1
