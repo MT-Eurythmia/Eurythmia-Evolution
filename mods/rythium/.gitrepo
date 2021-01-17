@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/mega-gigaMynetest/rythium.git
 	branch = main
-	commit = 5be5c638a5768c23b2784178b0a2430d5b8a3934
-	parent = ff4f21b237fe3c78cc6f4c909028a7d51ec3dcc8
+	commit = 2e844251f30881ffcd3d243af4737c9f34fcf451
+	parent = 703b1792792314c9b85723145e8c72ffe74eaa60
 	method = merge
 	cmdver = 0.4.1
