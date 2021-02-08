@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/hopper.git
 	branch = master
-	commit = 6525e577fb580657eaeb247cd0ed290b0c296bc0
+	commit = 6ac1b6195136eb2ad6961c744f67e9775b7f0fd6
 	parent = 333a359f89b67570b6b326b60da9a765cf1a11d0
 	method = merge
-	cmdver = 0.4.1
+	cmdver = 0.4.3
