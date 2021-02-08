@@ -27,19 +27,20 @@ local word_to_bright = {
 }
 
 local rules_alldir = {
-	{x =  0, y =  0, z = -1},  -- borrowed from lightstones
-	{x =  1, y =  0, z =  0},
-	{x = -1, y =  0, z =  0},
 	{x =  0, y =  0, z =  1},
-	{x =  1, y =  1, z =  0},
-	{x =  1, y = -1, z =  0},
-	{x = -1, y =  1, z =  0},
-	{x = -1, y = -1, z =  0},
+	{x = -1, y =  0, z =  0},
+	{x =  1, y =  0, z =  0},
+	{x =  0, y =  0, z = -1},  -- borrowed from lightstones
 	{x =  0, y =  1, z =  1},
-	{x =  0, y = -1, z =  1},
+	{x = -1, y =  1, z =  0},
+	{x =  0, y =  1, z =  0},
+	{x =  1, y =  1, z =  0},
 	{x =  0, y =  1, z = -1},
-	{x =  0, y = -1, z = -1},
+	{x =  0, y = -1, z =  1},
+	{x = -1, y = -1, z =  0},
 	{x =  0, y = -1, z =  0},
+	{x =  1, y = -1, z =  0},
+	{x =  0, y = -1, z = -1},
 }
 
 -- mesecons compatibility
@@ -430,7 +431,7 @@ for brightness_level = 0, 14 do
 
 		lighttex = {
 			name="homedecor_plasma_storm.png"..brightened,
-			animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=2.0},
+			animation={type="vertical_frames", aspect_w=48, aspect_h=48, length=2.0},
 		}
 	else
 		lighttex = "homedecor_plasma_lamp_off.png"
@@ -770,7 +771,7 @@ for _, light_brightn_name in ipairs({"off", "on"}) do
 	if onflag then
 		lighttex = {
 			name = "homedecor_plasma_ball_streamers.png",
-			animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=2.0},
+			animation={type="vertical_frames", aspect_w=48, aspect_h=48, length=2.0},
 		}
 	end
 
