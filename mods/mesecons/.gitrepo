@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/mesecons.git
 	branch = master
-	commit = 0d86f2c45eee3382e59652fce678d9c39a677d77
-	parent = 36921499a143b47659c9775725fbec3bfe7f8546
+	commit = 583d2c144165545f10a04075f1f215d829da1ab2
+	parent = 2f5bd3589060326b31e319f1b2cc450e4bd1d4b5
 	method = rebase
-	cmdver = 0.4.1
+	cmdver = 0.4.3
