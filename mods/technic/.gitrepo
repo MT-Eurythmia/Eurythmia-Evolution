@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/technic.git
 	branch = master
-	commit = d8fe9ad16caea0b99fef5bcce0c882e29ee468fc
-	parent = 34c52ca675db0a36aa352b1b9e1a8064970509d7
+	commit = 0f7810e53895f5742ab577559584539e6533a0dc
+	parent = 610996761a05487c3aaf9b23f24dcab086a8ad17
 	method = merge
-	cmdver = 0.4.1
+	cmdver = 0.4.3
