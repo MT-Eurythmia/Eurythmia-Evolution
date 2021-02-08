@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/minetest/minetest_game.git
+	branch = master
+	commit = aa9cc3931735a4ade09e83ffd76acdafcd697585
+	parent = f70f629c5ed31db8eae1c11fede81c40dd1dd17a
+	method = merge
+	cmdver = 0.4.3
