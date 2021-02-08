@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://gitlab.com/VanessaE/signs_lib.git
 	branch = master
-	commit = 1a6b9f38ff10026268ca83945a2f6e62116b212e
-	parent = 4cf4b52ccab45fe91410c97fd225d1d34b861328
+	commit = 8527f1d5b2a988492769580f63542061742aa3ba
+	parent = aba9cd0dcc9027d1b41525f35a9bad9eebd028c7
 	method = merge
-	cmdver = 0.4.1
+	cmdver = 0.4.3
