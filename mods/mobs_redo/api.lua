@@ -8,7 +8,7 @@ local use_cmi = minetest.global_exists("cmi")
 
 mobs = {
 	mod = "redo",
-	version = "20201029",
+	version = "20210206",
 	intllib = S,
 	invis = minetest.global_exists("invisibility") and invisibility or {}
 }
@@ -58,12 +58,14 @@ local mobs_drop_items = settings:get_bool("mobs_drop_items") ~= false
 local mobs_griefing = settings:get_bool("mobs_griefing") ~= false
 local spawn_protected = settings:get_bool("mobs_spawn_protected") ~= false
 local remove_far = settings:get_bool("remove_far_mobs") ~= false
+local mob_area_spawn = settings:get_bool("mob_area_spawn")
 local difficulty = tonumber(settings:get("mob_difficulty")) or 1.0
 local show_health = settings:get_bool("mob_show_health") ~= false
 local max_per_block = tonumber(settings:get("max_objects_per_block") or 99)
 local mob_nospawn_range = tonumber(settings:get("mob_nospawn_range") or 12)
 local active_limit = tonumber(settings:get("mob_active_limit") or 0)
 local mob_chance_multiplier = tonumber(settings:get("mob_chance_multiplier") or 1)
+local peaceful_player_enabled = settings:get_bool("enable_peaceful_player")
 local active_mobs = 0
 
 
@@ -111,6 +113,7 @@ local mob_class = {
 	light_damage_max = 15,
 	water_damage = 0,
 	lava_damage = 0,
+	air_damage = 0,
 	suffocation = 2,
 	fall_damage = 1,
 	fall_speed = -10, -- must be lower than -2 (default: -10)
@@ -276,10 +279,10 @@ function mob_class:set_velocity(v)
 		c_x, c_y = unpack(self:collision())
 	end
 
-	local yaw = (self.object:get_yaw() or 0) + self.rotate
+	local yaw = (self.object:get_yaw() or 0) + (self.rotate or 0)
 
 	-- nil check for velocity
-	v = v or 0
+	v = v or 0.01
 
 	-- check if standing in liquid with max viscosity of 7
 	local visc = min(minetest.registered_nodes[self.standing_in].liquid_viscosity, 7)
@@ -291,8 +294,8 @@ function mob_class:set_velocity(v)
 		v = v / (visc + 1)
 	end
 
-	-- set velocity with hard limit of 10
-	local vel = self.object:get_velocity()
+	-- set velocity
+	local vel = self.object:get_velocity() or 0
 
 	local new_vel = {
 		x = (sin(yaw) * -v) + c_x,
@@ -536,12 +539,10 @@ local ray_line_of_sight = function(self, pos1, pos2)
 	return true
 end
 
--- detect if using minetest 5.0 by searching for permafrost node
-local is_50 = minetest.registered_nodes["default:permafrost"]
 
 function mob_class:line_of_sight(pos1, pos2, stepsize)
 
-	if is_50 then -- only use if minetest 5.0 is detected
+	if minetest.raycast then -- only use if minetest 5.0 is detected
 		return ray_line_of_sight(self, pos1, pos2)
 	end
 
@@ -560,7 +561,7 @@ function mob_class:attempt_flight_correction(override)
 
 	-- We are not flying in what we are supposed to.
 	-- See if we can find intended flight medium and return to it
-	local pos = self.object:get_pos()
+	local pos = self.object:get_pos() ; if not pos then return true end
 	local searchnodes = self.fly_in
 
 	if type(searchnodes) == "string" then
@@ -569,7 +570,8 @@ function mob_class:attempt_flight_correction(override)
 
 	local flyable_nodes = minetest.find_nodes_in_area(
 		{x = pos.x - 1, y = pos.y - 1, z = pos.z - 1},
-		{x = pos.x + 1, y = pos.y + 1, z = pos.z + 1}, searchnodes)
+		{x = pos.x + 1, y = pos.y + 0, z = pos.z + 1}, searchnodes)
+		-- pos.y + 0 hopefully fixes floating swimmers
 
 	if #flyable_nodes < 1 then
 		return false
@@ -828,6 +830,11 @@ end
 -- check if mob is dead or only hurt
 function mob_class:check_for_death(cmi_cause)
 
+	-- We dead already
+	if self.state == "die" then
+		return true
+	end
+
 	-- has health actually changed?
 	if self.health == self.old_health and self.health > 0 then
 		return false
@@ -877,7 +884,7 @@ function mob_class:check_for_death(cmi_cause)
 	local pos = self.object:get_pos()
 
 	-- execute custom death function
-	if self.on_die then
+	if pos and self.on_die then
 
 		self:on_die(pos)
 
@@ -897,36 +904,47 @@ function mob_class:check_for_death(cmi_cause)
 
 		local frames = self.animation.die_end - self.animation.die_start
 		local speed = self.animation.die_speed or 15
-		local length = max(frames / speed, 0)
+		local length = max((frames / speed), 0)
+		local rot = self.animation.die_rotate and 5
 
 		self.attack = nil
+		self.following = nil
 		self.v_start = false
 		self.timer = 0
 		self.blinktimer = 0
 		self.passive = true
 		self.state = "die"
+		self.object:set_properties({
+			pointable = false, collide_with_objects = false,
+			automatic_rotate = rot, static_save = false
+		})
 		self:set_velocity(0)
 		self:set_animation("die")
 
 		minetest.after(length, function(self)
 
-			if use_cmi and self.object:get_luaentity() then
-				cmi.notify_die(self.object, cmi_cause)
+			if self.object:get_luaentity() then
+
+				if use_cmi then
+					cmi.notify_die(self.object, cmi_cause)
+				end
+
+				remove_mob(self, true)
 			end
-
-			remove_mob(self, true)
-
 		end, self)
-	else
+
+		return true
+
+	elseif pos then -- otherwise remove mod and show particle effect
 
 		if use_cmi then
 			cmi.notify_die(self.object, cmi_cause)
 		end
 
 		remove_mob(self, true)
-	end
 
-	effect(pos, 20, "tnt_smoke.png")
+		effect(pos, 20, "tnt_smoke.png")
+	end
 
 	return true
 end
@@ -1077,6 +1095,19 @@ function mob_class:do_env_damage()
 		self.health = self.health - nodef.damage_per_second
 
 		effect(pos, 5, "tnt_smoke.png")
+
+		if self:check_for_death({type = "environment",
+				pos = pos, node = self.standing_in}) then
+			return true
+		end
+	end
+
+	-- air damage
+	if self.air_damage ~= 0 and self.standing_in == "air" then
+
+		self.health = self.health - self.air_damage
+
+		effect(pos, 3, "bubble.png", 1, 1, 1, 0.2)
 
 		if self:check_for_death({type = "environment",
 				pos = pos, node = self.standing_in}) then
@@ -1290,16 +1321,20 @@ function mob_class:follow_holding(clicker)
 	return false
 end
 
+-- Thanks Wuzzy for the following editable settings
+local HORNY_TIME = 30
+local HORNY_AGAIN_TIME = 300
+local CHILD_GROW_TIME = 60 * 20 -- 20 minutes
 
 -- find two animals of same type and breed if nearby and horny
 function mob_class:breed()
 
-	-- child takes 240 seconds before growing into adult
+	-- child takes a long time before growing into adult
 	if self.child == true then
 
 		self.hornytimer = self.hornytimer + 1
 
-		if self.hornytimer > 240 then
+		if self.hornytimer > CHILD_GROW_TIME then
 
 			self.child = false
 			self.hornytimer = 0
@@ -1317,25 +1352,29 @@ function mob_class:breed()
 				self.on_grown(self)
 			else
 				-- jump when fully grown so as not to fall into ground
-				self.object:set_velocity({
-					x = 0,
-					y = self.jump_height,
-					z = 0
-				})
+--				self.object:set_velocity({
+--					x = 0,
+--					y = self.jump_height,
+--					z = 0
+--				})
+				local pos = self.object:get_pos() ; if not pos then return end
+				local ent = self.object:get_luaentity()
+				pos.y = pos.y + (ent.collisionbox[2] * -1) - 0.4
+				self.object:set_pos(pos)
 			end
 		end
 
 		return
 	end
 
-	-- horny animal can mate for 40 seconds,
-	-- afterwards horny animal cannot mate again for 200 seconds
+	-- horny animal can mate for HORNY_TIME seconds,
+	-- afterwards horny animal cannot mate again for HORNY_AGAIN_TIME seconds
 	if self.horny == true
-	and self.hornytimer < 240 then
+	and self.hornytimer < HORNY_TIME + HORNY_AGAIN_TIME then
 
 		self.hornytimer = self.hornytimer + 1
 
-		if self.hornytimer >= 240 then
+		if self.hornytimer >= HORNY_TIME + HORNY_AGAIN_TIME then
 			self.hornytimer = 0
 			self.horny = false
 		end
@@ -1343,7 +1382,7 @@ function mob_class:breed()
 
 	-- find another same animal who is also horny and mate if nearby
 	if self.horny == true
-	and self.hornytimer <= 40 then
+	and self.hornytimer <= HORNY_TIME then
 
 		local pos = self.object:get_pos()
 
@@ -1351,7 +1390,6 @@ function mob_class:breed()
 				"heart.png", 3, 4, 1, 0.1)
 
 		local objs = minetest.get_objects_inside_radius(pos, 3)
-		local num = 0
 		local ent
 
 		for n = 1, #objs do
@@ -1380,18 +1418,20 @@ function mob_class:breed()
 				end
 			end
 
-			if ent
+			-- found another similar horny animal that isn't self?
+			if ent and ent.object ~= self.object
 			and canmate == true
 			and ent.horny == true
-			and ent.hornytimer <= 40 then
-				num = num + 1
-			end
+			and ent.hornytimer <= HORNY_TIME then
 
-			-- found your mate? then have a baby
-			if num > 1 then
+				local pos2 = ent.object:get_pos()
 
-				self.hornytimer = 41
-				ent.hornytimer = 41
+				-- Have mobs face one another
+				yaw_to_pos(self, pos2)
+				yaw_to_pos(ent, self.object:get_pos())
+
+				self.hornytimer = HORNY_TIME + 1
+				ent.hornytimer = HORNY_TIME + 1
 
 				-- have we reached active mob limit
 				if active_limit > 0 and active_mobs >= active_limit then
@@ -1419,6 +1459,8 @@ function mob_class:breed()
 					else
 						effect(pos, 15, "tnt_smoke.png", 1, 2, 2, 15, 5)
 					end
+
+					pos.y = pos.y + 0.5 -- spawn child a little higher
 
 					local mob = minetest.add_entity(pos, self.name)
 					local ent2 = mob:get_luaentity()
@@ -1458,8 +1500,6 @@ function mob_class:breed()
 					ent2.tamed = true
 					ent2.owner = self.owner
 				end, self, ent)
-
-				num = 0
 
 				break
 			end
@@ -1815,6 +1855,23 @@ function mob_class:smart_mobs(s, p, dist, dtime)
 end
 
 
+-- peaceful player privilege support
+local function is_peaceful_player(player)
+
+	if peaceful_player_enabled then
+
+		local player_name = player:get_player_name()
+
+		if player_name
+		and minetest.check_player_privs(player_name, "peaceful_player") then
+			return true
+		end
+	end
+
+	return false
+end
+
+
 -- general attack function for all mobs
 function mob_class:general_attack()
 
@@ -1887,7 +1944,8 @@ function mob_class:general_attack()
 		-- choose closest player to attack that isnt self
 		if dist ~= 0
 		and dist < min_dist
-		and self:line_of_sight(sp, p, 2) == true then
+		and self:line_of_sight(sp, p, 2) == true
+		and not is_peaceful_player(player) then
 			min_dist = dist
 			min_player = player
 		end
@@ -2005,10 +2063,11 @@ function mob_class:follow_flop()
 			self.following = nil
 		end
 	else
-		-- stop following player if not holding specific item
+		-- stop following player if not holding specific item or mob is horny
 		if self.following
 		and self.following:is_player()
-		and self:follow_holding(self.following) == false then
+		and (self:follow_holding(self.following) == false
+		or self.horny) then
 			self.following = nil
 		end
 
@@ -2064,6 +2123,15 @@ function mob_class:follow_flop()
 		if not self:attempt_flight_correction() then
 
 			self.state = "flop"
+
+			-- do we have a custom on_flop function?
+			if self.on_flop then
+
+				if self:on_flop(self) then
+					return
+				end
+			end
+
 			self.object:set_velocity({x = 0, y = -5, z = 0})
 
 			self:set_animation("stand")
@@ -3011,6 +3079,7 @@ function mob_class:mob_staticdata()
 		if  t ~= "function"
 		and t ~= "nil"
 		and t ~= "userdata"
+		and _ ~= "object"
 		and _ ~= "_cmi_components" then
 			tmp[_] = self[_]
 		end
@@ -3263,6 +3332,8 @@ function mob_class:on_step(dtime, moveresult)
             }}
     }]]
 
+if self.state == "die" then return end ----------------
+
 	if use_cmi then
 		cmi.notify_step(self.object, dtime)
 	end
@@ -3462,6 +3533,7 @@ minetest.register_entity(name, setmetatable({
 	owner = def.owner,
 	order = def.order,
 	on_die = def.on_die,
+	on_flop = def.on_flop,
 	do_custom = def.do_custom,
 	jump_height = def.jump_height,
 	drawtype = def.drawtype, -- DEPRECATED, use rotate instead
@@ -3485,6 +3557,7 @@ minetest.register_entity(name, setmetatable({
 	light_damage_max = def.light_damage_max,
 	water_damage = def.water_damage,
 	lava_damage = def.lava_damage,
+	air_damage = def.air_damage,
 	suffocation = def.suffocation,
 	fall_damage = def.fall_damage,
 	fall_speed = def.fall_speed,
@@ -3635,9 +3708,6 @@ local can_spawn = function(pos, name)
 	end
 	end
 	end
-
-	-- spawn mob 1/2 node above ground
-	pos.y = pos.y + 0.5
 
 	-- tweak X/Z spawn pos
 	if width_x % 2 == 0 then
@@ -3903,10 +3973,32 @@ function mobs:spawn_specific(name, nodes, neighbors, min_light, max_light, inter
 			end
 		end
 
-		-- returns position if we have enough space to spawn mob
-		pos = can_spawn(pos, name)
+		local ent = minetest.registered_entities[name]
+
+		-- should we check mob area for obstructions ?
+		if mob_area_spawn ~= true then
+
+			-- do we have enough height clearance to spawn mob?
+			local height = max(0, ent.collisionbox[5] - ent.collisionbox[2])
+
+			for n = 0, floor(height) do
+
+				local pos2 = {x = pos.x, y = pos.y + n, z = pos.z}
+
+				if minetest.registered_nodes[node_ok(pos2).name].walkable == true then
+--print ("--- inside block", name, node_ok(pos2).name)
+					return
+				end
+			end
+		else
+			-- returns position if we have enough space to spawn mob
+			pos = can_spawn(pos, name)
+		end
 
 		if pos then
+
+			-- adjust for mob collision box
+			pos.y = pos.y + (ent.collisionbox[2] * -1) - 0.4
 
 			local mob = minetest.add_entity(pos, name)
 
@@ -4439,9 +4531,9 @@ function mobs:capture_mob(self, clicker, chance_hand, chance_net,
 				minetest.add_item(clicker:get_pos(), new_stack)
 			end
 
-			remove_mob(self, true)
-
 			self:mob_sound("default_place_node_hard")
+
+			remove_mob(self, true)
 
 			return new_stack
 
@@ -4547,8 +4639,11 @@ function mobs:feed_tame(self, clicker, feed_count, breed, tame)
 		-- make children grow quicker
 		if self.child == true then
 
-			self.hornytimer = self.hornytimer + 20
-
+--			self.hornytimer = self.hornytimer + 20
+			-- deduct 10% of the time to adulthood
+			self.hornytimer = self.hornytimer + (
+					(CHILD_GROW_TIME - self.hornytimer) * 0.1)
+print ("====", self.hornytimer)
 			return true
 		end
 
