@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/minetest-mods/maptools.git
 	branch = master
-	commit = d11b3a1caf2c8bac5621f3f211dc8a410129ad38
-	parent = 29eb14ecb847be121942bf7e5ece7c9fbf637fe9
+	commit = fd9476c1731e50ce02b89889058b0b8ca82f6916
+	parent = 30113c953be6ca44c3d37d3c265aae92a9a0256e
 	method = rebase
-	cmdver = 0.4.1
+	cmdver = 0.4.3
