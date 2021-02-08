@@ -71,13 +71,28 @@ mobs:register_mob("mobs_fish:clownfish", {
 	fall_speed = 0,
 	view_range = 8,
 	water_damage = 0,
+	air_damage = 1,
 	lava_damage = 5,
 	light_damage = 0,
 	animation = l_anims,
 	on_rightclick = function(self, clicker)
 		mobs:capture_mob(self, clicker, l_cc_hand, l_cc_net, 0, true,
 				"mobs_fish:clownfish")
-	end
+	end,
+	on_flop = function(self)
+
+--		print("=== am on land, help!", self.state)
+
+		self.object:set_acceleration({
+			x = math.random(-0.1, 0.1),
+			y = -10,
+			z = math.random(-0.1, 0.1)
+		})
+
+		self.object:set_velocity({x = 0, y = -10, z = 0})
+
+		return true
+	end,
 })
 
 mobs:spawn({
@@ -116,11 +131,26 @@ mobs:register_mob("mobs_fish:tropical", {
 	water_damage = 0,
 	lava_damage = 5,
 	light_damage = 0,
+	air_damage = 1,
 	animation = l_anims,
 	on_rightclick = function(self, clicker)
 		mobs:capture_mob(self, clicker, l_cc_hand, l_cc_net, 0, true,
 				"mobs_fish:tropical")
-	end
+	end,
+	on_flop = function(self)
+
+--		print("=== am on land, help!", self.state)
+
+		self.object:set_acceleration({
+			x = math.random(-0.1, 0.1),
+			y = -10,
+			z = math.random(-0.1, 0.1)
+		})
+
+		self.object:set_velocity({x = 0, y = -10, z = 0})
+
+		return true
+	end,
 })
 
 mobs:spawn({
