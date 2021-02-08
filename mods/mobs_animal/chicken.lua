@@ -302,7 +302,7 @@ minetest.register_craft({
 minetest.register_craftitem(":mobs:chicken_feather", {
 	description = S("Feather"),
 	inventory_image = "mobs_chicken_feather.png",
-	groups = {flammable = 2},
+	groups = {flammable = 2, feather = 1},
 })
 
 minetest.register_craft({

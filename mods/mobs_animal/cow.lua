@@ -188,11 +188,13 @@ minetest.register_craft({
 	type = "shapeless",
 	output = "mobs:bucket_milk",
 	recipe = {
-		"mobs:glass_milk", "mobs:glass_milk",
-		"mobs:glass_milk", "mobs:glass_milk",
+		"group:food_milk_glass", "group:food_milk_glass",
+		"group:food_milk_glass", "group:food_milk_glass",
 		"bucket:bucket_empty"
 	},
-	replacements = { {"mobs:glass_milk", "vessels:drinking_glass 4"} }
+	replacements = {
+		{"group:food_milk_glass", "vessels:drinking_glass 4"},
+	}
 })
 
 
@@ -241,16 +243,16 @@ minetest.register_node(":mobs:cheeseblock", {
 	description = S("Cheese Block"),
 	tiles = {"mobs_cheeseblock.png"},
 	is_ground_content = false,
-	groups = {crumbly = 3},
+	groups = {oddly_breakable_by_hand = 3},
 	sounds = default.node_sound_dirt_defaults()
 })
 
 minetest.register_craft({
 	output = "mobs:cheeseblock",
 	recipe = {
-		{"mobs:cheese", "mobs:cheese", "mobs:cheese"},
-		{"mobs:cheese", "mobs:cheese", "mobs:cheese"},
-		{"mobs:cheese", "mobs:cheese", "mobs:cheese"},
+		{"group:food_cheese", "group:food_cheese", "group:food_cheese"},
+		{"group:food_cheese", "group:food_cheese", "group:food_cheese"},
+		{"group:food_cheese", "group:food_cheese", "group:food_cheese"},
 	}
 })
 
