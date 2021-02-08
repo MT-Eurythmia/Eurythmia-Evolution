@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://notabug.org/TenPlus1/mob_horse.git
 	branch = master
-	commit = 0ddb46864547059027eb60c98af46cb018943f35
-	parent = 2d3e745fbcc7b0c4cb7bb8d4c9dba9abe1666bab
+	commit = 858167c386c08e180a82337114647ebf7b592a31
+	parent = ab2275735b97643d4b7ce918f055cb660312ee41
 	method = rebase
-	cmdver = 0.4.1
+	cmdver = 0.4.3

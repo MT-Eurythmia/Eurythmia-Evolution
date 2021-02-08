@@ -6,7 +6,7 @@ local S = minetest.get_translator and minetest.get_translator("mob_horse") or
 
 -- 0.4.17 or 5.0 check
 local y_off = 20
-if minetest.registered_nodes["default:permafrost"] then
+if minetest.features.object_independent_selectionbox then
 	y_off = 10
 end
 
@@ -104,6 +104,14 @@ mobs:register_mob("mob_horse:horse", {
 
 	end,
 
+	do_punch = function(self, hitter)
+
+		-- don't cut the branch you're... ah, that's not about that
+		if hitter ~= self.driver then
+			return true
+		end
+	end,
+
 	on_rightclick = function(self, clicker)
 
 		-- make sure player is clicking
@@ -121,8 +129,10 @@ mobs:register_mob("mob_horse:horse", {
 			return
 		end
 
+		local player_name = clicker:get_player_name()
+
 		-- make sure tamed horse is being clicked by owner only
-		if self.tamed and self.owner == clicker:get_player_name() then
+		if self.tamed and self.owner == player_name then
 
 			local inv = clicker:get_inventory()
 			local tool = clicker:get_wielded_item()
@@ -184,13 +194,15 @@ mobs:register_mob("mob_horse:horse", {
 				end
 
 				-- show horse speed and jump stats with shoes fitted
-				minetest.chat_send_player(clicker:get_player_name(),
+				minetest.chat_send_player(player_name,
 						S("Horse shoes fitted -")
 						.. S(" speed: ") .. speed
 						.. S(" , jump height: ") .. jump
 						.. S(" , stop speed: ") .. reverse)
 
-				tool:take_item() ; clicker:set_wielded_item(tool)
+				tool:take_item()
+
+				clicker:set_wielded_item(tool)
 
 				return
 			end
