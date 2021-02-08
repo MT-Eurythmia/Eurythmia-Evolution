@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/lisacvuk/minetest-toolranks.git
 	branch = master
-	commit = 12af618f9b66951b6da407be36c02b8e76c7f553
-	parent = e87b3fed9b99e65b6250b934b7f5c305ef4ad5df
+	commit = 8010feb5bfecd369c7a9353ac786bc6c83384174
+	parent = 1f557f6e618106467d510454db9f6deac32f0b86
 	method = merge
-	cmdver = 0.4.1
+	cmdver = 0.4.3
