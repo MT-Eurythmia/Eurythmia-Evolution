@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/joe7575/techpack.git
+	branch = master
+	commit = e1f9a8d4f6a2ed743a5fba7eced864550e814100
+	parent = 182e0c33266ff8957af1848a36bef5d07cede0cd
+	method = merge
+	cmdver = 0.4.3
