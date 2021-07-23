@@ -22,15 +22,13 @@ minetest.register_globalstep(function(dtime)
 	end
 
 	if os.date("%H:%M") == os.date("%H:%M", os.time(shutdown_time) - 10 * 60) then
-		minetest.chat_send_all("Info: the server will shutdown for power saving purposes in 10 minutes.")
-		minetest.chat_send_all("Info: le serveur va s'arrêter dans un but d'économie d'énergie dans 10 minutes.")
+		minetest.chat_send_all("Info: le serveur va redémarrer dans 10 minutes.")
 	elseif os.date("%H:%M") == os.date("%H:%M", os.time(shutdown_time) - 5 * 60) then
-		minetest.chat_send_all("Info: the server will shutdown for power saving purposes in 5 minutes.")
-		minetest.chat_send_all("Info: le serveur va s'arrêter dans un but d'économie d'énergie dans 5 minutes.")
+		minetest.chat_send_all("Info: le serveur va redémarrer dans 5 minutes.")
 	elseif os.date("%H:%M") == os.date("%H:%M", os.time(shutdown_time) - 60) then
-		minetest.chat_send_all("Info: the server will shutdown for power saving purposes in a minute.")
-		minetest.chat_send_all("Info: le serveur va s'arrêter dans un but d'économie d'énergie dans une minute.")
+		minetest.chat_send_all("Info: le serveur va redémarrer dans une minute.")
 	elseif os.date("%H:%M") == os.date("%H:%M", os.time(shutdown_time)) then
-		minetest.request_shutdown("Le serveur s'arrête ce soir dans un but d'économie d'énergie jusqu'à demain matin à 8:30.\nThe server is shutting down until tomorrow 8:30 AM for power saving purposes. Sorry for the inconvenience.", false)
+		minetest.request_shutdown("Le serveur redémarre.", false)
+		error("Redémarrage nocturne")
 	end
 end)
