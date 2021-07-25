@@ -28,7 +28,6 @@ minetest.register_globalstep(function(dtime)
 	elseif os.date("%H:%M") == os.date("%H:%M", os.time(shutdown_time) - 60) then
 		minetest.chat_send_all("Info: le serveur va redémarrer dans une minute.")
 	elseif os.date("%H:%M") == os.date("%H:%M", os.time(shutdown_time)) then
-		minetest.request_shutdown("Le serveur redémarre.", false)
 		error("Redémarrage nocturne")
 	end
 end)
